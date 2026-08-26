@@ -1,0 +1,30 @@
+# Unity standard
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
+/[Uu]ser[Ss]etting[Ss]/
+/[Mm]emoryCaptures/
+/ProjectSettings/ProjectVersion.txt
+/.vs/
+/.idea/
+
+# Visual Studio
+/*.csproj
+/*.unityproj
+/*.sln
+/*.suo
+/*.user
+/*.userprefs
+/*.pidb
+/*.booproj
+/*.svd
+/*.pdb
+/*.opendb
+/*.VC.db
+
+# OS
+.DS_Store
+Thumbs.db
