@@ -6,8 +6,16 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/SampleScene.unity
-    guid: 99c9720ab356a0642a771bea13969a05
-  m_configObjects:
-    com.unity.dt.app-ui: {fileID: 11400000, guid: 1b1c20d82303e4b5781c3ef50ac1449f, type: 2}
-    com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+    path: Assets/Projects/Demolition/Demolition_Scenes/Accueil_Demolition.unity
+    guid: 0ca2aed5d4168f941ad2bc0dec2346e4
+  - enabled: 1
+    path: Assets/Projects/Demolition/Demolition_Scenes/Menu_Demolition.unity
+    guid: 7b5eb5d69d8e6384389480e00999bc22
+  - enabled: 1
+    path: Assets/Projects/Demolition/Demolition_Scenes/GameScene_Demolition.unity
+    guid: 098a2d3b955f2feeef3efd34363c14c8
+  - enabled: 1
+    path: Assets/Projects/Demolition/Demolition_Scenes/Score_Demolition.unity
+    guid: 6d09b514587ad414fad3ad08ba492885  - enabled: 1
+    path: Assets/Universal/LoadingScreen/Scenes/LoadingScreen.unity
+    guid: 11111111111111111111111111111111

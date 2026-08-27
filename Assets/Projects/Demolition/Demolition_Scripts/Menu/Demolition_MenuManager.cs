@@ -26,7 +26,7 @@ namespace Demolition
 
         public void PlayGame()
         {
-            LoadingManager.LoadScene(Demolition_GeneralVariables.Instance.gameScene);
+            SceneManager.LoadScene(Demolition_GeneralVariables.Instance.gameScene);
         }
 
         public void ChangeScene()
