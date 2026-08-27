@@ -80,6 +80,33 @@ public class OSC_Manager : MonoBehaviour
     public void SendAccueilTous() { }
 }
 
+
+// --- CINEMACHINE STUB ---
+namespace Cinemachine
+{
+    public class CinemachineVirtualCamera : UnityEngine.MonoBehaviour
+    {
+        public UnityEngine.Transform Follow;
+        public UnityEngine.Transform LookAt;
+        public float m_LensHeight = 5f;
+        public float m_LensWidth = 5f;
+        public void MoveToTopOfPrioritySubqueue() { }
+    }
+    
+    public class CinemachineBrain : UnityEngine.MonoBehaviour { }
+    public class CinemachineComposer : UnityEngine.MonoBehaviour { }
+    public class CinemachineTransposer : UnityEngine.MonoBehaviour { }
+}
+
+// --- ONLINE MAPS STUB ---
+namespace OnlineMapsGooglePlacesAutocompleteResult
+{
+    public class Result { }
+    public class MatchedSubstring { }
+    public class Term { }
+    public class Description { }
+}
+
 // --- DOTWEEN STUBS & EXTENSIONS ---
 namespace DG.Tweening.Core 
 {
