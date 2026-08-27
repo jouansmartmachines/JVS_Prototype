@@ -202,8 +202,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 500}
   m_Enabled: 1
   m_Script: {fileID: 11500000, guid: 4f231c4fb786f3946a6b90b886c48677, type: 3}
---- !u!1660057539 &9223372036854775807
-
 --- !u!1001 &99998888
 PrefabInstance:
   m_ObjectHideFlags: 0
