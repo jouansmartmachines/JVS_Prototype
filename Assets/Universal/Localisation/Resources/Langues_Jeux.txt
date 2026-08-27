@@ -1,0 +1,130 @@
+	clef	Remplis	Français	Anglais	Espagnol	Catalan
+						
+Athletisme 100 m	Athletisme_Instructions	x	Tirer sur les jetons de votre pays	Shoot your team’s tokens	Dispara a las fichas de tu país.	Dispara a les fitxes del teu país
+Athletisme 400 m			Tirer sur les jetons de votre pays	Shoot your team’s tokens	Dispara a las fichas de tu país.	Dispara a les fitxes del teu país
+Basket 	Basket_Instructions	X	Marquer le maximum de paniers en visant l'arceau	Score as many baskets as possible by aiming for the hoop	Anota tantas canastas como puedas apuntando al aro.	Anoteu tantes cistelles com pugueu apuntant a l'anella.
+Blocks	Blocks_Instructions	x	Tourner les blocks dans le bon sens.	Turn the blocks the right way.	Gira los bloques en la dirección correcta.	Gira els blocs en la direcció correcta.
+Clean & collect banquise	Clean&collect_Instructions	X	Tirer sur les déchets pour les collecter	Shoot on the trash to collect it	Lanza sobre la basura para recogerla.	Apunta sobre els residus per recollir-los
+Clean & collect plage			Tirer sur les déchets pour les collecter		Lanza sobre la basura para recogerla.	Apunta sobre els residus per recollir-los
+Clean & collect espace			Tirer sur les déchets pour les collecter		Lanza sobre la basura para recogerla.	Apunta sobre els residus per recollir-los
+Clean & collect fond marin			Aligne les crudités pour faire le meilleur score !		¡Alinea las verduras crudas para obtener la mejor puntuación!	Alinea les verdures crues per obtenir la millor puntuació!
+Crudi Crush Fruits	CrudiCrush_Instructions	X	Aligne les cruditÉs pour faire le meilleur score !	Line up the raw vegetables to get the highest score!	¡Alinea las verduras crudas para obtener la mejor puntuación!!	Alinea les verdures crues per obtenir la millor puntuació!!
+Crudi Crush Legumes			Aligne les cruditÉs pour faire le meilleur score !		¡Alinea las verduras crudas para obtener la mejor puntuación!	Alinea les verdures crues per obtenir la millor puntuació!!
+La chasse au CO2	CO2_Instructions	X	Tirer sur les molecules 3D de CO2, NH4, N2O	Shoot the 3D molecules of CO2, NH4, and N2O	Tirar sobre las moléculas 3D de CO2, NH4, N2O	Apunteu a les molècules 3D de CO2, NH4, N2O
+differences	Differences_Instructions	X	Tirer sur les différences	Highlight the differences	Apuntar a las diferencias	Apunteu a les diferències
+Fuyons cimetierre	Fuyons_Instructions	X	Tirer sur les monstrer et sur les bols lumineux	Shoot the monsters and the glowing bowls	Dispara a los monstruos y a los cuencos de luz.	Dispara als monstres i als bols de llum
+Fuyons château fort			Tirer sur les monstrer et sur les bols lumineux		Dispara a los monstruos y a los cuencos de luz.	Dispara als monstres i als bols de llum
+Fuyons neiges			Tirer sur les monstrer et sur les bols lumineux		Dispara a los monstruos y a los cuencos de luz.	Dispara als monstres i als bols de llum
+La nuit des zombies dessert	Zombies_Instructions	X	Degommer un maximum de zombies !	Take out as many zombies as possible!	¡Elimina a tantos zombis como puedas!	Elimina tants zombis com puguis!
+La nuit des zombies western			Degommer un maximum de zombies !		¡Elimina a tantos zombis como puedas!	Elimina tants zombis com puguis!
+La nuit des zombies ville			Degommer un maximum de zombies !s		¡Elimina a tantos zombis como puedas!	Elimina tants zombis com puguis!
+Light Smash 	LightSmash_Instructions	X	Tirer sur les parties lumineuses	Shoot the bright areas	Tira a las partes luminosas	Apunta a les parts de lluminoses
+Mo&Mat	Mo&Mat_Instructions					
+Molécules	Molecules_Instructions	X	Lancez le ballon sur vos molecules pour les multiplier!	Bounce the ball off your molecules to multiply them!	¡Lanza la pelota a tus moléculas para multiplicarlas!	Llança la pilota a les teves molècules per multiplicar-les!
+Monstres Gallerie / Halloween	Monstres_Instructions	X	Eliminer un maximum de monstres !	Take out as many monsters as possible!	¡Elimina tantos monstruos como sea posible!	Elimina tants monstres com sigui possible!
+Mosquitoes camping	Mosquitoes_Instructions	x	Tirer sur les moustiques	Shoot the mosquitoes	Dispara a los mosquitos	Dispara als mosquits
+Mosquitoes sdb			Tirer sur les moustiques		Dispara a los mosquitos	Dispara als mosquits
+O’Lou	O’Lou_Instructions	X	Lance le ballon pour dégommer les loups !	Throw the ball to knock out the wolves!	¡Lanza la pelota para abatir a los lobos!	Apunta als llops per abatre'ls
+QUIZ 	QUIZ_Instructions	X	Tirer sur A, B, C, ou D pour la bonne réponse	Throw the ball on A, B, C, or D for the correct answer	Lanza a: A, B, C o D para obtener la respuesta correcta.	Apunta a: A, B, C o D per obtenir la resposta correcta
+Scène de ménage 	SceneDeMenage_Instructions	X	Casser la vaiselle !	Break the dishes!	¡Rompe los platos!	Trenca els plats!
+Target 	Target _Instructions		Lancer le ballon sur les cibles le plus vite possible !	Throw the ball at the targets as fast as you can!	¡Lanza la pelota a los objetivos lo más rápido posible!	Llança la pilota als objectius tan ràpid com puguis!
+Tetrax/Paques	Tetrax_Paques_Instructions	X	Lancer le ballon sur les oeufs avant qu'ils ne touchent le bas de l'ecran !	Throw the ball at the eggs before they hit the bottom of the screen!	¡Lanza la pelota a los huevos antes de que toquen la parte inferior de la pantalla!	Llança la pilota als ous abans que toquin la part inferior de la pantalla!
+Tetrax CovidKiller	Tetrax_CovidKiller_Instructions	X	Lancer le ballon sur les virus avant qu'ils ne touchent le bas de l'ecran !	Throw the ball at the virus before they hit the bottom of the screen!	¡Lanza la pelota a los virus antes de que lleguen al final de la pantalla!	Llança la pilota als virus abans que arribin a la part inferior de la pantalla!
+Tetrax	Tetrax_Instructions	X	Lancer le ballon sur les blocs avant qu'ils ne touchent le bas de l'ecran !	Throw the ball at the blocks before they hit the bottom of the screen!	¡Lanza la pelota a los bloques antes de que toquen la parte inferior de la pantalla!	Llança la pilota als blocs abans que toquin la part inferior de la pantalla!
+Tir à l’arc 	Tir_Instructions	X	 Tirer sur la cible, visez le centre	 Shoot at the target; aim for the center	Dispara al objetivo, apunta al centro.	Dispara a l'objectiu, apunta al centre
+Challenges Foot	ChallengesFoot_Instructions	X	Shooter les ballons !	Shoot the balloons!	¡Dispara a los globos!	Dispara als globus
+Challenges Rugby	ChallengesRugby_Instructions		Fais une passe aux mains	Pass it to the hands	Haz un pase con las manos	Fes una passada amb les mans
+Pareil	Pareil_Instructions	X	Trouver les éléments identiques	Find the identical elements	Encuentra los elementos idénticos	Troba els elements idèntics
+Joyeux		X				
+Vikinvader	Vikinvader_Instructions	X	Détruire le maximum de rune pour protéger le drakkar	Destroy as many runes as possible to protect the drakkar	Destruir el máximo de runas para proteger el drakkar	Destruir el màxim de runes per protegir el drakkar
+						
+						
+						
+Jouer Boutton	Play_Button		JOUER	PLAY	JUGAR	JUGAR
+Bouton GemeScene TousLesJeux	All_Game		TOUS LES JEUX	ALL GAMES	TODOS LOS JUEGOS	TOTS ELS JOCS
+Choisir votre environnement	Choose_Environment		Choisir l'environnement	Choose environment	Elegir el entorno	Escolleix l'entorn
+Clean and collect zone	Area		ZONE	AREA	ÁREA	ÀREA
+SceneScore Bravo entrer le nom sur écran tactile	Touch_screen		Bravo ! Entrez votre nom sur l'ecran tactile.	Well done! Enter your name on the touchscreen.	¡Felicidades! Introduce tu nombre en la pantalla táctil.	Enhorabona! Introduïu el vostre nom a la pantalla tàctil.
+Challenge Score	Score		Score :	Score:	Puntuación:	Puntuació:
+Challenge Niveau 	Level		Niveau	Level	Nivel	Nivell
+Bravo tu as atteint le niveau	Level_Reached		Bravo tu as atteint le niveau	Well done, you have reached level	¡Bien hecho, has alcanzado el nivel!	Ben fet, has arribat al nivell!
+avec	With		avec	with	con	amb
+points	Points		points	points	puntos	punts
+Ton tir va s’améliorer	Challenges_LVL1_Foot		Ton tir va s’améliorer	Your shot will improve	Tu tiro mejorará	El teu tir millorarà
+Ton niveau est confirmé	Challenges_LVL2_Foot		Ton niveau est confirmé	Your level is confirmed	Tu nivel está confirmado.	El teu nivell està confirmat
+Tu maîtrises parfaitement le terrain	Challenges_LVL3_Foot		Tu maîtrises parfaitement le terrain	You perfectly master the field	Tienes un conocimiento perfecto del terreno.	Tens un coneixement perfecte del terreny
+Ta technique balle au pied est au top	Challenges_LVL4_Foot		Ta technique balle au pied est au top	Your ball control technique is at the top	Tu control del balón es de primera categoría.	El teu control de la pilota és de primera categoria.
+Tu gagnes en précision à la passe	Challenges_LVL1_Rugby		Tu gagnes en précision à la passe	Your passing precision is improving	Tu precisión en los pases está mejorando.	Guanyes precisió en les passades
+Tu t’imposes dans le jeu	Challenges_LVL2_Rugby		Tu t’imposes dans le jeu	You are making your mark on the game	Estás dejando tu huella en el juego.	Estàs deixant la teva empremta al joc
+Tu lis parfaitement le terrain	Challenges_LVL3_Rugby		Tu lis parfaitement le terrain	You read the field perfectly	Has interpretado el terreno a la perfección.	Has llegit el terreny perfectament.
+Tu maîtrises le ballon dans toutes les situations	Challenges_LVL4_Rugby		Tu maîtrises le ballon dans toutes les situations	You master the ball in every situation	Controlas el balón en todas las situaciones.	Controles la pilota en totes les situacions
+point	Point		point	point	punto	punt
+Score_	Score_		Score	Score	Puntuación:	Puntuació
+	Missing		Pas d'images trouvées	No image found	No se encontraron imágenes	No s'han trobat imatges
+Bravo_Blue	Bravo_Blue		Bravo les rouges !	Well done reds !	¡Rojos, Bien hecho!	Ben fet Vermells!
+Bravo_Red	Bravo_Red		Bravo les bleus !	Well done blues !	¡Azules, Bien hecho!	Ben fet Blaus!
+Monte sur le vélo et part à la cjasse aux gas			Monte sur le vélo et part à la chasse aux gas	Get on the bike and go hunt for greenhouse gases	Súbete a la bici y elimina gases de efecto invernadero.	Puja a la bicicleta i elimina gasos d'efecte hivernacle
+bravo à tous	Bravo_Tous		bravo à tous	well done everyone	¡Bien hecho a todos!	Ben fet a tothom
+bravo vous avez gagné			bravo vous avez gagné	well done you won	¡Felicidades, has ganado!	Felicitats, has guanyat!
+Crudycrush jouer	CrudyCrush_Fruit_Play		Jouer avec des fruits	Play with fruits	Jugando con la fruta	Jugant amb la fruita
+Jouer avec des légumes	CrudyCrush_Vegetables_Play		Jouer avec des légumes	Play with vegetables	Jugando con verduras	Jugant amb verdures
+Bravo	Bravo		Bravo	Well done	Bien hecho	Ben fet.
+Bravo !	Bravo_		Bravo !	Well done!	 ¡Bien hecho !	Ben fet!
+End_Hunt	End_Hunt		FIN DE LA CHASSE AU Co2  !	END OF THE CARBON HUNT!	¡FIN DE LA CAZA DE CO2!	FI DE LA CAÇA DEL CO2!
+	Little_Red_Riding_Hood		Un petit chaperon rouge, s'en va chez sa mère grand.	Little Red Riding Hood is off to her grandmother's house.	Caperucita Roja va a casa de su abuela.	La Caputxeta Vermella va a casa de la seva àvia.
+	Encounter_Wolf		En chemin il rencontre DES loups.	On the way, she encounters wolves.	En su camino se encuentra con lobos.	Pel camí es troba amb llops.
+	Wolfes		Le voici dans le bois, d'autres loups apparaissent.	Here she is in the woods, more wolves are appearing.	Aquí está él en el bosque, aparecen otros lobos.	Aquí el tenim al bosc, apareixen altres llops.
+	Thanks_Animal		Merci d'avoir protégé tous les animaux !	Thank you for protecting all the animals!	¡Gracias por proteger a todos los animales!	Gràcies per protegir a tots els animals!
+	Wolf_Eating		O'malheur, le loup a mangé le petit chaperon rouge.	Oh dear, the wolf has eaten Little Red Riding Hood.	¡Oh no, el lobo se ha comido a Caperucita Roja!	Oh no, el llop s'ha menjat a la Caputxeta Vermella.
+	Near_Home		Ouf, il arrive enfin près de la maison.	Whew, she finally makes it close to the house.	Uf, por fin se está acercando a la casa.	Uf, finalment s'acosta a casa.
+	Wolf_End		En ouvrant la gueule, le loup  rend ce qu'il a mangé.	Opening its jaws, the wolf spits out what it ate.	Al abrir la boca, el lobo devuelve lo que ha comido.	En obrir la boca, el llop retorna el que ha menjat.
+Quiiz	OOPS		OOPS	OOPS	UPS	UPS
+	YES		YES	YES	SÍ	SÍ
+	Answer		Reponse:	Answer:	Respuesta:	Resposta:
+	Team_Orange		équipe orange	team Orange	equipo naranja	equip taronja
+	Team_Blue		équipe bleue	team Blue	equipo azul	equip blau
+	orange		orange	orange	naranja	taronja
+Tir à l'arc	Archery		Tir à l'arc	Archery	Tiro al arco	Tir amb arc
+Bravo vous avez gagné	Bravo_Won		Bravo vous avez gagné 	Well done, you won	¡Felicidades, has ganado!	Felicitats, has guanyat!
+fin de partie mosntres	End_Game		fin de partie	game over	fin del juego	fi del joc
+Le dossier ne contient pas d'operation ! Verifiez le dossier dans le menu.mo et ma	Empty_Folder		Le dossier ne contient pas d'operation ! Verifiez le dossier dans le menu.mo et ma	The folder does not contain any operations! Check the folder in the mo & mat menu.	¡La carpeta no contiene ninguna operación!  Verifique la carpeta en el menu. "mo y ma"	La carpeta no conté cap operació! Reviseu la carpeta al menu. "mo i ma"
+Vous avez resolu tous les calculs	Found_ calculation		Vous avez resolu tous les calculs	You have solved all the calculations	Has resuelto todos los cálculos.	Has resolt tots els càlculs.
+Vous avez trouve tous les mots	Found_Words		Vous avez trouve tous les mots	You have found all the words	Encontraste todas las palabras	Has trobat totes les paraules
+molécules rouges	Red_molecules		molécules rouges	red molecules	moléculas rojas	molècules vermelles
+molécules bleues	Blue_molecules		molécules bleues	blue molecules	moléculas azules	molècules blaves
+Egalite, tous les joueurs ont 	Equality_LightSmash		Egalite, tous les joueurs ont 	Tie game, all players have 	Empate, todos los jugadores tienen	Empat, tots els jugadors tenen
+Le joueur de	A_Player		Le joueur de	The player from	El jugador de	El jugador de
+a gagne avec	Won_with		a gagne avec	won with	ganó con	va guanyar amb
+Choisir un jeu sur l'écran tatctile	Choose_Touch_Screen		Choisir un jeu sur l'écran tactile 	Choose a game on the touchscreen	Elige un juego en la pantalla táctil.	Trieu un joc a la pantalla tàctil
+sortie fuyons	Exit		sortie	Exit 	salida	sortida
+vous avez gagné	Won		vous avez gagné	you won	¡Has Ganado!	Has Guanyat!
+Vous avez degomme	Shooted		Vous avez degomme	You knocked out	Te han pateado el trasero	T'han apallissat 
+zombies	Zombies		zombies	zombies	zombis	zombis
+fin de collecte	Collect_End		Fin de collecte !	End of collection !	¡Colecta completa!	Col·lecta completa!
+monte sur le vélo et pars à la chasse au ges *			monte sur le vélo et pars à la chasse au ges *	get on the bike and go hunt for GHG *	Sube a tu bicicleta y elimina gases de efecto invernadero 	Puja't a la teva bicicleta i elimina els gasos d'efecte hivernacle
+* gaz à effet de serre : CH4,CO2,N20,,,,			* gaz à effet de serre : CH4,CO2,N20,,,,	* greenhouse gases: CH4, CO2, N2O...	* Gases de efecto invernadero: CH4, CO2, N2O,,,,	* Gasos d'efecte hivernacle: CH4, CO2, N2O,
+	Athetism_Choice_100m		100 m ou 400 m ?	100 m or 400 m?	¿100 m o 400 m?	100 m o 400 m?
+	Athetism_Choice_maleorfemale		Masculin ou féminin ?	Male or female?	Masculino o femenino ?	Mascle o femella?
+	Athetism_Choice_2_3		à 2 ou 3 participants ?	2 or 3 players?	¿Con 2 o 3 participantes?	Amb 2 o 3 participants?
+	Athetism_Choice_Country		Quel pays participe ?	Which country is participating?	¿Qué país participa?	Quin país hi participa?
+	Athetism_Choice_Touch Screen		Faites vos choix sur l'écran tactile	Make your choices on the touchscreen	Seleccione sus opciones en la pantalla táctil.	Feu les vostres seleccions a la pantalla tàctil
+	Score_		Score 	Score	Puntuación	Puntuació
+	Equality_Basket		Égalite, personne n'a su se démarquer.	Tie game, no one managed to stand out.	Hubo un empate; nadie logró destacar.	Empat; ningú aconsegueix destacar.
+	Has_Won_		a gagné !	has won!	has ganado!	Has guanyat!
+Joueur	Player		Joueur	Player	Jugador	Jugador
+	Equality_All		Bravo egalite	Well done equality	¡Bravo, empate!	Bravo, empat!
+	Lost		Vous avez perdu ...	You lost ...	Has perdido...	Has perdut...
+	Hard		complexes	Hard	Difíciles	Complexes
+	Simple 		simples	Simple	Simple	Senzilles
+	Calculus		Opérations	Calculus	Operaciones	Operacions
+	0_Winner			Nobody won	No hay ganador	Cap guanyador
+	Equality		Egalité	Equality	Empate	Empat
+	Parti !		C'est parti !	Let's go !	¡Vamos!	Som-hi!
+	Happy		Joyeux	Happy	Feliz	Per molts
+	Unknown		Inconnu	Unknown	Desconocido	Desconegut
+	Birthday		Anniversaire	Birthday	cumpleaños	anys
+	SpecialRune		1 rune spéciale	1 special rune	1 runa especial	1 runa especial
+	MinusThreeRunes		- 3 runes	- 3 runes	- 3 runas	- 3 runes
+	Points300		300 points	300 points	300 puntos	300 punts
+	Blocked		 Bloqué	Blocked	Bloqueado	Bloquejat
+	Bonus_Chosen		Choisissez votre bonus	Choose your bonus	Elige tu bonus	Tria el teu bonus

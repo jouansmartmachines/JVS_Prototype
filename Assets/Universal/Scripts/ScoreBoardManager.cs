@@ -23,8 +23,7 @@ public enum GameScoreBoard
 
 
     Monstres,
-    Nettoyage,
-    Demolition
+    Nettoyage
 }
 
 public static class ScoreBoardManager
