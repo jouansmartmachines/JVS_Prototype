@@ -56,13 +56,6 @@ namespace Dobble
             if (isAnimating) return;
             if (button == null) return;
             g.soundManager.PlayOneShot("wrong");
-
-            button.transform.DOKill();
-         
-            button.transform
-                .DORotate(new Vector3(0, 15, 0f), 0.1f)
-                .SetLoops(6, LoopType.Yoyo)
-                .OnComplete(() => button.transform.rotation = Quaternion.identity);
         }
 
         private void PlayRightAnimation(Dobble_ButtonLinked button)
@@ -70,25 +63,6 @@ namespace Dobble
             if (isAnimating) return;
             if (button == null) return;
 
-
-            button.transform.DOKill();
-            Vector3 originalScale = button.transform.localScale;
-
-            Sequence seq = DOTween.Sequence();
-
-            seq.Append(button.transform.DOScale(originalScale * 2f, 0.12f)
-                .SetEase(Ease.OutBack)); 
-
-            seq.Append(button.transform.DOScale(originalScale * 0.6f, 0.1f)
-                .SetEase(Ease.InOutQuad)); 
-
-            seq.Append(button.transform.DOScale(originalScale * 1.5f, 0.1f)
-                .SetEase(Ease.OutQuad)); 
-
-            seq.Append(button.transform.DOScale(originalScale, 0.18f)
-                .SetEase(Ease.OutElastic)); 
-
-            seq.OnComplete(() => button.transform.localScale = originalScale);
         }
 
 
