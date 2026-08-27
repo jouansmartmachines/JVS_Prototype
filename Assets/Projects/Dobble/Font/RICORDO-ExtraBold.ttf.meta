@@ -1,0 +1,26 @@
+fileFormatVersion: 2
+guid: e5698110f07951e44ab847966813b096
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontNames:
+  - RICORDO
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: 1c428f27ad525e24abab358b73801c6d, type: 3}
+  - {fileID: 12800000, guid: ddf8eafda066ad74b892d8a461aff4a6, type: 3}
+  - {fileID: 12800000, guid: 3568e997c8462734d8bd10f64eda94fc, type: 3}
+  - {fileID: 12800000, guid: 2ba2930b899349348bbe764064a5a568, type: 3}
+  - {fileID: 12800000, guid: c326c2523dc12bc4894a611dd8f69a52, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
