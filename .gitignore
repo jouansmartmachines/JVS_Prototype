@@ -28,3 +28,6 @@
 # OS
 .DS_Store
 Thumbs.db
+# JVS specific
+/*.slnx
+JVS_Prototype.slnx
