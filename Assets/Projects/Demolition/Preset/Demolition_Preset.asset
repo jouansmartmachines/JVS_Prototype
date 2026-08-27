@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f3045bfa15373542ac5250a6bb392b9, type: 3}
+  m_Name: Demolition_Preset
+  m_EditorClassIdentifier: 
+  AllValues:
+  - {fileID: 11400000, guid: 40ad58d0b5513834884d62d9d670a7e7, type: 2}
+  - {fileID: 11400000, guid: b710cb08d2c997e4187004f1b60a0c46, type: 2}
+  - {fileID: 11400000, guid: ad4e3845302357246abcdadb5843e715, type: 2}
+  - {fileID: 11400000, guid: e3711dbdf69e4ab49a282c174f772fc0, type: 2}
