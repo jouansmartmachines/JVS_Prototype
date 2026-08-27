@@ -13,12 +13,13 @@ namespace Demolition
 
         [Header("Modes de lancement")]
         public LaunchMode launchMode = LaunchMode.Oiseau;
-        public GameObject oiseauPrefab;
-        public GameObject impactEffectPrefab;
+        public GameObject oiseauPrefab { get; private set; }
+        public GameObject impactEffectPrefab { get; private set; }
 
         [Header("Structure")]
         public Transform structuresParent;
-        public GameObject[] tableauPrefabs;
+        public GameObject[] tableauPrefabs { get; private set; }
+        public string[] tableauNames = { "Tableau_1", "Tableau_2", "Tableau_3" };
 
         [Header("Défilement")]
         public float baseScrollSpeed = 2f;
@@ -37,11 +38,7 @@ namespace Demolition
         public AudioClip gameOverSound;
         private AudioSource audioSource;
 
-        [Header("Particles")]
-        public ParticleSystem debrisParticles;
-        public ParticleSystem explosionParticles;
-
-        // Coordonnées d'impact
+        // Coordonnees d impact
         protected bool gotAPt;
         protected Vector3 newPt;
         protected int w, h;
@@ -57,6 +54,9 @@ namespace Demolition
             w = Screen.width;
             h = Screen.height;
             audioSource = GetComponent<AudioSource>();
+
+            // Charger les references depuis Resources
+            LoadReferences();
 
             // Mode depuis PlayerPrefs
             launchMode = PlayerPrefs.GetInt(Demolition_GeneralVariables.ModeOiseauKey, 1) == 1
@@ -76,6 +76,19 @@ namespace Demolition
 
             gameIsRunning = true;
             StartCoroutine(GameLoop());
+        }
+
+        void LoadReferences()
+        {
+            oiseauPrefab = Resources.Load<GameObject>("Prefabs/Oiseau");
+            impactEffectPrefab = Resources.Load<GameObject>("Prefabs/ImpactExplosion");
+            impactSound = Resources.Load<AudioClip>("Sounds/impact");
+            destructionSound = Resources.Load<AudioClip>("Sounds/destruction");
+            gameOverSound = Resources.Load<AudioClip>("Sounds/gameover");
+
+            tableauPrefabs = new GameObject[tableauNames.Length];
+            for (int i = 0; i < tableauNames.Length; i++)
+                tableauPrefabs[i] = Resources.Load<GameObject>("Prefabs/" + tableauNames[i]);
         }
 
         void Update()

@@ -9,9 +9,9 @@ public class Demolition_SetupEditor : EditorWindow
     static void GeneratePrefabs()
     {
         string basePath = "Assets/Projects/Demolition";
-        string prefabPath = basePath + "/Demolition_Prefabs";
-        string texPath = basePath + "/Textures";
-        string soundPath = basePath + "/Sounds";
+        string prefabPath = basePath + "/Resources/Prefabs";
+        string texPath = basePath + "/Resources/Textures";
+        string soundPath = basePath + "/Resources/Sounds";
 
         // 1. Creer les PNG puis les importer comme sprites
         MakePNG(texPath, "bois", 64, 32, new Color(0.545f, 0.353f, 0.169f));
@@ -79,12 +79,10 @@ public class Demolition_SetupEditor : EditorWindow
         MakeStruct(prefabPath, "Tableau_3", new[] { "Bloc_Verre", "Bloc_Bois", "Bloc_Pierre", "Bloc_Bois" },
             new Vector3[] { new(0,0,0), new(0.7f,0,0), new(1.4f,0.7f,0), new(0.7f,0.7f,0) });
 
-        // 10. Setup scene
-        SetupScene(prefabPath, soundPath);
-
+        // 10. Termine (ne touche pas a la scene)
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
-        Debug.Log("OK - Prefabs Demolition generes !");
+        Debug.Log("OK - Prefabs Demolition generes ! Ouvre GameScene et clique Play.");
     }
 
     static void MakePNG(string folder, string name, int w, int h, Color color)
@@ -216,40 +214,5 @@ public class Demolition_SetupEditor : EditorWindow
         }
         PrefabUtility.SaveAsPrefabAsset(go, path + "/" + name + ".prefab");
         DestroyImmediate(go);
-    }
-
-    static void SetupScene(string prefabPath, string soundPath)
-    {
-        string scenePath = "Assets/Projects/Demolition/Demolition_Scenes/GameScene_Demolition.unity";
-        var scene = UnityEditor.SceneManagement.EditorSceneManager.OpenScene(scenePath);
-
-        if (GameObject.Find("GeneralVariable") == null)
-        {
-            GameObject gvPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath + "/GeneralVariable.prefab");
-            if (gvPrefab != null)
-            {
-                var gv = (GameObject)PrefabUtility.InstantiatePrefab(gvPrefab);
-                gv.name = "GeneralVariable";
-                gv.GetComponent<Demolition_GeneralVariables>().gameName = "Demolition";
-            }
-        }
-
-        var gm = Object.FindFirstObjectByType<Demolition_GameManager>();
-        if (gm == null) { Debug.LogError("GameManager pas trouve!"); return; }
-
-        gm.oiseauPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath + "/Oiseau.prefab");
-        gm.impactEffectPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath + "/ImpactExplosion.prefab");
-        gm.impactSound = AssetDatabase.LoadAssetAtPath<AudioClip>(soundPath + "/impact.wav");
-        gm.destructionSound = AssetDatabase.LoadAssetAtPath<AudioClip>(soundPath + "/destruction.wav");
-        gm.gameOverSound = AssetDatabase.LoadAssetAtPath<AudioClip>(soundPath + "/gameover.wav");
-        gm.tableauPrefabs = new GameObject[] {
-            AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath + "/Tableau_1.prefab"),
-            AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath + "/Tableau_2.prefab"),
-            AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath + "/Tableau_3.prefab"),
-        };
-        gm.structuresParent = GameObject.Find("StructuresParent")?.transform;
-
-        UnityEditor.SceneManagement.EditorSceneManager.SaveScene(scene);
-        Debug.Log("GameScene mise a jour !");
     }
 }
