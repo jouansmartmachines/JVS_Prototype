@@ -75,8 +75,13 @@ public class Demolition_SetupEditor : EditorWindow
         SetupGameScene();
         Debug.Log("4/6 GameScene configuree");
 
-        
-        
+        // 5. Menu Toggle + Slider
+        SetupMenu();
+        Debug.Log("5/6 Menu Toggle+Slider ajoutes");
+
+        // 6. Backgrounds
+        Debug.Log("6/6 Backgrounds OK");
+
         AssetDatabase.Refresh();
         Debug.Log("=== FINI: Demolition completement configure ===");
     }
@@ -304,12 +309,5 @@ public class Demolition_SetupEditor : EditorWindow
         }
 
         EditorSceneManager.SaveScene(scene);
-    }
-
-    static void SetupBackGrounds()
-    {
-        // Replace sprites in Accueil, Menu, Score scenes
-        // Already done in YAML on GitHub - just log
-        Debug.Log("Backgrounds deja configures dans les scenes");
     }
 }
