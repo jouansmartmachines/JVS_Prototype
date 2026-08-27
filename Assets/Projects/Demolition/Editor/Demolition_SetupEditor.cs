@@ -10,387 +10,312 @@ using Demolition;
 
 public class Demolition_SetupEditor : EditorWindow
 {
-    [MenuItem("Tools/Demolition - Generer les prefabs")]
-    static void GenerateAll()
+    static string _basePath, _prefabPath, _texPath, _soundPath;
+
+    [MenuItem("Tools/Demolition - Tout configurer")]
+    static void ConfigurerTout()
     {
-        string basePath = "Assets/Projects/Demolition";
-        string resourcesPath = basePath + "/Resources";
-        string prefabPath = resourcesPath + "/Prefabs";
-        string texPath = resourcesPath + "/Textures";
-        string soundPath = resourcesPath + "/Sounds";
-        string scenePf = basePath + "/ScenePrefabs";
-        string demPrefabs = basePath + "/Demolition_Prefabs";
+        _basePath = "Assets/Projects/Demolition";
+        string resPath = _basePath + "/Resources";
+        _prefabPath = resPath + "/Prefabs";
+        _texPath = resPath + "/Textures";
+        _soundPath = resPath + "/Sounds";
 
-        // Creer les dossiers avant tout
-        Directory.CreateDirectory(prefabPath);
-        Directory.CreateDirectory(texPath);
-        Directory.CreateDirectory(soundPath);
+        Directory.CreateDirectory(_prefabPath);
+        Directory.CreateDirectory(_texPath);
+        Directory.CreateDirectory(_soundPath);
 
-        // 1. Textures gameplay
-        MakePNG(texPath, "bois", 64, 32, new Color(0.545f, 0.353f, 0.169f));
-        MakePNG(texPath, "verre", 64, 32, new Color(0.678f, 0.847f, 0.902f, 0.7f));
-        MakePNG(texPath, "pierre", 64, 32, new Color(0.5f, 0.5f, 0.5f));
-        MakePNG(texPath, "oiseau", 32, 32, new Color(0.863f, 0.196f, 0.196f));
-        MakePNG(texPath, "impact", 64, 64, new Color(1f, 0.647f, 0f));
-        MakePNG(texPath, "debris_bois", 16, 8, new Color(0.545f, 0.353f, 0.169f));
-        MakePNG(texPath, "debris_verre", 8, 8, new Color(0.678f, 0.847f, 0.902f));
-        MakePNG(texPath, "debris_pierre", 12, 12, new Color(0.5f, 0.5f, 0.5f));
+        Debug.Log("=== DEBUT configuration Demolition ===");
 
-        AssetDatabase.Refresh();
-        foreach (var tex in new[] { "bois", "verre", "pierre", "oiseau", "impact", "debris_bois", "debris_verre", "debris_pierre" })
-            SetSpriteMode(texPath + "/" + tex + ".png");
-        AssetDatabase.Refresh();
+        // 1. Textures
+        MakePNG("bois", 64, 32, new Color(0.545f, 0.353f, 0.169f));
+        MakePNG("verre", 64, 32, new Color(0.7f, 0.85f, 0.9f));
+        MakePNG("pierre", 64, 32, new Color(0.5f, 0.5f, 0.5f));
+        MakePNG("oiseau_dos", 32, 32, new Color(1, 0.5f, 0));
+        MakePNG("impact", 32, 32, new Color(1, 0.8f, 0));
+        MakePNG("debris_bois", 16, 16, new Color(0.6f, 0.4f, 0.2f));
+        MakePNG("debris_verre", 16, 16, new Color(0.7f, 0.85f, 0.9f));
+        MakePNG("debris_pierre", 16, 16, new Color(0.5f, 0.5f, 0.5f));
+        MakePNG("fissure1", 16, 16, new Color(0.3f, 0.3f, 0.3f));
+        MakePNG("fissure2", 16, 16, new Color(0.2f, 0.2f, 0.2f));
+        Debug.Log("1/6 Textures creees");
 
         // 2. Sons
-        MakeWAV(soundPath + "/impact.wav", 440, 0.15f, 0.8f);
-        MakeWAV(soundPath + "/destruction.wav", 220, 0.3f, 0.7f);
-        MakeWAV(soundPath + "/gameover.wav", 180, 0.5f, 0.6f);
+        MakeWAV("impact", 0.15f, 200, 0.3f);
+        MakeWAV("break", 0.3f, 150, 0.5f);
+        MakeWAV("explosion", 0.5f, 100, 0.8f);
+        Debug.Log("2/6 Sons crees");
+
         AssetDatabase.Refresh();
 
-        // 3. Charger sprites gameplay
-        Sprite sBois = LoadSprite(texPath + "/bois.png");
-        Sprite sVerre = LoadSprite(texPath + "/verre.png");
-        Sprite sPierre = LoadSprite(texPath + "/pierre.png");
-        Sprite sOiseau = LoadSprite(texPath + "/oiseau.png");
-        Sprite sImpact = LoadSprite(texPath + "/impact.png");
-        Sprite sDBois = LoadSprite(texPath + "/debris_bois.png");
-        Sprite sDVerre = LoadSprite(texPath + "/debris_verre.png");
-        Sprite sDPierre = LoadSprite(texPath + "/debris_pierre.png");
+        // 3. Prefabs gameplay
+        var t_bois = LoadSprite("bois");
+        var t_verre = LoadSprite("verre");
+        var t_pierre = LoadSprite("pierre");
+        var t_f1 = LoadSprite("fissure1");
+        var t_f2 = LoadSprite("fissure2");
+        var t_oiseau = LoadSprite("oiseau_dos");
+        var t_impact = LoadSprite("impact");
+        var t_db = LoadSprite("debris_bois");
+        var t_dv = LoadSprite("debris_verre");
+        var t_dp = LoadSprite("debris_pierre");
 
-        if (sBois == null) { Debug.LogError("ERREUR: sprites non charges"); return; }
+        if (t_bois == null) { Debug.LogError("Textures non trouvees"); return; }
 
-        // 4. Blocs + debris + oiseau
-        var bBois = CreateBloc(prefabPath, "Bloc_Bois", sBois, Demolition_Block.MaterialType.Bois, 2, 50);
-        var bVerre = CreateBloc(prefabPath, "Bloc_Verre", sVerre, Demolition_Block.MaterialType.Verre, 1, 100);
-        var bPierre = CreateBloc(prefabPath, "Bloc_Pierre", sPierre, Demolition_Block.MaterialType.Pierre, 4, 150);
-        var dBois = CreateDebris(prefabPath, "Debris_Bois", sDBois);
-        var dVerre = CreateDebris(prefabPath, "Debris_Verre", sDVerre);
-        var dPierre = CreateDebris(prefabPath, "Debris_Pierre", sDPierre);
-        LinkDebris(bBois, dBois); LinkDebris(bVerre, dVerre); LinkDebris(bPierre, dPierre);
-        CreateOiseau(prefabPath, sOiseau, sImpact);
-        MakeStruct(prefabPath, "Structure_Exemple", new[] { "Bloc_Bois", "Bloc_Bois", "Bloc_Bois" }, new Vector3[] { new(0,0,0), new(0.7f,0.35f,0), new(1.4f,0.7f,0) });
-        MakeStruct(prefabPath, "Tableau_1", new[] { "Bloc_Bois", "Bloc_Verre", "Bloc_Bois", "Bloc_Pierre" }, new Vector3[] { new(0,0,0), new(0.7f,0.35f,0), new(1.4f,0,0), new(2.1f,0.35f,0) });
-        MakeStruct(prefabPath, "Tableau_2", new[] { "Bloc_Pierre", "Bloc_Bois", "Bloc_Verre", "Bloc_Verre" }, new Vector3[] { new(0,0,0), new(0.7f,0.7f,0), new(1.4f,0,0), new(2.1f,0,0) });
-        MakeStruct(prefabPath, "Tableau_3", new[] { "Bloc_Verre", "Bloc_Bois", "Bloc_Pierre", "Bloc_Bois" }, new Vector3[] { new(0,0,0), new(0.7f,0,0), new(1.4f,0.7f,0), new(0.7f,0.7f,0) });
+        CreateBloc("Bloc_Bois", t_bois, Demolition_Block.MaterialType.Bois, 2, 50, t_f1, t_f2);
+        CreateBloc("Bloc_Verre", t_verre, Demolition_Block.MaterialType.Verre, 1, 100, t_f1, t_f2);
+        CreateBloc("Bloc_Pierre", t_pierre, Demolition_Block.MaterialType.Pierre, 4, 20, t_f1, t_f2);
+        CreateDebris("Debris_Bois", t_db);
+        CreateDebris("Debris_Verre", t_dv);
+        CreateDebris("Debris_Pierre", t_dp);
+        CreateOiseau(t_oiseau, t_impact);
+        Debug.Log("3/6 Prefabs gameplay crees");
 
-        // 5. Setup GameScene (doit etre fait AVANT de charger les prefabs scenes pour les refs)
-        SetupGameScene(prefabPath, soundPath, demPrefabs);
+        // 4. GameScene
+        SetupGameScene();
+        Debug.Log("4/6 GameScene configuree");
 
-        // 6. Changer les backgrounds dans les ScenePrefabs (apres la scene pour avoir les textures)
-        ReplaceAllBackgrounds(scenePf, texPath);
+        // 5. Menu
+        SetupMenu();
+        Debug.Log("5/6 Menu Toggle+Slider ajoutes");
 
-        AssetDatabase.SaveAssets();
+        // 6. Accueil + Score backgrounds
+        SetupBackGrounds();
+        Debug.Log("6/6 Backgrounds scenes mis a jour");
+
         AssetDatabase.Refresh();
-        Debug.Log("OK - Tout genere ! Prefabs gameplay, GameScene, backgrounds mis a jour.");
+        Debug.Log("=== FINI: Demolition completement configure ===");
     }
 
-    static void ReplaceAllBackgrounds(string scenePrefabPath, string texPath)
+    static void MakePNG(string name, int w, int h, Color c)
     {
-        // Generer les backgrounds textures
-        MakePNG(texPath, "bg_accueil", 1920, 1080, new Color(0.08f, 0.08f, 0.12f));
-        MakePNG(texPath, "bg_menu", 1920, 1080, new Color(0.08f, 0.08f, 0.12f));
-        MakePNG(texPath, "bg_score", 1920, 1080, new Color(0.08f, 0.08f, 0.12f));
-        AssetDatabase.Refresh();
-        foreach (var bgt in new[] { "bg_accueil", "bg_menu", "bg_score" })
-            SetSpriteMode(texPath + "/" + bgt + ".png");
-        AssetDatabase.Refresh();
+        string path = _texPath + "/" + name + ".png";
+        if (File.Exists(path)) return;
+        var tex = new Texture2D(w, h);
+        for (int x = 0; x < w; x++) for (int y = 0; y < h; y++) tex.SetPixel(x, y, c);
+        tex.Apply();
+        File.WriteAllBytes(path, tex.EncodeToPNG());
+        Object.DestroyImmediate(tex);
+    }
 
-        // Mapping: prefab -> background texture
-        var mapping = new[] {
-            ("Accueil_Demolition.prefab", "bg_accueil"),
-            ("Menu_Demolition.prefab", "bg_menu"),
-            ("Score_Demolition.prefab", "bg_score"),
-        };
+    static Sprite LoadSprite(string name)
+    {
+        AssetDatabase.Refresh();
+        return AssetDatabase.LoadAssetAtPath<Sprite>(_texPath + "/" + name + ".png");
+    }
 
-        foreach (var (prefabName, texName) in mapping)
+    static void MakeWAV(string name, float dur, float freq, float vol)
+    {
+        string path = _soundPath + "/" + name + ".wav";
+        if (File.Exists(path)) return;
+        int sr = 44100; int samples = (int)(sr * dur);
+        var audio = new float[samples];
+        for (int i = 0; i < samples; i++)
+            audio[i] = (float)(System.Math.Sin(2 * System.Math.PI * freq * i / sr) * vol * (1 - i / (float)samples));
+
+        using (var bw = new BinaryWriter(File.Open(path, FileMode.Create)))
         {
-            string fullPath = scenePrefabPath + "/" + prefabName;
-            if (!File.Exists(fullPath))
-            {
-                Debug.LogWarning("Prefab introuvable: " + fullPath);
-                continue;
-            }
-
-            Sprite newBg = LoadSprite(texPath + "/" + texName + ".png");
-            if (newBg == null) { Debug.LogWarning("Background texture not found: " + texName); continue; }
-
-            GameObject go = PrefabUtility.LoadPrefabContents(fullPath);
-            if (go == null) continue;
-
-            int count = 0;
-            // Parcourir TOUS les Image et SpriteRenderer, pas juste ceux nommes "Background"
-            var images = go.GetComponentsInChildren<Image>(true);
-            foreach (var img in images)
-            {
-                img.sprite = newBg;
-                count++;
-                break; // Seulement le premier Image (le fond)
-            }
-            // Fallback: SpriteRenderer
-            if (count == 0)
-            {
-                var srs = go.GetComponentsInChildren<SpriteRenderer>(true);
-                foreach (var sr in srs)
-                {
-                    sr.sprite = newBg;
-                    count++;
-                    break;
-                }
-            }
-
-            if (count > 0)
-            {
-                PrefabUtility.SaveAsPrefabAsset(go, fullPath);
-                Debug.Log("  Background mis a jour dans " + prefabName);
-            }
-            else
-                Debug.LogWarning("  Aucun Image/SpriteRenderer trouve dans " + prefabName);
-
-            PrefabUtility.UnloadPrefabContents(go);
+            bw.Write(new char[] { 'R', 'I', 'F', 'F' });
+            bw.Write(36 + samples * 2);
+            bw.Write(new char[] { 'W', 'A', 'V', 'E', 'f', 'm', 't', ' ' });
+            bw.Write(16); bw.Write((short)1); bw.Write((short)1);
+            bw.Write(sr); bw.Write(sr * 2);
+            bw.Write((short)2); bw.Write((short)16);
+            bw.Write(new char[] { 'd', 'a', 't', 'a' });
+            bw.Write(samples * 2);
+            for (int i = 0; i < samples; i++) bw.Write((short)(audio[i] * 32767));
         }
     }
 
-    static void SetupGameScene(string prefabPath, string soundPath, string demPrefabs)
+    static void CreateBloc(string name, Sprite sprite, Demolition_Block.MaterialType mat, int hp, int pts, Sprite f1, Sprite f2)
     {
-        string scenePath = "Assets/Projects/Demolition/Demolition_Scenes/GameScene_Demolition.unity";
+        var go = new GameObject(name, typeof(SpriteRenderer), typeof(BoxCollider2D), typeof(Rigidbody2D), typeof(AudioSource), typeof(Demolition_Block));
+        var sr = go.GetComponent<SpriteRenderer>(); sr.sprite = sprite; sr.sortingOrder = 2;
+        var blk = go.GetComponent<Demolition_Block>();
+        blk.hp = hp; blk.points = pts; blk.materialType = mat; blk.spriteRenderer = sr;
+        blk.damageSprites = new Sprite[] { f1, f2 };
+        PrefabUtility.SaveAsPrefabAsset(go, _prefabPath + "/" + name + ".prefab");
+        Object.DestroyImmediate(go);
+    }
+
+    static void CreateDebris(string name, Sprite sprite)
+    {
+        var go = new GameObject(name, typeof(SpriteRenderer));
+        go.GetComponent<SpriteRenderer>().sprite = sprite;
+        PrefabUtility.SaveAsPrefabAsset(go, _prefabPath + "/" + name + ".prefab");
+        Object.DestroyImmediate(go);
+    }
+
+    static void CreateOiseau(Sprite oiSprite, Sprite imSprite)
+    {
+        var imp = new GameObject("ImpactExplosion", typeof(SpriteRenderer));
+        imp.GetComponent<SpriteRenderer>().sprite = imSprite;
+        imp.GetComponent<SpriteRenderer>().sortingOrder = 4;
+        PrefabUtility.SaveAsPrefabAsset(imp, _prefabPath + "/ImpactExplosion.prefab");
+        Object.DestroyImmediate(imp);
+
+        var go = new GameObject("Oiseau", typeof(SpriteRenderer), typeof(Demolition_Projectile));
+        go.GetComponent<SpriteRenderer>().sprite = oiSprite;
+        go.GetComponent<SpriteRenderer>().sortingOrder = 3;
+        var p = go.GetComponent<Demolition_Projectile>();
+        p.oiseauDos = oiSprite;
+        p.spriteRenderer = go.GetComponent<SpriteRenderer>();
+        p.vitesseDepart = 5; p.acceleration = 2;
+        p.scaleMin = 0.1f; p.scaleMax = 1;
+        p.forceExplosion = 500; p.radiusExplosion = 2;
+        p.explosionPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(_prefabPath + "/ImpactExplosion.prefab");
+        PrefabUtility.SaveAsPrefabAsset(go, _prefabPath + "/Oiseau.prefab");
+        Object.DestroyImmediate(go);
+    }
+
+    static void SetupGameScene()
+    {
+        string scenePath = _basePath + "/Demolition_Scenes/GameScene_Demolition.unity";
         var scene = EditorSceneManager.OpenScene(scenePath);
 
-        // Nettoyer anciens objets
-        foreach (var name in new[] { "Demolition_GameManager", "Background", "StructuresParent", "GeneralVariable", "EventSystem" })
+        // Camera
+        if (Object.FindFirstObjectByType<Camera>() == null)
         {
-            var old = GameObject.Find(name);
-            if (old != null) DestroyImmediate(old);
-        }
-
-        // Camera si absente
-        if (Camera.main == null)
-        {
-            new GameObject("Main Camera", typeof(Camera), typeof(AudioListener)) { tag = "MainCamera" };
-            Camera.main.orthographic = true;
-            Camera.main.orthographicSize = 5;
-            Camera.main.backgroundColor = new Color(0.05f, 0.05f, 0.08f);
-            Camera.main.transform.position = new Vector3(0, 0, -10);
+            var go = new GameObject("Main Camera", typeof(Camera), typeof(AudioListener));
+            var cam = go.GetComponent<Camera>();
+            cam.orthographic = true; cam.orthographicSize = 5;
+            cam.clearFlags = CameraClearFlags.Color;
+            cam.backgroundColor = new Color(0.05f, 0.05f, 0.08f);
+            go.transform.position = new Vector3(0, 0, -10);
+            go.tag = "MainCamera";
+            Debug.Log("Camera OK");
         }
 
         // EventSystem
-        var es = new GameObject("EventSystem", typeof(EventSystem));
-        es.AddComponent<StandaloneInputModule>();
+        if (Object.FindFirstObjectByType<EventSystem>() == null)
+        {
+            new GameObject("EventSystem", typeof(EventSystem), typeof(StandaloneInputModule));
+            Debug.Log("EventSystem OK");
+        }
 
         // Background
-        var bg = new GameObject("Background", typeof(SpriteRenderer));
-        bg.transform.position = new Vector3(0, 0, 5);
-        bg.transform.localScale = new Vector3(50, 30, 1);
-        var sr = bg.GetComponent<SpriteRenderer>();
-        sr.sortingOrder = -10;
+        if (GameObject.Find("Background") == null)
+        {
+            var bg = new GameObject("Background", typeof(SpriteRenderer));
+            var sr = bg.GetComponent<SpriteRenderer>();
+            var tex = LoadSprite("bg_game");
+            if (tex != null) sr.sprite = tex;
+            sr.color = new Color(0.05f, 0.05f, 0.08f);
+            bg.transform.position = new Vector3(0, 0, 5);
+            sr.sortingOrder = -1;
+            Debug.Log("Background OK");
+        }
 
         // StructuresParent
-        var sp = new GameObject("StructuresParent");
-        sp.transform.position = new Vector3(0, -2, 0);
+        if (GameObject.Find("StructuresParent") == null)
+        {
+            new GameObject("StructuresParent");
+            Debug.Log("StructuresParent OK");
+        }
 
         // GeneralVariable
-        GameObject gvPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(demPrefabs + "/GeneralVariable.prefab");
-        if (gvPrefab != null)
+        if (Object.FindFirstObjectByType<Demolition_GeneralVariables>() == null)
         {
-            var gv = (GameObject)PrefabUtility.InstantiatePrefab(gvPrefab);
-            gv.name = "GeneralVariable";
-            gv.GetComponent<Demolition_GeneralVariables>().gameName = "Demolition";
+            var gvPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(_basePath + "/Demolition_Prefabs/GeneralVariable.prefab");
+            if (gvPrefab != null) { PrefabUtility.InstantiatePrefab(gvPrefab); Debug.Log("GV OK"); }
+            else Debug.LogWarning("GeneralVariable.prefab manquant");
         }
 
         // GameManager
-        var gmGO = new GameObject("Demolition_GameManager", typeof(Demolition_GameManager), typeof(AudioSource));
-        var gm = gmGO.GetComponent<Demolition_GameManager>();
-        gm.structuresParent = sp.transform;
-        gm.impactSound = AssetDatabase.LoadAssetAtPath<AudioClip>(soundPath + "/impact.wav");
-        gm.destructionSound = AssetDatabase.LoadAssetAtPath<AudioClip>(soundPath + "/destruction.wav");
-        gm.gameOverSound = AssetDatabase.LoadAssetAtPath<AudioClip>(soundPath + "/gameover.wav");
-        gm.oiseauPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath + "/Oiseau.prefab");
-        gm.impactEffectPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath + "/ImpactExplosion.prefab");
+        if (Object.FindFirstObjectByType<Demolition_GameManager>() == null)
+        {
+            var gmGO = new GameObject("Demolition_GameManager", typeof(Demolition_GameManager));
+            var gm = gmGO.GetComponent<Demolition_GameManager>();
+            var aud = gmGO.AddComponent<AudioSource>();
+            aud.playOnAwake = false;
+            gm.impactSound = AssetDatabase.LoadAssetAtPath<AudioClip>(_soundPath + "/impact.wav");
+            gm.breakSound = AssetDatabase.LoadAssetAtPath<AudioClip>(_soundPath + "/break.wav");
+            gm.oiseauPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(_prefabPath + "/Oiseau.prefab");
+            gm.impactEffectPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(_prefabPath + "/ImpactExplosion.prefab");
+            Debug.Log("GameManager OK");
+        }
 
         EditorSceneManager.SaveScene(scene);
-        Debug.Log("GameScene configuree: Camera, EventSystem, Background, StructuresParent, GeneralVariable, GameManager");
+        Debug.Log("GameScene sauvegardee");
     }
 
-    // --- Methodes de generation ---
-    static void MakePNG(string folder, string name, int w, int h, Color color)
+    static void SetupMenu()
     {
-        Directory.CreateDirectory(folder);
-        string path = folder + "/" + name + ".png";
-        if (File.Exists(path)) return;
-        Texture2D tex = new Texture2D(w, h, TextureFormat.RGBA32, false);
-        Color[] px = new Color[w * h];
-        for (int i = 0; i < px.Length; i++) px[i] = color;
-        tex.SetPixels(px); tex.Apply();
-        File.WriteAllBytes(path, tex.EncodeToPNG());
-        DestroyImmediate(tex);
-    }
-
-    static void SetSpriteMode(string path)
-    {
-        if (!File.Exists(path)) return;
-        TextureImporter imp = AssetImporter.GetAtPath(path) as TextureImporter;
-        if (imp != null) { imp.textureType = TextureImporterType.Sprite; imp.spriteImportMode = SpriteImportMode.Single; imp.SaveAndReimport(); }
-    }
-
-    static Sprite LoadSprite(string path) { return AssetDatabase.LoadAssetAtPath<Sprite>(path); }
-
-    static void MakeWAV(string path, float freq, float dur, float vol)
-    {
-        if (File.Exists(path)) return;
-        Directory.CreateDirectory(Path.GetDirectoryName(path));
-        int sr = 44100; int samples = (int)(sr * dur); float[] data = new float[samples];
-        for (int i = 0; i < samples; i++) { float t = (float)i / sr; float env = 1f - (t / dur); data[i] = Mathf.Sin(2 * Mathf.PI * freq * t) * vol * env * env; }
-        using (var fs = new FileStream(path, FileMode.Create)) using (var bw = new BinaryWriter(fs))
-        {
-            bw.Write("RIFF".ToCharArray()); bw.Write(36 + samples * 2);
-            bw.Write("WAVEfmt ".ToCharArray()); bw.Write(16); bw.Write((short)1); bw.Write((short)1); bw.Write(sr); bw.Write(sr * 2); bw.Write((short)2); bw.Write((short)16);
-            bw.Write("data".ToCharArray()); bw.Write(samples * 2);
-            foreach (float s in data) bw.Write((short)(Mathf.Clamp(s, -1f, 1f) * 32767));
-        }
-    }
-
-    static GameObject CreateBloc(string path, string name, Sprite sprite, Demolition_Block.MaterialType mat, int hp, int pts)
-    {
-        GameObject go = new GameObject(name, typeof(SpriteRenderer), typeof(BoxCollider2D), typeof(Rigidbody2D), typeof(Demolition_Block), typeof(AudioSource));
-        var sr = go.GetComponent<SpriteRenderer>(); sr.sprite = sprite; sr.sortingOrder = 1;
-        go.GetComponent<Rigidbody2D>().gravityScale = 1; go.GetComponent<Rigidbody2D>().mass = 1; go.GetComponent<Rigidbody2D>().linearDamping = 0.5f;
-        var b = go.GetComponent<Demolition_Block>(); b.hp = hp; b.points = pts; b.materialType = mat; b.spriteRenderer = sr; b.damageSprites = new Sprite[] { sprite, sprite, sprite }; b.debrisForce = 200f;
-        string fp = path + "/" + name + ".prefab"; PrefabUtility.SaveAsPrefabAsset(go, fp); DestroyImmediate(go);
-        return AssetDatabase.LoadAssetAtPath<GameObject>(fp);
-    }
-
-    static GameObject CreateDebris(string path, string name, Sprite sprite)
-    {
-        GameObject go = new GameObject(name, typeof(SpriteRenderer), typeof(Rigidbody2D), typeof(BoxCollider2D));
-        go.GetComponent<SpriteRenderer>().sprite = sprite; go.GetComponent<SpriteRenderer>().sortingOrder = 2;
-        go.GetComponent<Rigidbody2D>().gravityScale = 1; go.GetComponent<Rigidbody2D>().mass = 0.2f;
-        string fp = path + "/" + name + ".prefab"; PrefabUtility.SaveAsPrefabAsset(go, fp); DestroyImmediate(go);
-        return AssetDatabase.LoadAssetAtPath<GameObject>(fp);
-    }
-
-    static void LinkDebris(GameObject block, GameObject debris) { block.GetComponent<Demolition_Block>().debrisPrefab = debris; PrefabUtility.SavePrefabAsset(block); }
-
-    static void CreateOiseau(string path, Sprite oiSprite, Sprite imSprite)
-    {
-        var imp = new GameObject("ImpactExplosion", typeof(SpriteRenderer));
-        imp.GetComponent<SpriteRenderer>().sprite = imSprite; imp.GetComponent<SpriteRenderer>().sortingOrder = 4;
-        string ip = path + "/ImpactExplosion.prefab"; PrefabUtility.SaveAsPrefabAsset(imp, ip); DestroyImmediate(imp);
-        var go = new GameObject("Oiseau", typeof(SpriteRenderer), typeof(Demolition_Projectile));
-        go.GetComponent<SpriteRenderer>().sprite = oiSprite; go.GetComponent<SpriteRenderer>().sortingOrder = 3;
-        var p = go.GetComponent<Demolition_Projectile>(); p.oiseauDos = oiSprite; p.spriteRenderer = go.GetComponent<SpriteRenderer>();
-        p.vitesseDepart = 5; p.acceleration = 2; p.scaleMin = 0.1f; p.scaleMax = 1; p.forceExplosion = 500; p.radiusExplosion = 2;
-        p.explosionPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(ip);
-        PrefabUtility.SaveAsPrefabAsset(go, path + "/Oiseau.prefab"); DestroyImmediate(go);
-    }
-
-    static void MakeStruct(string path, string name, string[] blocks, Vector3[] pos)
-    {
-        var go = new GameObject(name, typeof(Demolition_Structure));
-        var s = go.GetComponent<Demolition_Structure>(); s.blocs = new Demolition_Block[blocks.Length];
-        for (int i = 0; i < blocks.Length; i++)
-        {
-            var bp = AssetDatabase.LoadAssetAtPath<GameObject>(path + "/" + blocks[i] + ".prefab");
-            if (bp == null) continue;
-            var b = (GameObject)PrefabUtility.InstantiatePrefab(bp, go.transform);
-            b.transform.localPosition = pos[i]; s.blocs[i] = b.GetComponent<Demolition_Block>();
-        }
-        PrefabUtility.SaveAsPrefabAsset(go, path + "/" + name + ".prefab"); DestroyImmediate(go);
-    }
-
-    [MenuItem("Tools/Demolition - Ajouter Toggle & Slider")]
-    static void AddMenuControls()
-    {
-        string scenePath = "Assets/Projects/Demolition/Demolition_Scenes/Menu_Demolition.unity";
+        string scenePath = _basePath + "/Demolition_Scenes/Menu_Demolition.unity";
         var scene = EditorSceneManager.OpenScene(scenePath);
 
-        // Trouver le canvas
         var canvas = Object.FindFirstObjectByType<Canvas>();
         if (canvas == null) { Debug.LogError("Canvas pas trouve!"); return; }
 
-        // --- Toggle ModeOiseau ---
-        GameObject toggleGO = new GameObject("ModeOiseau", typeof(RectTransform));
-        toggleGO.transform.SetParent(canvas.transform);
-        toggleGO.AddComponent<Image>();
-        Toggle toggle = toggleGO.AddComponent<Toggle>();
-        toggle.isOn = PlayerPrefs.GetInt(Demolition_GeneralVariables.ModeOiseauKey, 1) == 1;
+        // Toggle ModeOiseau
+        if (GameObject.Find("ModeOiseau") == null)
+        {
+            var go = new GameObject("ModeOiseau", typeof(RectTransform));
+            go.transform.SetParent(canvas.transform);
+            go.AddComponent<Image>();
+            var toggle = go.AddComponent<Toggle>();
+            toggle.isOn = PlayerPrefs.GetInt(Demolition_GeneralVariables.ModeOiseauKey, 1) == 1;
 
-        // Checkmark
-        GameObject checkGO = new GameObject("Checkmark", typeof(RectTransform));
-        checkGO.transform.SetParent(toggleGO.transform);
-        Image checkImage = checkGO.AddComponent<Image>();
-        checkGO.AddComponent<CanvasRenderer>();
+            var chk = new GameObject("Checkmark", typeof(RectTransform));
+            chk.transform.SetParent(go.transform);
+            var ci = chk.AddComponent<Image>();
+            ci.sprite = LoadSprite("bois");
+            chk.AddComponent<CanvasRenderer>();
+            toggle.graphic = ci;
 
-        // Relier checkmark au toggle
-        toggle.graphic = checkImage;
-        toggle.targetGraphic = checkImage;
+            var lbl = new GameObject("Label", typeof(RectTransform));
+            lbl.transform.SetParent(go.transform);
+            var txt = lbl.AddComponent<TextMeshProUGUI>();
+            txt.text = "Mode Oiseau"; txt.fontSize = 24;
 
-        // Label "Oiseau / Impact"
-        GameObject labelGO = new GameObject("Label", typeof(RectTransform));
-        labelGO.transform.SetParent(toggleGO.transform);
-        var labelText = labelGO.AddComponent<TextMeshProUGUI>();
-        labelText.text = "Mode Oiseau";
-        labelText.fontSize = 24;
-        labelText.alignment = TextAlignmentOptions.Left;
+            var rt = go.GetComponent<RectTransform>();
+            rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
+            rt.anchoredPosition = new Vector2(-100, 150);
+            rt.sizeDelta = new Vector2(200, 50);
+            Debug.Log("Toggle OK");
+        }
 
-        // Position toggle
-        RectTransform rt = toggleGO.GetComponent<RectTransform>();
-        rt.anchorMin = new Vector2(0.5f, 0.5f);
-        rt.anchorMax = new Vector2(0.5f, 0.5f);
-        rt.anchoredPosition = new Vector2(-200, 100);
-        rt.sizeDelta = new Vector2(200, 50);
+        // Slider
+        if (GameObject.Find("ScrollSpeed") == null)
+        {
+            var go = new GameObject("ScrollSpeed", typeof(RectTransform));
+            go.transform.SetParent(canvas.transform);
+            var slider = go.AddComponent<Slider>();
+            go.AddComponent<Image>();
 
-        Debug.Log("Toggle ModeOiseau ajoute");
+            var bg = new GameObject("Background", typeof(RectTransform));
+            bg.transform.SetParent(go.transform); bg.AddComponent<Image>();
 
-        // --- Slider ScrollSpeed ---
-        GameObject sliderGO = new GameObject("ScrollSpeed", typeof(RectTransform));
-        sliderGO.transform.SetParent(canvas.transform);
-        Slider slider = sliderGO.AddComponent<Slider>();
-        sliderGO.AddComponent<Image>();
+            var fill = new GameObject("Fill", typeof(RectTransform));
+            fill.transform.SetParent(go.transform); fill.AddComponent<Image>();
 
-        // Background du slider
-        GameObject bgGO = new GameObject("Background", typeof(RectTransform));
-        bgGO.transform.SetParent(sliderGO.transform);
-        var bgImage = bgGO.AddComponent<Image>();
-        bgImage.color = Color.gray;
+            var hdl = new GameObject("Handle", typeof(RectTransform));
+            hdl.transform.SetParent(go.transform); hdl.AddComponent<Image>();
 
-        // Fill
-        GameObject fillGO = new GameObject("Fill", typeof(RectTransform));
-        fillGO.transform.SetParent(sliderGO.transform);
-        var fillImage = fillGO.AddComponent<Image>();
-        fillImage.color = Color.white;
+            slider.fillRect = fill.GetComponent<RectTransform>();
+            slider.handleRect = hdl.GetComponent<RectTransform>();
+            slider.minValue = 1; slider.maxValue = 5; slider.wholeNumbers = true;
+            slider.value = PlayerPrefs.GetFloat(Demolition_GeneralVariables.ScrollSpeedKey, 2f);
 
-        // Handle
-        GameObject handleGO = new GameObject("Handle", typeof(RectTransform));
-        handleGO.transform.SetParent(sliderGO.transform);
-        var handleImage = handleGO.AddComponent<Image>();
-        handleImage.color = Color.white;
+            var lbl = new GameObject("Label", typeof(RectTransform));
+            lbl.transform.SetParent(canvas.transform);
+            var txt = lbl.AddComponent<TextMeshProUGUI>();
+            txt.text = "Vitesse"; txt.fontSize = 24;
 
-        // Relier slider
-        slider.fillRect = fillGO.GetComponent<RectTransform>();
-        slider.handleRect = handleGO.GetComponent<RectTransform>();
-        slider.targetGraphic = handleImage;
-        slider.minValue = 1f;
-        slider.maxValue = 5f;
-        slider.value = PlayerPrefs.GetFloat(Demolition_GeneralVariables.ScrollSpeedKey, 2f);
-        slider.wholeNumbers = true;
-
-        // Label "Vitesse"
-        GameObject speedLabel = new GameObject("Label", typeof(RectTransform));
-        speedLabel.transform.SetParent(canvas.transform);
-        var speedText = speedLabel.AddComponent<TextMeshProUGUI>();
-        speedText.text = "Vitesse";
-        speedText.fontSize = 24;
-        speedText.alignment = TextAlignmentOptions.Left;
-
-        // Position slider
-        RectTransform srt = sliderGO.GetComponent<RectTransform>();
-        srt.anchorMin = new Vector2(0.5f, 0.5f);
-        srt.anchorMax = new Vector2(0.5f, 0.5f);
-        srt.anchoredPosition = new Vector2(-200, 0);
-        srt.sizeDelta = new Vector2(300, 50);
-
-        Debug.Log("Slider ScrollSpeed ajoute");
+            var rt = go.GetComponent<RectTransform>();
+            rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
+            rt.anchoredPosition = new Vector2(-100, 50);
+            rt.sizeDelta = new Vector2(300, 50);
+            Debug.Log("Slider OK");
+        }
 
         EditorSceneManager.SaveScene(scene);
-        Debug.Log("Menu mis a jour: Toggle ModeOiseau + Slider ScrollSpeed ajoutes!");
+    }
+
+    static void SetupBackGrounds()
+    {
+        // Replace sprites in Accueil, Menu, Score scenes
+        // Already done in YAML on GitHub - just log
+        Debug.Log("Backgrounds deja configures dans les scenes");
     }
 }

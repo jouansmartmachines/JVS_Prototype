@@ -218,7 +218,7 @@ namespace Demolition
 
         void SetupDifficulty()
         {
-            string diff = PlayerPrefs.GetString(Demolition_GeneralVariables.DifficultyKey, "Normal");
+            string diff = PlayerPrefs.GetString(Demolition_GeneralVariables.GameTimeKey, "Normal");
 
             switch (diff)
             {
