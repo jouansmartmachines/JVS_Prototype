@@ -229,7 +229,7 @@ public class Demolition_SetupEditor : EditorWindow
             var aud = gmGO.AddComponent<AudioSource>();
             aud.playOnAwake = false;
             gm.impactSound = AssetDatabase.LoadAssetAtPath<AudioClip>(_soundPath + "/impact.wav");
-            gm.breakSound = AssetDatabase.LoadAssetAtPath<AudioClip>(_soundPath + "/break.wav");
+            gm.destructionSound = AssetDatabase.LoadAssetAtPath<AudioClip>(_soundPath + "/break.wav");
             gm.oiseauPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(_prefabPath + "/Oiseau.prefab");
             gm.impactEffectPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(_prefabPath + "/ImpactExplosion.prefab");
             Debug.Log("GameManager OK");
