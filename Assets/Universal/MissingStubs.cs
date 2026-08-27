@@ -49,38 +49,6 @@ namespace UnityRawInput
     }
 } 
 
-// --- OSC MANAGER STUB ---
-public class OSC_Manager : MonoBehaviour 
-{
-    private static OSC_Manager _instance;
-    public static OSC_Manager Instance 
-    {
-        get 
-        {
-            if (_instance == null) 
-            {
-                GameObject obj = new GameObject("OSC_Manager_Stub");
-                _instance = obj.AddComponent<OSC_Manager>();
-            }
-            return _instance;
-        }
-    }
-
-    public object receiveP;
-
-    public void onOSCAccueilTous(object arg = null) { }
-    public void onOSCAccueilAppli(object arg = null) { }
-    public void messageOutQuit(object arg = null) { }
-    public void OnResetAllScoreBoard(object arg = null) { }
-
-    public void ShowSoftKeyboard() { }
-    public void GameEnCours() { }
-    public void DeactivateAllOscMessages() { }
-    public void ReactivateAllOscMessages() { }
-    public void StartChoix() { }
-    public void SendAccueilTous() { }
-}
-
 // --- DOTWEEN STUBS & EXTENSIONS ---
 namespace DG.Tweening.Core 
 {

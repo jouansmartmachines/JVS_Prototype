@@ -99,7 +99,7 @@ namespace Demolition
             if (isScrolling)
             {
                 Vector3 pos = structuresParent.position;
-                pos.x -= currentScrollSpeed * Time.deltaTime * 50f;
+                pos.x -= currentScrollSpeed * Time.deltaTime;
                 structuresParent.position = pos;
             }
 
@@ -170,13 +170,6 @@ namespace Demolition
                 Destroy(effect, 2f);
             }
 
-            // Particules
-            if (explosionParticles != null)
-            {
-                explosionParticles.transform.position = worldPos;
-                explosionParticles.Play();
-            }
-
             // Appliquer une force à la structure la plus proche
             ApplyForceToNearestStructure(worldPos, 500f);
         }
@@ -230,15 +223,15 @@ namespace Demolition
             {
                 case "Easy":
                     gameDuration = 90f;
-                    baseScrollSpeed = 1.2f;
+                    baseScrollSpeed = 0.008f;
                     break;
                 case "Normal":
                     gameDuration = 60f;
-                    baseScrollSpeed = 2f;
+                    baseScrollSpeed = 0.01f;
                     break;
                 case "Hard":
                     gameDuration = 45f;
-                    baseScrollSpeed = 3.2f;
+                    baseScrollSpeed = 0.02f;
                     break;
             }
 
@@ -268,12 +261,6 @@ namespace Demolition
         public void AddScore(int points, Vector3 pos)
         {
             score += points;
-            // Feedback visuel du score
-            if (debrisParticles != null)
-            {
-                debrisParticles.transform.position = pos;
-                debrisParticles.Play();
-            }
         }
 
         void EndGame()
