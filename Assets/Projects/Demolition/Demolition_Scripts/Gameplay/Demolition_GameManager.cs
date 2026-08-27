@@ -159,8 +159,10 @@ namespace Demolition
 
             // Particules
             if (explosionParticles != null)
+            {
                 explosionParticles.transform.position = worldPos;
                 explosionParticles.Play();
+            }
 
             // Appliquer une force à la structure la plus proche
             ApplyForceToNearestStructure(worldPos, 500f);
