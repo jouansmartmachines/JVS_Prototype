@@ -276,7 +276,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10905, guid: 407785c49db7761004fbba5a6d82bc68, type: 0}
+  m_Sprite: {fileID: 0}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -648,7 +648,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 5126954722666051195}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &502660742
 GameObject:
@@ -1209,7 +1209,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1560288416}
-  m_Father: {fileID: 5126954722666051195}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -1720,11 +1720,8 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2133864910}
-  - {fileID: 6760041153640186097}
   - {fileID: 119422843207304478}
-  - {fileID: 6887205881317200207}
   - {fileID: 545639905}
-  - {fileID: 2035560289258264428}
   - {fileID: 622724072}
   m_Father: {fileID: 978255437}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -2968,7 +2965,6 @@ GameObject:
   m_Component:
   - component: {fileID: 119422843254890653}
   - component: {fileID: 119422843254890650}
-  - component: {fileID: 6080321823590002978}
   - component: {fileID: 119422843254890651}
   - component: {fileID: 119422843254890652}
   m_Layer: 5
@@ -3201,10 +3197,12 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
-
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 227201932}
   - {fileID: 1098126480}
+  - {fileID: 1480741958}
+  - {fileID: 358589148}
+  - {fileID: 978255437}
