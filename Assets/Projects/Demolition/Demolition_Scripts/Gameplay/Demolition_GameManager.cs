@@ -14,12 +14,12 @@ namespace Demolition
 
         [Header("Modes de lancement")]
         public LaunchMode launchMode = LaunchMode.Oiseau;
-        public GameObject oiseauPrefab { get; private set; }
-        public GameObject impactEffectPrefab { get; private set; }
+        public GameObject oiseauPrefab;
+        public GameObject impactEffectPrefab;
 
         [Header("Structure")]
         public Transform structuresParent;
-        public GameObject[] tableauPrefabs { get; private set; }
+        public GameObject[] tableauPrefabs;
         public string[] tableauNames = { "Tableau_1", "Tableau_2", "Tableau_3" };
 
         [Header("Défilement")]
