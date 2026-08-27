@@ -4,12 +4,13 @@ using MenuSelection;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using DG.Tweening;
 using TMPro;
 using Tool;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using static OnlineMapsGooglePlacesAutocompleteResult;
+//using static OnlineMapsGooglePlacesAutocompleteResult;
 
 namespace Basket
 {
@@ -36,7 +37,6 @@ namespace Basket
         public float Multiplicator { get; set; } = 1f;
         public Coroutine PointCountDownCoroutine { get; set; }
         public int ScoreMultiplicator { get; set; }
-        public Tween FillTween { get; set; }
         public int NetCount { get; set; } = 0;
     }
 
@@ -90,9 +90,7 @@ namespace Basket
                     IEnumerator Transition()
                     {
                         team.NetCount++;
-                        team.Target.SetActive(false);
-                        team.Ball.DOColor(new Color(0.52f, 0.52f, 0.52f, 0.94f), 0.25f);
-                        team.Ball.transform.DOScale(0.75f, 0.125f);
+                       
                         team.ThrowManager.CanShot = false;
                         team.PointCountDownHolder.gameObject.SetActive(false);
                         if (team.PointCountDownCoroutine != null) StopCoroutine(team.PointCountDownCoroutine);
@@ -154,7 +152,7 @@ namespace Basket
                             team.Target.transform.DOScale(1f / team.Multiplicator, 0f);
                         }
 
-                        team.Ball.DOColor(Color.white, 0.25f);
+                  
                         team.Ball.transform.DOScale(1.25f, 0.125f);
 
                         //Debug.Log(team.Ball.color);
@@ -177,7 +175,6 @@ namespace Basket
                     foreach (var t in Teams)
                     {
                         t.Target.SetActive(false);
-                        t.Ball.DOColor(new Color(0.52f, 0.52f, 0.52f, 0.94f), 0.5f);
                         t.Ball.transform.DOScale(0.75f, 0.25f);
                     }
 
@@ -215,43 +212,25 @@ namespace Basket
         {
             team.PointCountDownHolder.gameObject.SetActive(true);
 
-            if(team.FillTween != null && team.FillTween.IsPlaying())
-            {
-                team.FillTween.Pause();
-                team.FillTween.Kill();
-            }
-
             (team.PointCountDownHolder.transform as RectTransform).localScale = Vector3.zero;
             team.PointCountDownText.text = "3";
             team.ScoreMultiplicator = 3;
             team.PointCountDownHolder.fillAmount = 0;
-            team.FillTween = DOTween.To(
-            () => team.PointCountDownHolder.fillAmount,
-                x => team.PointCountDownHolder.fillAmount = x,
-                1f,
-                1.5f
-                ).SetEase(Ease.Linear).OnPlay(() => (team.PointCountDownHolder.transform as RectTransform).DOScale(1, 0.5f).SetEase(Ease.OutElastic));
-            yield return team.FillTween.WaitForCompletion();
+            
 
 
             (team.PointCountDownHolder.transform as RectTransform).localScale = Vector3.zero;
             team.PointCountDownText.text = "2";
             team.ScoreMultiplicator = 2;
             team.PointCountDownHolder.fillAmount = 0;
-            team.FillTween = DOTween.To(
-                () => team.PointCountDownHolder.fillAmount,
-                x => team.PointCountDownHolder.fillAmount = x,
-                1f,
-                2.5f
-                ).SetEase(Ease.Linear).OnPlay(() => (team.PointCountDownHolder.transform as RectTransform).DOScale(0.75f, 0.5f).SetEase(Ease.OutElastic));
-            yield return team.FillTween.WaitForCompletion();
+         
 
 
             (team.PointCountDownHolder.transform as RectTransform).localScale = Vector3.zero;
             team.PointCountDownText.text = "1";
             team.ScoreMultiplicator = 1;
             team.PointCountDownHolder.fillAmount = 1;
-            yield return (team.PointCountDownHolder.transform as RectTransform).DOScale(0.5f, 0.5f).SetEase(Ease.OutElastic);
+            yield return new WaitForSeconds(1f);
         }
 
         public IEnumerator MoveCameraToPoint(Transform cam, Vector3 end)
@@ -282,7 +261,6 @@ namespace Basket
             else
             {
                 if (t.Score < 4) t.Target.SetActive(true);
-                t.Ball.DOColor(Color.white, 0.5f);
                 t.Ball.transform.DOScale(1.25f, 0.25f);
             }
         }
