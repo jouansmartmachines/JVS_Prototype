@@ -20,7 +20,7 @@ namespace Demolition
 
         public const string HighScoreKey = "Demolition_HighScore";
         public const string ModeOiseauKey = "Demolition_ModeOiseau";
-        public const string DifficultyKey = "Demolition_Difficulty";
+        public const string GameTimeKey = "Demolition_GameTime";
         public const string ScrollSpeedKey = "Demolition_ScrollSpeed";
 
         public override void ReceiveName(string name)

@@ -36,7 +36,7 @@ namespace Demolition
 
         void SetDifficulty()
         {
-            switch (PlayerPrefs.GetString("Difficulty"))
+            switch (PlayerPrefs.GetString(Demolition_GeneralVariables.GameTimeKey))
             {
                 case "Easy": difficultyDropdown.value = 0; break;
                 case "Medium": difficultyDropdown.value = 1; break;
@@ -48,9 +48,9 @@ namespace Demolition
         {
             switch (difficultyDropdown.value)
             {
-                case 0: PlayerPrefs.SetString("Difficulty", "Easy"); break;
-                case 1: PlayerPrefs.SetString("Difficulty", "Medium"); break;
-                case 2: PlayerPrefs.SetString("Difficulty", "Hard"); break;
+                case 0: PlayerPrefs.SetString(Demolition_GeneralVariables.GameTimeKey, "Easy"); break;
+                case 1: PlayerPrefs.SetString(Demolition_GeneralVariables.GameTimeKey, "Medium"); break;
+                case 2: PlayerPrefs.SetString(Demolition_GeneralVariables.GameTimeKey, "Hard"); break;
             }
         }
 
