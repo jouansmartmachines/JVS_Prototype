@@ -6,16 +6,16 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Projects/Demolition/Demolition_Scenes/Accueil_Demolition.unity
+    path: Assets/Projects/Basketball/Scenes/Accueil_Basketball.unity
     guid: 9371b971bea31c44d8e21f9d3725171f
   - enabled: 1
-    path: Assets/Projects/Demolition/Demolition_Scenes/Menu_Demolition.unity
+    path: Assets/Projects/Basketball/Scenes/Menu_Basketball.unity
     guid: e8d58041a7eed3e4783de153a383692b
   - enabled: 1
     path: Assets/Projects/Demolition/Demolition_Scenes/GameScene_Demolition.unity
     guid: 22449ef9df46cdb0b4ffb8901dd390a2
   - enabled: 1
-    path: Assets/Projects/Demolition/Demolition_Scenes/Score_Demolition.unity
+    path: Assets/Projects/Basketball/Scenes/Score_Basketball.unity
     guid: 7fdaff77a66f3124498749e3ba77fa0d
   - enabled: 1
     path: Assets/Universal/LoadingScreen/Scenes/LoadingScreen.unity
@@ -23,4 +23,5 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Universal/SelectionMenu/Scenes/SelectionMenu.unity
     guid: 223b5f088c7798135c242fb8b74e3bf5
-  m_configObjects: {}
+  m_configObjects:
+    com.unity.dt.app-ui: {fileID: 11400000, guid: 1b1c20d82303e4b5781c3ef50ac1449f, type: 2}
