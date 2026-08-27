@@ -108,13 +108,10 @@ MonoBehaviour:
   m_Name:
   m_EditorClassIdentifier:
   launchMode: 0
-  oiseauPrefab: {fileID: 100100000, guid: 3551d858673b681f0949d2bebfb89227, type: 3}
-  impactEffectPrefab: {fileID: 100100000, guid: cbc3ecf27c89a8f86c3d7fd505ae9e88, type: 3}
+  oiseauPrefab: {fileID: 0}
+  impactEffectPrefab: {fileID: 0}
   structuresParent: {fileID: 401}
-  tableauPrefabs:
-  - {fileID: 100100000, guid: 20d872d6d2447f5f1992729dcc7f913d, type: 3}
-  - {fileID: 100100000, guid: 8797266166bb52e7cbd6d5d3ba79c2f1, type: 3}
-  - {fileID: 100100000, guid: d20fbe2ed1f584702d484ec2db6fc13f, type: 3}
+  tableauPrefabs: []
   baseScrollSpeed: 2
   currentScrollSpeed: 2
   gameDuration: 60
@@ -179,6 +176,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 501}
+  - component: {fileID: 502}
+  - component: {fileID: 503}
   m_Layer: 0
   m_Name: EventSystem
   m_TagString: Untagged
@@ -204,67 +203,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_Script: {fileID: 11500000, guid: 4f231c4fb786f3946a6b90b886c48677, type: 3}
 --- !u!1660057539 &9223372036854775807
-
---- !u!1001 &999999999
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 3974371604670181987, guid: 405ae91de013fbe4a88a17153f3e3a52, type: 3}
-      propertyPath: m_Name
-      value: GeneralVariable
-      objectReference: {fileID: 0}
-    - target: {fileID: 4203373875502466000, guid: 405ae91de013fbe4a88a17153f3e3a52, type: 3}
-      propertyPath: m_RootOrder
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 4203373875502466000, guid: 405ae91de013fbe4a88a17153f3e3a52, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4203373875502466000, guid: 405ae91de013fbe4a88a17153f3e3a52, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4203373875502466000, guid: 405ae91de013fbe4a88a17153f3e3a52, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4203373875502466000, guid: 405ae91de013fbe4a88a17153f3e3a52, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4203373875502466000, guid: 405ae91de013fbe4a88a17153f3e3a52, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4203373875502466000, guid: 405ae91de013fbe4a88a17153f3e3a52, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4203373875502466000, guid: 405ae91de013fbe4a88a17153f3e3a52, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4323395270781668479, guid: 405ae91de013fbe4a88a17153f3e3a52, type: 3}
-      propertyPath: gameName
-      value: Demolition
-      objectReference: {fileID: 0}
-    m_SourcePrefab: {fileID: 100100000, guid: 405ae91de013fbe4a88a17153f3e3a52, type: 3}
-
---- !u!1660057539 &9223372036854775807
 SceneRoots:
-  m_ObjectHideFlags: 0
-  m_Roots:
-  - {fileID: 101}
-  - {fileID: 201}
-  - {fileID: 301}
-  - {fileID: 401}
-  - {fileID: 501}
-
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 101}
