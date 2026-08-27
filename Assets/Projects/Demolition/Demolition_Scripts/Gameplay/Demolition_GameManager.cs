@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections;
 using MenuSelection;
+using OSC;
 
 namespace Demolition
 {
@@ -223,15 +224,15 @@ namespace Demolition
             {
                 case "Easy":
                     gameDuration = 90f;
-                    baseScrollSpeed = 0.008f;
+                    baseScrollSpeed = 1.2f;
                     break;
                 case "Normal":
                     gameDuration = 60f;
-                    baseScrollSpeed = 0.01f;
+                    baseScrollSpeed = 2f;
                     break;
                 case "Hard":
                     gameDuration = 45f;
-                    baseScrollSpeed = 0.02f;
+                    baseScrollSpeed = 3.2f;
                     break;
             }
 
