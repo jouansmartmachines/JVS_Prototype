@@ -75,14 +75,8 @@ public class Demolition_SetupEditor : EditorWindow
         SetupGameScene();
         Debug.Log("4/6 GameScene configuree");
 
-        // 5. Menu
-        SetupMenu();
-        Debug.Log("5/6 Menu Toggle+Slider ajoutes");
-
-        // 6. Accueil + Score backgrounds
-        SetupBackGrounds();
-        Debug.Log("6/6 Backgrounds scenes mis a jour");
-
+        
+        
         AssetDatabase.Refresh();
         Debug.Log("=== FINI: Demolition completement configure ===");
     }
