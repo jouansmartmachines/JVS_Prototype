@@ -20,6 +20,11 @@ public class Demolition_SetupEditor : EditorWindow
         string scenePf = basePath + "/ScenePrefabs";
         string demPrefabs = basePath + "/Demolition_Prefabs";
 
+        // Creer les dossiers avant tout
+        Directory.CreateDirectory(prefabPath);
+        Directory.CreateDirectory(texPath);
+        Directory.CreateDirectory(soundPath);
+
         // 1. Textures gameplay
         MakePNG(texPath, "bois", 64, 32, new Color(0.545f, 0.353f, 0.169f));
         MakePNG(texPath, "verre", 64, 32, new Color(0.678f, 0.847f, 0.902f, 0.7f));
