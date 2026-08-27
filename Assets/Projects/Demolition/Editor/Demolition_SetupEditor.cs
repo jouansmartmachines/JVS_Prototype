@@ -13,97 +13,116 @@ public class Demolition_SetupEditor : EditorWindow
         string texPath = basePath + "/Textures";
         string soundPath = basePath + "/Sounds";
 
-        Directory.CreateDirectory(texPath);
-        Directory.CreateDirectory(soundPath);
-        Directory.CreateDirectory(prefabPath);
+        // 1. Creer les PNG puis les importer comme sprites
+        MakePNG(texPath, "bois", 64, 32, new Color(0.545f, 0.353f, 0.169f));
+        MakePNG(texPath, "verre", 64, 32, new Color(0.678f, 0.847f, 0.902f, 0.7f));
+        MakePNG(texPath, "pierre", 64, 32, new Color(0.5f, 0.5f, 0.5f));
+        MakePNG(texPath, "oiseau", 32, 32, new Color(0.863f, 0.196f, 0.196f));
+        MakePNG(texPath, "impact", 64, 64, new Color(1f, 0.647f, 0f));
+        MakePNG(texPath, "debris_bois", 16, 8, new Color(0.545f, 0.353f, 0.169f));
+        MakePNG(texPath, "debris_verre", 8, 8, new Color(0.678f, 0.847f, 0.902f));
+        MakePNG(texPath, "debris_pierre", 12, 12, new Color(0.5f, 0.5f, 0.5f));
 
-        // 1. Creer les textures PNG
-        AssetDatabase.StartAssetEditing();
-        CreatePNG(texPath + "/bois.png", 64, 32, new Color(0.545f, 0.353f, 0.169f));
-        CreatePNG(texPath + "/verre.png", 64, 32, new Color(0.678f, 0.847f, 0.902f, 0.7f));
-        CreatePNG(texPath + "/pierre.png", 64, 32, new Color(0.5f, 0.5f, 0.5f));
-        CreatePNG(texPath + "/oiseau.png", 32, 32, new Color(0.863f, 0.196f, 0.196f));
-        CreatePNG(texPath + "/impact.png", 64, 64, new Color(1f, 0.647f, 0f));
-        CreatePNG(texPath + "/debris_bois.png", 16, 8, new Color(0.545f, 0.353f, 0.169f));
-        CreatePNG(texPath + "/debris_verre.png", 8, 8, new Color(0.678f, 0.847f, 0.902f));
-        CreatePNG(texPath + "/debris_pierre.png", 12, 12, new Color(0.5f, 0.5f, 0.5f));
-        AssetDatabase.StopAssetEditing();
+        // 2. Forcer l'import + reimport
         AssetDatabase.Refresh();
 
-        // 2. Sons
-        CreateWAV(soundPath + "/impact.wav", 440, 0.15f, 0.8f);
-        CreateWAV(soundPath + "/destruction.wav", 220, 0.3f, 0.7f);
-        CreateWAV(soundPath + "/gameover.wav", 180, 0.5f, 0.6f);
+        // 3. Forcer le mode sprite sur chaque texture
+        SetSpriteMode(texPath + "/bois.png");
+        SetSpriteMode(texPath + "/verre.png");
+        SetSpriteMode(texPath + "/pierre.png");
+        SetSpriteMode(texPath + "/oiseau.png");
+        SetSpriteMode(texPath + "/impact.png");
+        SetSpriteMode(texPath + "/debris_bois.png");
+        SetSpriteMode(texPath + "/debris_verre.png");
+        SetSpriteMode(texPath + "/debris_pierre.png");
         AssetDatabase.Refresh();
 
-        // 3. Charger les sprites fraichement importes
-        Sprite boisSprite = AssetDatabase.LoadAssetAtPath<Sprite>(texPath + "/bois.png");
-        Sprite verreSprite = AssetDatabase.LoadAssetAtPath<Sprite>(texPath + "/verre.png");
-        Sprite pierreSprite = AssetDatabase.LoadAssetAtPath<Sprite>(texPath + "/pierre.png");
-        Sprite oiseauSprite = AssetDatabase.LoadAssetAtPath<Sprite>(texPath + "/oiseau.png");
-        Sprite impactSprite = AssetDatabase.LoadAssetAtPath<Sprite>(texPath + "/impact.png");
-        Sprite debrisBoisSprite = AssetDatabase.LoadAssetAtPath<Sprite>(texPath + "/debris_bois.png");
-        Sprite debrisVerreSprite = AssetDatabase.LoadAssetAtPath<Sprite>(texPath + "/debris_verre.png");
-        Sprite debrisPierreSprite = AssetDatabase.LoadAssetAtPath<Sprite>(texPath + "/debris_pierre.png");
+        // 4. Sons
+        MakeWAV(soundPath + "/impact.wav", 440, 0.15f, 0.8f);
+        MakeWAV(soundPath + "/destruction.wav", 220, 0.3f, 0.7f);
+        MakeWAV(soundPath + "/gameover.wav", 180, 0.5f, 0.6f);
+        AssetDatabase.Refresh();
 
-        if (boisSprite == null) { Debug.LogError("Sprites non trouves! Reessaie."); return; }
+        // 5. Charger les sprites
+        Sprite sBois = LoadSprite(texPath + "/bois.png");
+        Sprite sVerre = LoadSprite(texPath + "/verre.png");
+        Sprite sPierre = LoadSprite(texPath + "/pierre.png");
+        Sprite sOiseau = LoadSprite(texPath + "/oiseau.png");
+        Sprite sImpact = LoadSprite(texPath + "/impact.png");
+        Sprite sDBois = LoadSprite(texPath + "/debris_bois.png");
+        Sprite sDVerre = LoadSprite(texPath + "/debris_verre.png");
+        Sprite sDPierre = LoadSprite(texPath + "/debris_pierre.png");
 
-        // 4. Blocs
-        GameObject blocBois = CreateBloc(prefabPath, "Bloc_Bois", boisSprite, Demolition_Block.MaterialType.Bois, 2, 50);
-        GameObject blocVerre = CreateBloc(prefabPath, "Bloc_Verre", verreSprite, Demolition_Block.MaterialType.Verre, 1, 100);
-        GameObject blocPierre = CreateBloc(prefabPath, "Bloc_Pierre", pierreSprite, Demolition_Block.MaterialType.Pierre, 4, 150);
+        if (sBois == null) { Debug.LogError("ERREUR: impossible de charger les sprites!"); return; }
 
-        // 5. Debris
-        GameObject dBois = CreateDebris(prefabPath, "Debris_Bois", debrisBoisSprite);
-        GameObject dVerre = CreateDebris(prefabPath, "Debris_Verre", debrisVerreSprite);
-        GameObject dPierre = CreateDebris(prefabPath, "Debris_Pierre", debrisPierreSprite);
+        // 6. Blocs
+        var bBois = CreateBloc(prefabPath, "Bloc_Bois", sBois, Demolition_Block.MaterialType.Bois, 2, 50);
+        var bVerre = CreateBloc(prefabPath, "Bloc_Verre", sVerre, Demolition_Block.MaterialType.Verre, 1, 100);
+        var bPierre = CreateBloc(prefabPath, "Bloc_Pierre", sPierre, Demolition_Block.MaterialType.Pierre, 4, 150);
 
-        // Lier debris -> blocs
-        LinkDebris(blocBois, dBois);
-        LinkDebris(blocVerre, dVerre);
-        LinkDebris(blocPierre, dPierre);
+        // 7. Debris
+        var dBois = CreateDebris(prefabPath, "Debris_Bois", sDBois);
+        var dVerre = CreateDebris(prefabPath, "Debris_Verre", sDVerre);
+        var dPierre = CreateDebris(prefabPath, "Debris_Pierre", sDPierre);
+        LinkDebris(bBois, dBois); LinkDebris(bVerre, dVerre); LinkDebris(bPierre, dPierre);
 
-        // 6. Oiseau + Explosion
-        CreateOiseau(prefabPath, oiseauSprite, impactSprite);
-        CreateImpact(prefabPath, impactSprite);
+        // 8. Oiseau
+        CreateOiseau(prefabPath, sOiseau, sImpact);
 
-        // 7. Structures
-        CreateStruct(prefabPath, "Structure_Exemple",
-            new[] { "Bloc_Bois", "Bloc_Bois", "Bloc_Bois" },
-            new Vector3[] { new(0, 0, 0), new(0.7f, 0.35f, 0), new(1.4f, 0.7f, 0) });
-        CreateStruct(prefabPath, "Tableau_1",
-            new[] { "Bloc_Bois", "Bloc_Verre", "Bloc_Bois", "Bloc_Pierre" },
-            new Vector3[] { new(0, 0, 0), new(0.7f, 0.35f, 0), new(1.4f, 0, 0), new(2.1f, 0.35f, 0) });
-        CreateStruct(prefabPath, "Tableau_2",
-            new[] { "Bloc_Pierre", "Bloc_Bois", "Bloc_Verre", "Bloc_Verre" },
-            new Vector3[] { new(0, 0, 0), new(0.7f, 0.7f, 0), new(1.4f, 0, 0), new(2.1f, 0, 0) });
-        CreateStruct(prefabPath, "Tableau_3",
-            new[] { "Bloc_Verre", "Bloc_Bois", "Bloc_Pierre", "Bloc_Bois" },
-            new Vector3[] { new(0, 0, 0), new(0.7f, 0, 0), new(1.4f, 0.7f, 0), new(0.7f, 0.7f, 0) });
+        // 9. Structures
+        MakeStruct(prefabPath, "Structure_Exemple", new[] { "Bloc_Bois", "Bloc_Bois", "Bloc_Bois" },
+            new Vector3[] { new(0,0,0), new(0.7f,0.35f,0), new(1.4f,0.7f,0) });
+        MakeStruct(prefabPath, "Tableau_1", new[] { "Bloc_Bois", "Bloc_Verre", "Bloc_Bois", "Bloc_Pierre" },
+            new Vector3[] { new(0,0,0), new(0.7f,0.35f,0), new(1.4f,0,0), new(2.1f,0.35f,0) });
+        MakeStruct(prefabPath, "Tableau_2", new[] { "Bloc_Pierre", "Bloc_Bois", "Bloc_Verre", "Bloc_Verre" },
+            new Vector3[] { new(0,0,0), new(0.7f,0.7f,0), new(1.4f,0,0), new(2.1f,0,0) });
+        MakeStruct(prefabPath, "Tableau_3", new[] { "Bloc_Verre", "Bloc_Bois", "Bloc_Pierre", "Bloc_Bois" },
+            new Vector3[] { new(0,0,0), new(0.7f,0,0), new(1.4f,0.7f,0), new(0.7f,0.7f,0) });
 
-        // 8. Ajouter GeneralVariable a la GameScene + assigner references
-        SetupGameScene(prefabPath, soundPath);
+        // 10. Setup scene
+        SetupScene(prefabPath, soundPath);
 
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
         Debug.Log("OK - Prefabs Demolition generes !");
     }
 
-    static void CreatePNG(string path, int w, int h, Color color)
+    static void MakePNG(string folder, string name, int w, int h, Color color)
     {
-        if (File.Exists(path)) return;
+        Directory.CreateDirectory(folder);
+        string path = folder + "/" + name + ".png";
+        if (File.Exists(path)) File.Delete(path);
+
         Texture2D tex = new Texture2D(w, h, TextureFormat.RGBA32, false);
-        for (int y = 0; y < h; y++)
-            for (int x = 0; x < w; x++)
-                tex.SetPixel(x, y, color);
+        Color[] px = new Color[w * h];
+        for (int i = 0; i < px.Length; i++) px[i] = color;
+        tex.SetPixels(px);
         tex.Apply();
         File.WriteAllBytes(path, tex.EncodeToPNG());
         DestroyImmediate(tex);
     }
 
-    static void CreateWAV(string path, float freq, float dur, float vol)
+    static void SetSpriteMode(string path)
+    {
+        if (!File.Exists(path)) return;
+        TextureImporter imp = AssetImporter.GetAtPath(path) as TextureImporter;
+        if (imp != null)
+        {
+            imp.textureType = TextureImporterType.Sprite;
+            imp.spriteImportMode = SpriteImportMode.Single;
+            imp.SaveAndReimport();
+        }
+    }
+
+    static Sprite LoadSprite(string path)
+    {
+        return AssetDatabase.LoadAssetAtPath<Sprite>(path);
+    }
+
+    static void MakeWAV(string path, float freq, float dur, float vol)
     {
         if (File.Exists(path)) return;
+        Directory.CreateDirectory(Path.GetDirectoryName(path));
         int sr = 44100;
         int samples = (int)(sr * dur);
         float[] data = new float[samples];
@@ -182,15 +201,7 @@ public class Demolition_SetupEditor : EditorWindow
         DestroyImmediate(go);
     }
 
-    static void CreateImpact(string path, Sprite sprite)
-    {
-        GameObject go = new GameObject("ImpactExplosion", typeof(SpriteRenderer));
-        go.GetComponent<SpriteRenderer>().sprite = sprite; go.GetComponent<SpriteRenderer>().sortingOrder = 4;
-        PrefabUtility.SaveAsPrefabAsset(go, path + "/ImpactExplosion.prefab");
-        DestroyImmediate(go);
-    }
-
-    static void CreateStruct(string path, string name, string[] blocks, Vector3[] pos)
+    static void MakeStruct(string path, string name, string[] blocks, Vector3[] pos)
     {
         GameObject go = new GameObject(name, typeof(Demolition_Structure));
         var s = go.GetComponent<Demolition_Structure>();
@@ -207,22 +218,19 @@ public class Demolition_SetupEditor : EditorWindow
         DestroyImmediate(go);
     }
 
-    static void SetupGameScene(string prefabPath, string soundPath)
+    static void SetupScene(string prefabPath, string soundPath)
     {
         string scenePath = "Assets/Projects/Demolition/Demolition_Scenes/GameScene_Demolition.unity";
         var scene = UnityEditor.SceneManagement.EditorSceneManager.OpenScene(scenePath);
 
-        // Ajouter GeneralVariable prefab instance
-        GameObject gvPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath + "/GeneralVariable.prefab");
-        if (gvPrefab != null)
+        if (GameObject.Find("GeneralVariable") == null)
         {
-            var existing = GameObject.Find("GeneralVariable");
-            if (existing == null)
+            GameObject gvPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath + "/GeneralVariable.prefab");
+            if (gvPrefab != null)
             {
                 var gv = (GameObject)PrefabUtility.InstantiatePrefab(gvPrefab);
                 gv.name = "GeneralVariable";
                 gv.GetComponent<Demolition_GeneralVariables>().gameName = "Demolition";
-                Debug.Log("GeneralVariable ajoute a la scene");
             }
         }
 
@@ -242,6 +250,6 @@ public class Demolition_SetupEditor : EditorWindow
         gm.structuresParent = GameObject.Find("StructuresParent")?.transform;
 
         UnityEditor.SceneManagement.EditorSceneManager.SaveScene(scene);
-        Debug.Log("GameScene mise a jour avec toutes les references!");
+        Debug.Log("GameScene mise a jour !");
     }
 }
