@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 87b3a430d836d28c2e63791a5650dd16, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameName: 
+  gameName: Demolition 
   callGameEnCoursAtStart: 1
   dataSaved: []
   margeY: 1
