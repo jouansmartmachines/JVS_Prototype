@@ -3,6 +3,7 @@ using UnityEditor;
 using System.IO;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using TMPro;
 using UnityEditor.SceneManagement;
 using UnityEngine.SceneManagement;
 using Demolition;
@@ -293,5 +294,103 @@ public class Demolition_SetupEditor : EditorWindow
             b.transform.localPosition = pos[i]; s.blocs[i] = b.GetComponent<Demolition_Block>();
         }
         PrefabUtility.SaveAsPrefabAsset(go, path + "/" + name + ".prefab"); DestroyImmediate(go);
+    }
+
+    [MenuItem("Tools/Demolition - Ajouter Toggle & Slider")]
+    static void AddMenuControls()
+    {
+        string scenePath = "Assets/Projects/Demolition/Demolition_Scenes/Menu_Demolition.unity";
+        var scene = EditorSceneManager.OpenScene(scenePath);
+
+        // Trouver le canvas
+        var canvas = Object.FindFirstObjectByType<Canvas>();
+        if (canvas == null) { Debug.LogError("Canvas pas trouve!"); return; }
+
+        // --- Toggle ModeOiseau ---
+        GameObject toggleGO = new GameObject("ModeOiseau", typeof(RectTransform));
+        toggleGO.transform.SetParent(canvas.transform);
+        toggleGO.AddComponent<Image>();
+        Toggle toggle = toggleGO.AddComponent<Toggle>();
+        toggle.isOn = PlayerPrefs.GetInt(Demolition_GeneralVariables.ModeOiseauKey, 1) == 1;
+
+        // Checkmark
+        GameObject checkGO = new GameObject("Checkmark", typeof(RectTransform));
+        checkGO.transform.SetParent(toggleGO.transform);
+        Image checkImage = checkGO.AddComponent<Image>();
+        checkGO.AddComponent<CanvasRenderer>();
+
+        // Relier checkmark au toggle
+        toggle.graphic = checkImage;
+        toggle.targetGraphic = checkImage;
+
+        // Label "Oiseau / Impact"
+        GameObject labelGO = new GameObject("Label", typeof(RectTransform));
+        labelGO.transform.SetParent(toggleGO.transform);
+        var labelText = labelGO.AddComponent<TextMeshProUGUI>();
+        labelText.text = "Mode Oiseau";
+        labelText.fontSize = 24;
+        labelText.alignment = TextAlignmentOptions.Left;
+
+        // Position toggle
+        RectTransform rt = toggleGO.GetComponent<RectTransform>();
+        rt.anchorMin = new Vector2(0.5f, 0.5f);
+        rt.anchorMax = new Vector2(0.5f, 0.5f);
+        rt.anchoredPosition = new Vector2(-200, 100);
+        rt.sizeDelta = new Vector2(200, 50);
+
+        Debug.Log("Toggle ModeOiseau ajoute");
+
+        // --- Slider ScrollSpeed ---
+        GameObject sliderGO = new GameObject("ScrollSpeed", typeof(RectTransform));
+        sliderGO.transform.SetParent(canvas.transform);
+        Slider slider = sliderGO.AddComponent<Slider>();
+        sliderGO.AddComponent<Image>();
+
+        // Background du slider
+        GameObject bgGO = new GameObject("Background", typeof(RectTransform));
+        bgGO.transform.SetParent(sliderGO.transform);
+        var bgImage = bgGO.AddComponent<Image>();
+        bgImage.color = Color.gray;
+
+        // Fill
+        GameObject fillGO = new GameObject("Fill", typeof(RectTransform));
+        fillGO.transform.SetParent(sliderGO.transform);
+        var fillImage = fillGO.AddComponent<Image>();
+        fillImage.color = Color.white;
+
+        // Handle
+        GameObject handleGO = new GameObject("Handle", typeof(RectTransform));
+        handleGO.transform.SetParent(sliderGO.transform);
+        var handleImage = handleGO.AddComponent<Image>();
+        handleImage.color = Color.white;
+
+        // Relier slider
+        slider.fillRect = fillGO.GetComponent<RectTransform>();
+        slider.handleRect = handleGO.GetComponent<RectTransform>();
+        slider.targetGraphic = handleImage;
+        slider.minValue = 1f;
+        slider.maxValue = 5f;
+        slider.value = PlayerPrefs.GetFloat(Demolition_GeneralVariables.ScrollSpeedKey, 2f);
+        slider.wholeNumbers = true;
+
+        // Label "Vitesse"
+        GameObject speedLabel = new GameObject("Label", typeof(RectTransform));
+        speedLabel.transform.SetParent(canvas.transform);
+        var speedText = speedLabel.AddComponent<TextMeshProUGUI>();
+        speedText.text = "Vitesse";
+        speedText.fontSize = 24;
+        speedText.alignment = TextAlignmentOptions.Left;
+
+        // Position slider
+        RectTransform srt = sliderGO.GetComponent<RectTransform>();
+        srt.anchorMin = new Vector2(0.5f, 0.5f);
+        srt.anchorMax = new Vector2(0.5f, 0.5f);
+        srt.anchoredPosition = new Vector2(-200, 0);
+        srt.sizeDelta = new Vector2(300, 50);
+
+        Debug.Log("Slider ScrollSpeed ajoute");
+
+        EditorSceneManager.SaveScene(scene);
+        Debug.Log("Menu mis a jour: Toggle ModeOiseau + Slider ScrollSpeed ajoutes!");
     }
 }
