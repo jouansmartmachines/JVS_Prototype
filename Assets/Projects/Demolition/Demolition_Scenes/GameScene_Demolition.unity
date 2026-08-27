@@ -33,6 +33,7 @@ Transform:
 --- !u!20 &102
 Camera:
   m_ObjectHideFlags: 0
+  m_GameObject: {fileID: 100}
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
@@ -45,26 +46,8 @@ AudioListener:
   m_ObjectHideFlags: 0
   m_GameObject: {fileID: 100}
   m_Enabled: 1
---- !u!1 &200
-GameObject:
-  m_ObjectHideFlags: 0
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 201}
-  m_Layer: 0
-  m_Name: Directional Light
-  m_IsActive: 1
---- !u!4 &201
-Transform:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_LocalRotation: {x: 0.4082179, y: -0.23456968, z: 0.10938163, w: 0.8754261}
-  m_LocalPosition: {x: 0, y: 3, z: 0}
-  m_Children: []
-  m_Father: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 101}
-  - {fileID: 201}

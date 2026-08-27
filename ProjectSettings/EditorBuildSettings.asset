@@ -13,7 +13,7 @@ EditorBuildSettings:
     guid: e8d58041a7eed3e4783de153a383692b
   - enabled: 1
     path: Assets/Projects/Demolition/Demolition_Scenes/GameScene_Demolition.unity
-    guid: dd24b9431f954569b6080b69ca790069
+    guid: 63190b4fb68fa3f2887b3caf46ca30a9
   - enabled: 1
     path: Assets/Projects/Demolition/Demolition_Scenes/Score_Demolition.unity
     guid: 7fdaff77a66f3124498749e3ba77fa0d
