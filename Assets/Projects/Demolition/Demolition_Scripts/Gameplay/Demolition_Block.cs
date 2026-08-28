@@ -37,6 +37,16 @@ namespace Demolition
                 rb = gameObject.AddComponent<Rigidbody2D>();
 
             maxHp = hp;
+
+            // Charger les sprites depuis Resources si non assignes
+            if (spriteRenderer == null)
+                spriteRenderer = GetComponent<SpriteRenderer>();
+            if (damageSprites == null || damageSprites.Length == 0)
+            {
+                damageSprites = new Sprite[2];
+                damageSprites[0] = Resources.Load<Sprite>("Textures/fissure1");
+                damageSprites[1] = Resources.Load<Sprite>("Textures/fissure2");
+            }
         }
 
         void Start()

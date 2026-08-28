@@ -37,7 +37,11 @@ namespace Demolition
             flightTime = 0f;
             startX = transform.position.x;
 
-            // De dos
+            // Charger le sprite depuis Resources (evite les prefabs sans sprite)
+            if (spriteRenderer == null)
+                spriteRenderer = GetComponent<SpriteRenderer>();
+            if (oiseauDos == null)
+                oiseauDos = Resources.Load<Sprite>("Textures/oiseau_dos");
             if (spriteRenderer != null && oiseauDos != null)
                 spriteRenderer.sprite = oiseauDos;
 

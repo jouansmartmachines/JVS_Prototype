@@ -22,7 +22,7 @@ namespace Demolition
         public Transform structuresParent;
 
         [Header("Défilement")]
-        public float baseScrollSpeed = 0.8f;
+        public float baseScrollSpeed = 0.3f;
         public float currentScrollSpeed;
         private bool isScrolling = true;
 
@@ -58,6 +58,8 @@ namespace Demolition
             else Destroy(gameObject);
         }
 
+        float groundY = -2f; // decalage pour poser les structures sur le sol (y=-5 + taille 2, top a y=-4, StructuresParent a y=-2)
+
         void Start()
         {
             w = Screen.width;
@@ -77,8 +79,8 @@ namespace Demolition
             currentTime = gameDuration;
             score = 0;
 
-            // Spawn du premier tableau
-            SpawnTableau(Vector3.zero);
+            // Spawn du premier tableau SUR le sol
+            SpawnTableau(new Vector3(0, groundY, 0));
 
             // Enregistrement OSC
             OSC_Manager.Instance.receiveP = this;
@@ -226,6 +228,10 @@ namespace Demolition
             if (impactEffectPrefab != null)
             {
                 GameObject effect = Instantiate(impactEffectPrefab, worldPos, Quaternion.identity);
+                // Charger le sprite impact depuis Resources
+                var sr = effect.GetComponent<SpriteRenderer>();
+                if (sr != null && sr.sprite == null)
+                    sr.sprite = Resources.Load<Sprite>("Textures/impact");
                 Destroy(effect, 2f);
             }
 
@@ -278,15 +284,15 @@ namespace Demolition
             {
                 case "Easy":
                     gameDuration = 90f;
-                    baseScrollSpeed = 0.5f;
+                    baseScrollSpeed = 0.2f;
                     break;
                 case "Normal":
                     gameDuration = 60f;
-                    baseScrollSpeed = 0.8f;
+                    baseScrollSpeed = 0.3f;
                     break;
                 case "Hard":
                     gameDuration = 45f;
-                    baseScrollSpeed = 1.4f;
+                    baseScrollSpeed = 0.6f;
                     break;
             }
 
@@ -305,7 +311,7 @@ namespace Demolition
                 if (elapsed >= nextTableauTime)
                 {
                     float rightEdge = Camera.main.ViewportToWorldPoint(new Vector3(1, 0, 0)).x;
-                    SpawnTableau(new Vector3(rightEdge + 5f, 0, 0));
+                    SpawnTableau(new Vector3(rightEdge + 5f, groundY, 0));
                     elapsed = 0f;
                     nextTableauTime = Random.Range(12f, 20f);
                 }
