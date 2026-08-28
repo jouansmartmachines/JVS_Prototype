@@ -220,7 +220,7 @@ namespace Demolition
             GameObject oiseau = Instantiate(oiseauPrefab, worldPos, Quaternion.identity);
             Demolition_Projectile proj = oiseau.GetComponent<Demolition_Projectile>();
             if (proj != null)
-                proj.Launch(structuresParent, currentScrollSpeed);
+                proj.Launch(worldPos);
         }
 
         void LaunchImpact(Vector3 worldPos)

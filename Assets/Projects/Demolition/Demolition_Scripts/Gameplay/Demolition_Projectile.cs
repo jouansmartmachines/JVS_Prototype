@@ -5,28 +5,21 @@ namespace Demolition
     public class Demolition_Projectile : MonoBehaviour
     {
         [Header("Apparence")]
-        public Sprite oiseauDos;
         public SpriteRenderer spriteRenderer;
 
-        [Header("Mouvement")]
-        public float vitesseDepart = 1.5f;
-        public float acceleration = 0.3f;
+        [Header("Mouvement Z (profondeur)")]
+        public float vitesseZ = 3f;
         public float scaleMin = 0.1f;
         public float scaleMax = 1f;
-        public float tempsVolMax = 5f;  // secondes avant auto-destruction
+        public float zTarget = 0f;  // Quand on atteint ce Z, on explose
+        public float explosionRadius = 2f;
+        public float explosionForce = 500f;
 
-        [Header("Destruction à l'arrivée")]
-        public GameObject explosionPrefab;
-        public float forceExplosion = 500f;
-        public float radiusExplosion = 2f;
-
-        private Transform cible;
-        private float scrollSpeed;
+        private float startZ;
+        private float totalDist;
         private bool launched = false;
-        private Vector3 direction;
-        private float currentSpeed;
         private float flightTime;
-        private float startX;
+        private Vector3 hitPoint; // point X,Y où l'oiseau va exploser
 
         void Awake()
         {
@@ -34,39 +27,26 @@ namespace Demolition
             if (spriteRenderer == null)
                 spriteRenderer = gameObject.AddComponent<SpriteRenderer>();
 
-            // Charger le sprite depuis le fichier PNG en Resources
+            // Charger le sprite oiseau depuis Resources
             Texture2D tex = Resources.Load<Texture2D>("Textures/oiseau_dos");
             if (tex != null)
             {
-                oiseauDos = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
-                spriteRenderer.sprite = oiseauDos;
+                Sprite s = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
+                spriteRenderer.sprite = s;
             }
             spriteRenderer.sortingOrder = 3;
         }
 
-        public void Launch(Transform targetParent, float bgScrollSpeed)
+        public void Launch(Vector3 worldPos)
         {
-            cible = targetParent;
-            scrollSpeed = bgScrollSpeed;
-            launched = true;
-            currentSpeed = vitesseDepart;
+            // Position de depart = la ou on a touche, mais profond
+            startZ = Camera.main.transform.position.z + 2f; // juste devant la camera
+            transform.position = new Vector3(worldPos.x, worldPos.y, startZ);
+            hitPoint = new Vector3(worldPos.x, worldPos.y, 0); // le point cible sur le plan de jeu
+
+            totalDist = Mathf.Abs(zTarget - startZ);
             flightTime = 0f;
-            startX = transform.position.x;
-
-            // Charger le sprite depuis Resources (evite les prefabs sans sprite)
-            if (spriteRenderer == null)
-                spriteRenderer = GetComponent<SpriteRenderer>();
-            if (oiseauDos == null)
-            {
-                Texture2D tex = Resources.Load<Texture2D>("Textures/oiseau_dos");
-                if (tex != null)
-                    oiseauDos = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
-            }
-            if (spriteRenderer != null && oiseauDos != null)
-                spriteRenderer.sprite = oiseauDos;
-
-            // Direction vers la gauche (vers la structure)
-            direction = Vector3.left;
+            launched = true;
         }
 
         void Update()
@@ -75,49 +55,57 @@ namespace Demolition
 
             flightTime += Time.deltaTime;
 
-            // Avance vers la structure - vitesse lisible par le joueur
-            currentSpeed += acceleration * Time.deltaTime;
-            float moveSpeed = Mathf.Lerp(2f, 6f, flightTime / tempsVolMax);
-            transform.position += direction * moveSpeed * Time.deltaTime;
+            // Avance sur Z (profondeur) vers le plan de jeu
+            float step = vitesseZ * Time.deltaTime;
+            Vector3 pos = transform.position;
+            pos.z += step;
 
-            // Petite ondulation verticale (effet de vol)
-            float wave = Mathf.Sin(flightTime * 3f) * 0.15f;
-            transform.position += Vector3.up * wave * Time.deltaTime;
+            // Si on a depasse zTarget, on explose
+            if (pos.z >= zTarget)
+            {
+                pos.z = zTarget;
+                transform.position = pos;
+                Explode();
+                return;
+            }
+
+            // Ratio de progression (0 = depart, 1 = arrivee)
+            float t = Mathf.Clamp01((pos.z - startZ) / totalDist);
 
             // Rétrécit progressivement (effet de profondeur)
-            float scale = Mathf.Lerp(scaleMax, scaleMin, 
-                Mathf.Clamp01(currentSpeed / (vitesseDepart + 10f)));
+            float scale = Mathf.Lerp(scaleMax, scaleMin, t);
             transform.localScale = Vector3.one * scale;
 
-            // Détection collision avec la structure
-            Collider2D hit = Physics2D.OverlapCircle(transform.position, 0.5f);
-            if (hit != null && hit.GetComponent<Demolition_Block>() != null)
-            {
-                Explode();
-            }
-
-            // Auto-destruction si trop loin ou temps ecoule
-            if (flightTime >= tempsVolMax || transform.position.x < -Camera.main.orthographicSize * 2f)
-            {
-                Destroy(gameObject);
-            }
+            transform.position = pos;
         }
 
         void Explode()
         {
+            // Explosion visuelle
+            GameObject explosionPrefab = Resources.Load<GameObject>("Prefabs/ImpactExplosion");
             if (explosionPrefab != null)
-                Instantiate(explosionPrefab, transform.position, Quaternion.identity);
+            {
+                GameObject effect = Instantiate(explosionPrefab, hitPoint, Quaternion.identity);
+                var sr = effect.GetComponent<SpriteRenderer>();
+                if (sr != null && sr.sprite == null)
+                {
+                    Texture2D tex = Resources.Load<Texture2D>("Textures/impact");
+                    if (tex != null)
+                        sr.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
+                }
+                Destroy(effect, 2f);
+            }
 
-            // Force sur les blocs proches
-            Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, radiusExplosion);
+            // Dégâts aux blocs au point d'impact (en 2D, sur le plan)
+            Collider2D[] hits = Physics2D.OverlapCircleAll(hitPoint, explosionRadius);
             foreach (var hit in hits)
             {
                 Rigidbody2D rb = hit.GetComponent<Rigidbody2D>();
                 if (rb != null)
                 {
-                    Vector2 dir = (hit.transform.position - transform.position).normalized;
-                    float dist = Vector2.Distance(hit.transform.position, transform.position);
-                    rb.AddForce(dir * (forceExplosion / Mathf.Max(0.1f, dist)), ForceMode2D.Impulse);
+                    Vector2 dir = (hit.transform.position - (Vector3)hitPoint).normalized;
+                    float dist = Vector2.Distance(hit.transform.position, hitPoint);
+                    rb.AddForce(dir * (explosionForce / Mathf.Max(0.1f, dist)), ForceMode2D.Impulse);
 
                     Demolition_Block block = hit.GetComponent<Demolition_Block>();
                     if (block != null)
@@ -125,10 +113,16 @@ namespace Demolition
                 }
             }
 
-            // Particules
+            // Score
+            if (Demolition_GameManager.Instance != null)
+                Demolition_GameManager.Instance.AddScore(100, hitPoint);
+
+            // Son
             if (Demolition_GameManager.Instance != null)
             {
-                Demolition_GameManager.Instance.AddScore(100, transform.position);
+                AudioSource aud = Demolition_GameManager.Instance.GetComponent<AudioSource>();
+                if (aud != null && Demolition_GameManager.Instance.impactSound != null)
+                    aud.PlayOneShot(Demolition_GameManager.Instance.impactSound);
             }
 
             Destroy(gameObject);
@@ -137,7 +131,7 @@ namespace Demolition
         void OnDrawGizmosSelected()
         {
             Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(transform.position, radiusExplosion);
+            Gizmos.DrawWireSphere(transform.position, explosionRadius);
         }
     }
 }

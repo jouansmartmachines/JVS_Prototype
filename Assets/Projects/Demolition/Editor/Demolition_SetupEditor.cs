@@ -177,12 +177,10 @@ public class Demolition_SetupEditor : EditorWindow
         go.GetComponent<SpriteRenderer>().sprite = oiSprite;
         go.GetComponent<SpriteRenderer>().sortingOrder = 3;
         var p = go.GetComponent<Demolition_Projectile>();
-        p.oiseauDos = oiSprite;
-        p.spriteRenderer = go.GetComponent<SpriteRenderer>();
-        p.vitesseDepart = 1.5f; p.acceleration = 0.3f;
+        p.vitesseZ = 3f;
         p.scaleMin = 0.1f; p.scaleMax = 1;
-        p.forceExplosion = 500; p.radiusExplosion = 2;
-        p.explosionPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(_prefabPath + "/ImpactExplosion.prefab");
+        p.explosionRadius = 2f;
+        p.explosionForce = 500f;
         PrefabUtility.SaveAsPrefabAsset(go, _prefabPath + "/Oiseau.prefab");
         Object.DestroyImmediate(go);
     }
