@@ -1,18 +1,14 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 namespace Demolition
 {
-    /// <summary>
-    /// Génère des structures complexes type Angry Birds :
-    /// pyramides, tours, murs avec cochons intégrés.
-    /// </summary>
     public class Demolition_StructureBuilder : MonoBehaviour
     {
         public static void BuildRandomStructure(Transform parent, Vector3 position)
         {
             int type = Random.Range(0, 5);
 
-            // Charger les prefabs de blocs
             GameObject blocBois = Resources.Load<GameObject>("Prefabs/Bloc_Bois");
             GameObject blocVerre = Resources.Load<GameObject>("Prefabs/Bloc_Verre");
             GameObject blocPierre = Resources.Load<GameObject>("Prefabs/Bloc_Pierre");
@@ -25,185 +21,222 @@ namespace Demolition
             GameObject structureGO = new GameObject("Structure_" + type);
             structureGO.transform.SetParent(parent);
             structureGO.transform.localPosition = position;
+            structureGO.AddComponent<Demolition_Structure>();
 
-            // Ajouter un Rigidbody2D à la racine pour que la structure bouge
-            var rb = structureGO.AddComponent<Rigidbody2D>();
-            rb.bodyType = RigidbodyType2D.Kinematic;
-            var structure = structureGO.AddComponent<Demolition_Structure>();
+            List<GameObject> allBlocks = new List<GameObject>();
 
-            // Créer la structure selon le type
+            // Creer la structure selon le type
             switch (type)
             {
-                case 0: TourSimple(structureGO, blocBois, blocVerre, blocPierre, cochon, cochonVert); break;
-                case 1: Pyramide(structureGO, blocBois, blocVerre, blocPierre, cochon, cochonVert); break;
-                case 2: MurAvecCochons(structureGO, blocBois, blocVerre, blocPierre, cochon, cochonBleu); break;
-                case 3: DoubleTour(structureGO, blocBois, blocVerre, blocPierre, cochon, cochonVert, cochonBleu); break;
-                case 4: Chateau(structureGO, blocBois, blocVerre, blocPierre, cochon, cochonVert, cochonBleu); break;
+                case 0: TourSimple(structureGO.transform, blocBois, blocVerre, blocPierre, cochon, cochonVert, allBlocks); break;
+                case 1: Pyramide(structureGO.transform, blocBois, blocVerre, blocPierre, cochon, cochonVert, allBlocks); break;
+                case 2: MurAvecCochons(structureGO.transform, blocBois, blocVerre, blocPierre, cochon, cochonBleu, allBlocks); break;
+                case 3: DoubleTour(structureGO.transform, blocBois, blocVerre, blocPierre, cochon, cochonVert, cochonBleu, allBlocks); break;
+                case 4: Chateau(structureGO.transform, blocBois, blocVerre, blocPierre, cochon, cochonVert, cochonBleu, allBlocks); break;
             }
         }
 
-        static void TourSimple(GameObject parent, GameObject bois, GameObject verre, GameObject pierre,
-            GameObject cochon, GameObject cochonVert)
+        // Connecte chaque bloc a son voisin le plus proche en dessous (ou a cote)
+        static void ConnectNeighbors(List<GameObject> blocks)
         {
-            // Tour de 4 blocs empilés
+            if (blocks.Count < 2) return;
+            for (int i = 0; i < blocks.Count; i++)
+            {
+                var rb = blocks[i].GetComponent<Rigidbody2D>();
+                if (rb == null) continue;
+
+                // Chercher le bloc le plus proche en dessous
+                GameObject nearest = null;
+                float nearestDist = 3f;
+                for (int j = 0; j < blocks.Count; j++)
+                {
+                    if (i == j) continue;
+                    float dy = blocks[j].transform.position.y - blocks[i].transform.position.y;
+                    if (dy < 0 && Mathf.Abs(dy) < nearestDist)
+                    {
+                        float dx = Mathf.Abs(blocks[j].transform.position.x - blocks[i].transform.position.x);
+                        if (dx < 1.2f)
+                        {
+                            nearestDist = Mathf.Abs(dy);
+                            nearest = blocks[j];
+                        }
+                    }
+                }
+                if (nearest != null)
+                {
+                    var joint = blocks[i].AddComponent<FixedJoint2D>();
+                    joint.connectedBody = nearest.GetComponent<Rigidbody2D>();
+                    joint.breakForce = 300f;
+                    joint.breakTorque = 300f;
+                }
+            }
+        }
+
+        static void TourSimple(Transform parent, GameObject bois, GameObject verre, GameObject pierre,
+            GameObject cochon, GameObject cochonVert, List<GameObject> allBlocks)
+        {
             float y = 0;
             for (int i = 0; i < 4; i++)
             {
                 GameObject prefab = (i == 0) ? pierre : ((i == 2) ? verre : bois);
-                GameObject bloc = Object.Instantiate(prefab, parent.transform);
+                GameObject bloc = Object.Instantiate(prefab, parent);
                 bloc.transform.localPosition = new Vector3(0, y, 0);
+                allBlocks.Add(bloc);
                 y += 1.0f;
             }
-            // Cochon au sommet
             if (cochon != null)
             {
-                GameObject c = Object.Instantiate(cochon, parent.transform);
+                GameObject c = Object.Instantiate(cochon, parent);
                 c.transform.localPosition = new Vector3(0, y, 0);
+                allBlocks.Add(c);
             }
+            ConnectNeighbors(allBlocks);
         }
 
-        static void Pyramide(GameObject parent, GameObject bois, GameObject verre, GameObject pierre,
-            GameObject cochon, GameObject cochonVert)
+        static void Pyramide(Transform parent, GameObject bois, GameObject verre, GameObject pierre,
+            GameObject cochon, GameObject cochonVert, List<GameObject> allBlocks)
         {
-            // 3 blocs en bas, 2 au milieu, 1 au sommet, cochon au milieu
             float startX = -1.0f;
-            // Base: 3 blocs
             for (int i = 0; i < 3; i++)
             {
                 GameObject prefab = (i == 1) ? pierre : bois;
-                GameObject bloc = Object.Instantiate(prefab, parent.transform);
+                GameObject bloc = Object.Instantiate(prefab, parent);
                 bloc.transform.localPosition = new Vector3(startX + i * 1.0f, 0, 0);
+                allBlocks.Add(bloc);
             }
-            // Milieu: 2 blocs + cochon
             for (int i = 0; i < 2; i++)
             {
-                GameObject bloc = Object.Instantiate(verre, parent.transform);
+                GameObject bloc = Object.Instantiate(verre, parent);
                 bloc.transform.localPosition = new Vector3(startX + 0.5f + i * 1.0f, 1.0f, 0);
+                allBlocks.Add(bloc);
             }
-            // Cochon vert au milieu
             if (cochonVert != null)
             {
-                GameObject c = Object.Instantiate(cochonVert, parent.transform);
+                GameObject c = Object.Instantiate(cochonVert, parent);
                 c.transform.localPosition = new Vector3(startX + 1.0f, 1.0f, 0);
+                allBlocks.Add(c);
             }
-            // Sommet: 1 bloc
-            GameObject top = Object.Instantiate(bois, parent.transform);
+            GameObject top = Object.Instantiate(bois, parent);
             top.transform.localPosition = new Vector3(startX + 1.0f, 2.0f, 0);
+            allBlocks.Add(top);
+            ConnectNeighbors(allBlocks);
         }
 
-        static void MurAvecCochons(GameObject parent, GameObject bois, GameObject verre, GameObject pierre,
-            GameObject cochon, GameObject cochonBleu)
+        static void MurAvecCochons(Transform parent, GameObject bois, GameObject verre, GameObject pierre,
+            GameObject cochon, GameObject cochonBleu, List<GameObject> allBlocks)
         {
-            // Mur de 5 blocs de large avec 2 cochons
             float startX = -2.0f;
             for (int i = 0; i < 5; i++)
             {
                 GameObject prefab = (i == 0 || i == 4) ? pierre : bois;
-                GameObject bloc = Object.Instantiate(prefab, parent.transform);
+                GameObject bloc = Object.Instantiate(prefab, parent);
                 bloc.transform.localPosition = new Vector3(startX + i * 1.0f, 0, 0);
+                allBlocks.Add(bloc);
             }
-            // 2e rangée: 3 blocs + cochon
             for (int i = 0; i < 3; i++)
             {
-                GameObject bloc = Object.Instantiate(verre, parent.transform);
+                GameObject bloc = Object.Instantiate(verre, parent);
                 bloc.transform.localPosition = new Vector3(startX + 1.0f + i * 1.0f, 1.0f, 0);
+                allBlocks.Add(bloc);
             }
-            // Cochon au centre
             if (cochon != null)
             {
-                GameObject c = Object.Instantiate(cochon, parent.transform);
+                GameObject c = Object.Instantiate(cochon, parent);
                 c.transform.localPosition = new Vector3(startX + 2.0f, 1.0f, 0);
+                allBlocks.Add(c);
             }
-            // 3e rangée: 1 bloc + cochon bleu
             if (cochonBleu != null)
             {
-                GameObject c = Object.Instantiate(cochonBleu, parent.transform);
+                GameObject c = Object.Instantiate(cochonBleu, parent);
                 c.transform.localPosition = new Vector3(startX + 2.0f, 2.0f, 0);
+                allBlocks.Add(c);
             }
-            GameObject top = Object.Instantiate(bois, parent.transform);
+            GameObject top = Object.Instantiate(bois, parent);
             top.transform.localPosition = new Vector3(startX + 2.0f, 2.0f, 0);
+            allBlocks.Add(top);
+            ConnectNeighbors(allBlocks);
         }
 
-        static void DoubleTour(GameObject parent, GameObject bois, GameObject verre, GameObject pierre,
-            GameObject cochon, GameObject cochonVert, GameObject cochonBleu)
+        static void DoubleTour(Transform parent, GameObject bois, GameObject verre, GameObject pierre,
+            GameObject cochon, GameObject cochonVert, GameObject cochonBleu, List<GameObject> allBlocks)
         {
-            // Deux tours reliées par un pont
-            // Tour gauche: 3 blocs
             for (int i = 0; i < 3; i++)
             {
                 GameObject prefab = (i == 0) ? pierre : bois;
-                GameObject bloc = Object.Instantiate(prefab, parent.transform);
+                GameObject bloc = Object.Instantiate(prefab, parent);
                 bloc.transform.localPosition = new Vector3(-1.5f, i * 1.0f, 0);
+                allBlocks.Add(bloc);
             }
-            // Tour droite: 3 blocs
             for (int i = 0; i < 3; i++)
             {
                 GameObject prefab = (i == 0) ? pierre : bois;
-                GameObject bloc = Object.Instantiate(prefab, parent.transform);
+                GameObject bloc = Object.Instantiate(prefab, parent);
                 bloc.transform.localPosition = new Vector3(1.5f, i * 1.0f, 0);
+                allBlocks.Add(bloc);
             }
-            // Pont: 3 blocs de verre
             for (int i = 0; i < 3; i++)
             {
-                GameObject bloc = Object.Instantiate(verre, parent.transform);
+                GameObject bloc = Object.Instantiate(verre, parent);
                 bloc.transform.localPosition = new Vector3(-1.0f + i * 1.0f, 2.0f, 0);
+                allBlocks.Add(bloc);
             }
-            // Cochon sur le pont
             if (cochon != null)
             {
-                GameObject c = Object.Instantiate(cochon, parent.transform);
+                GameObject c = Object.Instantiate(cochon, parent);
                 c.transform.localPosition = new Vector3(0, 3.0f, 0);
+                allBlocks.Add(c);
             }
-            // Cochon vert dans la tour droite
             if (cochonVert != null)
             {
-                GameObject c = Object.Instantiate(cochonVert, parent.transform);
+                GameObject c = Object.Instantiate(cochonVert, parent);
                 c.transform.localPosition = new Vector3(1.5f, 1.0f, 0);
+                allBlocks.Add(c);
             }
+            ConnectNeighbors(allBlocks);
         }
 
-        static void Chateau(GameObject parent, GameObject bois, GameObject verre, GameObject pierre,
-            GameObject cochon, GameObject cochonVert, GameObject cochonBleu)
+        static void Chateau(Transform parent, GameObject bois, GameObject verre, GameObject pierre,
+            GameObject cochon, GameObject cochonVert, GameObject cochonBleu, List<GameObject> allBlocks)
         {
-            // Structure complexe: 2 murs lateraux + toit + cochons
-            // Mur gauche: 4 blocs
             for (int i = 0; i < 4; i++)
             {
                 GameObject prefab = (i == 0) ? pierre : (i == 3) ? verre : bois;
-                GameObject bloc = Object.Instantiate(prefab, parent.transform);
+                GameObject bloc = Object.Instantiate(prefab, parent);
                 bloc.transform.localPosition = new Vector3(-2.0f, i * 1.0f, 0);
+                allBlocks.Add(bloc);
             }
-            // Mur droit: 4 blocs
             for (int i = 0; i < 4; i++)
             {
                 GameObject prefab = (i == 0) ? pierre : (i == 3) ? verre : bois;
-                GameObject bloc = Object.Instantiate(prefab, parent.transform);
+                GameObject bloc = Object.Instantiate(prefab, parent);
                 bloc.transform.localPosition = new Vector3(2.0f, i * 1.0f, 0);
+                allBlocks.Add(bloc);
             }
-            // Toit: 3 blocs
             for (int i = 0; i < 3; i++)
             {
-                GameObject bloc = Object.Instantiate(pierre, parent.transform);
+                GameObject bloc = Object.Instantiate(pierre, parent);
                 bloc.transform.localPosition = new Vector3(-1.0f + i * 1.0f, 4.0f, 0);
+                allBlocks.Add(bloc);
             }
-            // Cochon bleu au sommet
             if (cochonBleu != null)
             {
-                GameObject c = Object.Instantiate(cochonBleu, parent.transform);
+                GameObject c = Object.Instantiate(cochonBleu, parent);
                 c.transform.localPosition = new Vector3(0, 5.0f, 0);
+                allBlocks.Add(c);
             }
-            // Cochon rose dans la tour gauche
             if (cochon != null)
             {
-                GameObject c = Object.Instantiate(cochon, parent.transform);
+                GameObject c = Object.Instantiate(cochon, parent);
                 c.transform.localPosition = new Vector3(-2.0f, 2.0f, 0);
+                allBlocks.Add(c);
             }
-            // Cochon vert dans la tour droite
             if (cochonVert != null)
             {
-                GameObject c = Object.Instantiate(cochonVert, parent.transform);
+                GameObject c = Object.Instantiate(cochonVert, parent);
                 c.transform.localPosition = new Vector3(2.0f, 2.0f, 0);
+                allBlocks.Add(c);
             }
+            ConnectNeighbors(allBlocks);
         }
     }
 }

@@ -38,9 +38,13 @@ namespace Demolition
             if (rb == null)
                 rb = gameObject.AddComponent<Rigidbody2D>();
 
-            maxHp = hp;
+            // Gravite active pour que les blocs tombent
+            rb.gravityScale = 3f;
+            rb.mass = 1f;
+            rb.linearDamping = 0.5f;
+            rb.angularDamping = 0.5f;
 
-            // Charger les sprites depuis Resources
+            maxHp = hp;
             if (spriteRenderer == null)
                 spriteRenderer = GetComponent<SpriteRenderer>();
             if (spriteRenderer != null && spriteRenderer.sprite == null)
@@ -70,13 +74,8 @@ namespace Demolition
         {
             parentStructure = GetComponentInParent<Demolition_Structure>();
 
-            // Joint au parent
-            FixedJoint2D joint = GetComponent<FixedJoint2D>();
-            if (joint == null && transform.parent != null)
-            {
-                joint = gameObject.AddComponent<FixedJoint2D>();
-                joint.connectedBody = transform.parent.GetComponent<Rigidbody2D>();
-            }
+            // Pas de joint au parent - c'est le StructureBuilder qui connecte
+            // les blocs entre eux (chaque bloc a son voisin du dessous)
         }
 
         public void TakeDamage(int amount)
@@ -113,7 +112,11 @@ namespace Demolition
             if (isDestroyed) return;
             isDestroyed = true;
 
-            // Débris physiques (4-8 morceaux qui volent)
+            // Casser nos joints (blocs relies a nous)
+            var joints = GetComponents<FixedJoint2D>();
+            foreach (var j in joints) Destroy(j);
+
+            // Debris physiques
             Demolition_DebrisSpawner.SpawnDebris(transform.position, materialType, Random.Range(4, 8));
 
             // Score
