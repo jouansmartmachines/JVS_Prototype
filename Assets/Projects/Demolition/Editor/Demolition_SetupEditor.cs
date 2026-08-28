@@ -36,15 +36,18 @@ public class Demolition_SetupEditor : EditorWindow
         MakePNG("debris_bois", 16, 16, new Color(0.6f, 0.4f, 0.2f));
         MakePNG("debris_verre", 16, 16, new Color(0.7f, 0.85f, 0.9f));
         MakePNG("debris_pierre", 16, 16, new Color(0.5f, 0.5f, 0.5f));
+        MakePNG("debris_cochon", 16, 16, new Color(0.9f, 0.5f, 0.5f));
         MakePNG("fissure1", 16, 16, new Color(0.3f, 0.3f, 0.3f));
         MakePNG("fissure2", 16, 16, new Color(0.2f, 0.2f, 0.2f));
-        Debug.Log("1/6 Textures creees");
+        MakePNG("sol", 128, 32, new Color(0.4f, 0.3f, 0.2f));
+        Debug.Log("1/7 Textures creees");
 
         // 2. Sons
         MakeWAV("impact", 0.15f, 200, 0.3f);
         MakeWAV("destruction", 0.3f, 150, 0.5f);
         MakeWAV("gameover", 0.5f, 100, 0.8f);
-        Debug.Log("2/6 Sons crees");
+        MakeWAV("pig_hit", 0.2f, 300, 0.4f);
+        Debug.Log("2/7 Sons crees");
 
         AssetDatabase.Refresh();
 
@@ -55,10 +58,15 @@ public class Demolition_SetupEditor : EditorWindow
         var t_f1 = LoadSprite("fissure1");
         var t_f2 = LoadSprite("fissure2");
         var t_oiseau = LoadSprite("oiseau_dos");
+        var t_sol = LoadSprite("sol");
         var t_impact = LoadSprite("impact");
         var t_db = LoadSprite("debris_bois");
         var t_dv = LoadSprite("debris_verre");
         var t_dp = LoadSprite("debris_pierre");
+        var t_dc = LoadSprite("debris_cochon");
+        var t_cochon = LoadSprite("cochon");
+        var t_cochon_vert = LoadSprite("cochon_vert");
+        var t_cochon_bleu = LoadSprite("cochon_bleu");
 
         if (t_bois == null) { Debug.LogError("Textures non trouvees"); return; }
 
@@ -68,16 +76,27 @@ public class Demolition_SetupEditor : EditorWindow
         CreateDebris("Debris_Bois", t_db);
         CreateDebris("Debris_Verre", t_dv);
         CreateDebris("Debris_Pierre", t_dp);
+        CreateDebris("Debris_Cochon", t_dc);
         CreateOiseau(t_oiseau, t_impact);
-        Debug.Log("3/6 Prefabs gameplay crees");
+        CreateCochonPrefabs();
+        CreatePopupTextPrefab();
+        Debug.Log("3/7 Prefabs gameplay + cochon + popup crees");
 
         // 4. GameScene
         SetupGameScene();
-        Debug.Log("4/6 GameScene + Canvas U configuree");
+        Debug.Log("4/7 GameScene + Canvas configuree");
 
-        // 5. Menu Toggle (ModeOiseau) + Slider (ScrollSpeed) - style SpotTheDif
+        // 5. Menu Toggle (ModeOiseau) + Slider (ScrollSpeed)
         SetupMenu();
-        Debug.Log("5/6 Menu Toggle+Slider ajoutes");
+        Debug.Log("5/7 Menu Toggle+Slider ajoutes");
+
+        // 6. Creer star images
+        CreateStarImages();
+        Debug.Log("6/7 Stars images generees");
+
+        // 7. Rebuild
+        RebuildStructures();
+        Debug.Log("7/7 Structures rebuild");
 
         AssetDatabase.Refresh();
         Debug.Log("=== FINI: Demolition completement configure ===");
@@ -164,6 +183,54 @@ public class Demolition_SetupEditor : EditorWindow
         Object.DestroyImmediate(go);
     }
 
+    static void CreateCochonPrefabs()
+    {
+        var t_cochon = LoadSprite("cochon");
+        if (t_cochon == null) { Debug.LogWarning("cochon.png pas trouve"); return; }
+        CreateCochonBloc("Cochon", t_cochon, 3, 500, 1);
+        var t_cv = LoadSprite("cochon_vert");
+        if (t_cv != null) CreateCochonBloc("Cochon_Vert", t_cv, 5, 1000, 2);
+        var t_cb = LoadSprite("cochon_bleu");
+        if (t_cb != null) CreateCochonBloc("Cochon_Bleu", t_cb, 8, 2000, 3);
+    }
+
+    static void CreateCochonBloc(string name, Sprite sprite, int hp, int pts, int starVal)
+    {
+        var go = new GameObject(name, typeof(SpriteRenderer), typeof(BoxCollider2D), typeof(Rigidbody2D), typeof(AudioSource), typeof(Demolition_Block));
+        var sr = go.GetComponent<SpriteRenderer>(); sr.sprite = sprite; sr.sortingOrder = 3;
+        var blk = go.GetComponent<Demolition_Block>();
+        blk.hp = hp; blk.points = pts; blk.materialType = Demolition_Block.MaterialType.Cochon; blk.spriteRenderer = sr;
+        blk.isTarget = true; blk.starValue = starVal;
+        PrefabUtility.SaveAsPrefabAsset(go, _prefabPath + "/" + name + ".prefab");
+        Object.DestroyImmediate(go);
+    }
+
+    static void CreatePopupTextPrefab()
+    {
+        var go = new GameObject("PopupText", typeof(TextMeshPro), typeof(Demolition_PopupText));
+        var tmp = go.GetComponent<TextMeshPro>();
+        tmp.fontSize = 3;
+        tmp.color = Color.yellow;
+        tmp.alignment = TextAlignmentOptions.Center;
+        tmp.fontStyle = FontStyles.Bold;
+        tmp.text = "+50";
+        PrefabUtility.SaveAsPrefabAsset(go, _prefabPath + "/PopupText.prefab");
+        Object.DestroyImmediate(go);
+    }
+
+    static void CreateStarImages()
+    {
+        MakePNG("star_1", 32, 32, new Color(1, 0.8f, 0));
+        MakePNG("star_2", 32, 32, new Color(1, 0.9f, 0.2f));
+        MakePNG("star_3", 32, 32, new Color(1, 1, 0.4f));
+    }
+
+    static void RebuildStructures()
+    {
+        AssetDatabase.Refresh();
+        Debug.Log("Structures rebuild OK");
+    }
+
     static void SetupGameScene()
     {
         string scenePath = _basePath + "/Demolition_Scenes/GameScene_Demolition.unity";
@@ -247,12 +314,10 @@ public class Demolition_SetupEditor : EditorWindow
         var canvas = Object.FindFirstObjectByType<Canvas>();
         if (canvas != null)
         {
-            // Canvas deja present, verifier les textes
             if (GameObject.Find("ScoreText") != null && GameObject.Find("TimerText") != null)
                 return;
         }
 
-        // Creer le Canvas
         if (canvas == null)
         {
             var canvasGO = new GameObject("Canvas", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
@@ -265,7 +330,6 @@ public class Demolition_SetupEditor : EditorWindow
             scaler.matchWidthOrHeight = 0.5f;
         }
 
-        // Score en haut a gauche
         if (GameObject.Find("ScoreText") == null)
         {
             var scoreGO = new GameObject("ScoreText", typeof(RectTransform));
@@ -285,7 +349,6 @@ public class Demolition_SetupEditor : EditorWindow
             Debug.Log("ScoreText cree dans GameScene");
         }
 
-        // Timer en haut a droite
         if (GameObject.Find("TimerText") == null)
         {
             var timerGO = new GameObject("TimerText", typeof(RectTransform));
@@ -304,6 +367,26 @@ public class Demolition_SetupEditor : EditorWindow
             timerGO.AddComponent<CanvasRenderer>();
             Debug.Log("TimerText cree dans GameScene");
         }
+
+        // Etoiles en haut au milieu
+        if (GameObject.Find("StarText") == null)
+        {
+            var starGO = new GameObject("StarText", typeof(RectTransform));
+            starGO.transform.SetParent(canvas.transform);
+            var strt = starGO.GetComponent<RectTransform>();
+            strt.anchorMin = new Vector2(0.5f, 1);
+            strt.anchorMax = new Vector2(0.5f, 1);
+            strt.pivot = new Vector2(0.5f, 1);
+            strt.anchoredPosition = new Vector2(0, -35);
+            strt.sizeDelta = new Vector2(400, 60);
+            var starTxt = starGO.AddComponent<TextMeshProUGUI>();
+            starTxt.text = "★";
+            starTxt.fontSize = 42;
+            starTxt.color = Color.yellow;
+            starTxt.alignment = TextAlignmentOptions.Center;
+            starGO.AddComponent<CanvasRenderer>();
+            Debug.Log("StarText cree dans GameScene");
+        }
     }
 
     static void SetupMenu()
@@ -317,7 +400,6 @@ public class Demolition_SetupEditor : EditorWindow
         // === Toggle ModeOiseau (style SpotTheDif Instructions) ===
         if (GameObject.Find("ModeOiseau") == null)
         {
-            // Container (like Instructions)
             var container = new GameObject("ModeOiseau", typeof(RectTransform));
             container.transform.SetParent(canvas.transform);
             var crt = container.GetComponent<RectTransform>();
@@ -327,7 +409,6 @@ public class Demolition_SetupEditor : EditorWindow
             crt.sizeDelta = new Vector2(1221, 150);
             crt.localScale = Vector3.one * 0.5f;
 
-            // Label "Mode Oiseau"
             var label = new GameObject("Label", typeof(RectTransform));
             label.transform.SetParent(container.transform);
             var lrt = label.GetComponent<RectTransform>();
@@ -343,7 +424,6 @@ public class Demolition_SetupEditor : EditorWindow
             txt.margin = new Vector4(5, 0, 0, 0);
             label.AddComponent<CanvasRenderer>();
 
-            // Toggle
             var toggleGO = new GameObject("Toggle", typeof(RectTransform));
             toggleGO.transform.SetParent(container.transform);
             var trt = toggleGO.GetComponent<RectTransform>();
@@ -357,7 +437,6 @@ public class Demolition_SetupEditor : EditorWindow
             var bgImg = toggleGO.AddComponent<Image>();
             bgImg.color = new Color(0.96f, 0.64f, 0);
 
-            // Checkmark
             var check = new GameObject("Checkmark", typeof(RectTransform));
             check.transform.SetParent(toggleGO.transform);
             var crt2 = check.GetComponent<RectTransform>();
@@ -377,7 +456,6 @@ public class Demolition_SetupEditor : EditorWindow
         // === Slider ScrollSpeed (style SpotTheDif ScenesNumber) ===
         if (GameObject.Find("ScrollSpeed") == null)
         {
-            // Container (like ScenesNumber)
             var container = new GameObject("ScrollSpeed", typeof(RectTransform));
             container.transform.SetParent(canvas.transform);
             var crt = container.GetComponent<RectTransform>();
@@ -387,7 +465,6 @@ public class Demolition_SetupEditor : EditorWindow
             crt.sizeDelta = new Vector2(500, 400);
             crt.localScale = Vector3.one * 0.8f;
 
-            // Label "Vitesse"
             var label = new GameObject("Label", typeof(RectTransform));
             label.transform.SetParent(container.transform);
             var lrt = label.GetComponent<RectTransform>();
@@ -402,7 +479,6 @@ public class Demolition_SetupEditor : EditorWindow
             txt.alignment = TextAlignmentOptions.Center;
             label.AddComponent<CanvasRenderer>();
 
-            // Slider
             var sliderGO = new GameObject("Slider", typeof(RectTransform));
             sliderGO.transform.SetParent(container.transform);
             var srt = sliderGO.GetComponent<RectTransform>();
@@ -415,7 +491,6 @@ public class Demolition_SetupEditor : EditorWindow
             var sliderImg = sliderGO.AddComponent<Image>();
             sliderImg.color = Color.white;
 
-            // Fill
             var fill = new GameObject("Fill", typeof(RectTransform));
             fill.transform.SetParent(sliderGO.transform);
             fill.AddComponent<Image>();
@@ -427,7 +502,6 @@ public class Demolition_SetupEditor : EditorWindow
             frt.sizeDelta = Vector2.zero;
             slider.fillRect = frt;
 
-            // Handle
             var handle = new GameObject("Handle", typeof(RectTransform));
             handle.transform.SetParent(sliderGO.transform);
             handle.AddComponent<Image>();
@@ -443,7 +517,6 @@ public class Demolition_SetupEditor : EditorWindow
             slider.minValue = 1; slider.maxValue = 5; slider.wholeNumbers = true;
             slider.value = PlayerPrefs.GetFloat(Demolition_GeneralVariables.ScrollSpeedKey, 2f);
 
-            // Background of slider
             var bg = new GameObject("Background", typeof(RectTransform));
             bg.transform.SetParent(sliderGO.transform);
             var brt = bg.GetComponent<RectTransform>();

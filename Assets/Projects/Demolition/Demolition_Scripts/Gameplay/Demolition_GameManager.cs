@@ -43,6 +43,11 @@ namespace Demolition
         [Header("UI")]
         private TextMeshProUGUI scoreText;
         private TextMeshProUGUI timerText;
+        private TextMeshProUGUI starText;
+        public GameObject popupTextPrefab;
+
+        [Header("Étoiles")]
+        public int currentStars = 0;
 
         // Coordonnees d impact
         protected bool gotAPt;
@@ -89,8 +94,17 @@ namespace Demolition
             {
                 scoreText = GameObject.Find("ScoreText")?.GetComponent<TextMeshProUGUI>();
                 timerText = GameObject.Find("TimerText")?.GetComponent<TextMeshProUGUI>();
+                starText = GameObject.Find("StarText")?.GetComponent<TextMeshProUGUI>();
                 if (scoreText != null) scoreText.text = "Score: 0";
                 if (timerText != null) timerText.text = Mathf.CeilToInt(gameDuration).ToString();
+                if (starText != null) starText.text = "★";
+            }
+
+            // Assigner popupTextPrefab aux blocs
+            foreach (var block in FindObjectsByType<Demolition_Block>(FindObjectsSortMode.None))
+            {
+                if (block.popupTextPrefab == null)
+                    block.popupTextPrefab = popupTextPrefab;
             }
         }
 
@@ -102,9 +116,23 @@ namespace Demolition
             destructionSound = Resources.Load<AudioClip>("Sounds/destruction");
             gameOverSound = Resources.Load<AudioClip>("Sounds/gameover");
 
+            popupTextPrefab = Resources.Load<GameObject>("Prefabs/PopupText");
+
             tableauPrefabs = new GameObject[tableauNames.Length];
             for (int i = 0; i < tableauNames.Length; i++)
                 tableauPrefabs[i] = Resources.Load<GameObject>("Prefabs/" + tableauNames[i]);
+
+            // Chercher le sol
+            if (GameObject.Find("Ground") == null)
+            {
+                var groundGO = new GameObject("Ground", typeof(BoxCollider2D));
+                var col = groundGO.GetComponent<BoxCollider2D>();
+                col.size = new Vector2(50, 1);
+                col.offset = new Vector2(0, -0.5f);
+                groundGO.layer = LayerMask.NameToLayer("Default");
+                groundGO.transform.position = new Vector3(0, -4.5f, 0);
+                groundGO.tag = "Ground";
+            }
         }
 
         void Update()
@@ -289,11 +317,34 @@ namespace Demolition
             StopAllCoroutines();
             Time.timeScale = 1f;
 
+            // Calcul des étoiles (1-3)
+            currentStars = 1;
+            int highScore = PlayerPrefs.GetInt(Demolition_GeneralVariables.HighScoreKey, 0);
+            if (score >= 150 && score < 500)
+                currentStars = 2;
+            else if (score >= 500)
+                currentStars = 3;
+
+            // Afficher les étoiles
+            if (starText != null)
+            {
+                string stars = "";
+                for (int i = 0; i < currentStars; i++) stars += "★";
+                for (int i = currentStars; i < 3; i++) stars += "☆";
+                starText.text = stars;
+            }
+
+            // Ne pas écraser un meilleur score
+            if (score > highScore)
+            {
+                PlayerPrefs.SetInt(Demolition_GeneralVariables.HighScoreKey, score);
+                PlayerPrefs.SetInt("Demolition_Stars", currentStars);
+            }
+
             if (gameOverSound != null)
                 audioSource.PlayOneShot(gameOverSound);
 
             PlayerPrefs.SetInt("Demolition_FinalScore", score);
-            PlayerPrefs.SetFloat(Demolition_GeneralVariables.HighScoreKey, score);
 
             StartCoroutine(TransitionToScore());
         }

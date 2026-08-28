@@ -23,7 +23,12 @@ namespace Demolition
         private int maxHp;
         private bool isDestroyed = false;
 
-        public enum MaterialType { Bois, Verre, Pierre }
+        public enum MaterialType { Bois, Verre, Pierre, Cochon }
+    
+        [Header("Cible spéciale")]
+        public bool isTarget = false;
+        public int starValue = 0;  // 1-3 si c'est un cochon/cible
+        public GameObject popupTextPrefab;
 
         void Awake()
         {
@@ -84,6 +89,15 @@ namespace Demolition
             if (Demolition_GameManager.Instance != null)
                 Demolition_GameManager.Instance.AddScore(points, transform.position);
 
+            // Popup de score flottant
+            if (popupTextPrefab != null)
+            {
+                GameObject popup = Instantiate(popupTextPrefab, transform.position, Quaternion.identity);
+                var popupText = popup.GetComponent<Demolition_PopupText>();
+                if (popupText != null)
+                    popupText.SetText("+" + points);
+            }
+
             // Son
             AudioSource audio = GetComponent<AudioSource>();
             if (audio != null) audio.Play();
@@ -109,6 +123,7 @@ namespace Demolition
                 case MaterialType.Verre: return 50f;
                 case MaterialType.Bois: return 200f;
                 case MaterialType.Pierre: return 500f;
+                case MaterialType.Cochon: return 800f;
                 default: return 200f;
             }
         }
