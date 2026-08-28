@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb1bb9c780346104f98752789f193f27, type: 3}
+  m_Name: SORecipe_BaseEvolutif
+  m_EditorClassIdentifier: Assembly-CSharp::Challenge.Recipe_BaseTargetType
+  targetCategories: 04000000
+  timeAdded: 0
+  scoreMultiplier: 2
+  secondLayerPrefab: {fileID: 8044215582453393360, guid: 4e2a7af0eaa9dee488706e3765c7bce2,
+    type: 3}
+  vfxPrefab: {fileID: 4111683814577017992, guid: 61210f7bdcd372045a67f791f22aedd2,
+    type: 3}
+  timePrefab: {fileID: 0}
+  health: 10
+  ephemereLifetime: 5

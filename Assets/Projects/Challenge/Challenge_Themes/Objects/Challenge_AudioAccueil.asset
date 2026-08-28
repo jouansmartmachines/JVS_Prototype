@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e48ab837e3b3da46bf64433fee161fd, type: 3}
+  m_Name: Challenge_AudioAccueil
+  m_EditorClassIdentifier: Assembly-CSharp::Theme.SwapObject
+  ThemeManager: {fileID: 11400000, guid: 468d4346cad626b4cb409c481522c9a1, type: 2}
+  _swaps:
+  - {fileID: 11400000, guid: bad9a9765cb533143abbca6b7e8f6b91, type: 2}
+  - {fileID: 11400000, guid: b09f7ae2052c7034d830e0a2d95366b2, type: 2}

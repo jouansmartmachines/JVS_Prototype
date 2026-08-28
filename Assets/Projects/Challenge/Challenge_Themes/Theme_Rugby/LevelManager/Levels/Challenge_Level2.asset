@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8dc881b40bbb1624b891c3f247a39b57, type: 3}
+  m_Name: Challenge_Level2
+  m_EditorClassIdentifier: 
+  level: 2
+  points: 20
+  positionMode: 3200000042000000
+  targetCategories:
+  - category: 0
+    spawnChance: 0.5
+  - category: 1
+    spawnChance: 0.24
+  - category: 2
+    spawnChance: 0.06
+  - category: 3
+    spawnChance: 0.2
+  mask: 0
+  color: {r: 0.9333334, g: 0.9058824, b: 0.1254902, a: 1}
+  levelImage: {fileID: 21300000, guid: 83862bd45a5aebe418772d30b7ebff3f, type: 3}
+  Offset: 400
+  EphemereTime: 30
+  scoreToReach: 250
+  statut: "Confirm\xE9"
+  targetScale: 1

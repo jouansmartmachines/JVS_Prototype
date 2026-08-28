@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb1bb9c780346104f98752789f193f27, type: 3}
+  m_Name: SORecipe_BaseMalus
+  m_EditorClassIdentifier: Assembly-CSharp::Challenge.Recipe_BaseTargetType
+  targetCategories: 02000000
+  timeAdded: 0
+  scoreMultiplier: -1
+  secondLayerPrefab: {fileID: 8044215582453393360, guid: 9643cf6b5719d6a4ebae0f72ca62d131,
+    type: 3}
+  vfxPrefab: {fileID: 4111683814577017992, guid: e53f35d700b824b479ca3d5dc0b0f28d,
+    type: 3}
+  timePrefab: {fileID: 436239537959061086, guid: 69afdb144eb60b64a9b639c82bc62209,
+    type: 3}
+  health: 5
+  ephemereLifetime: 5

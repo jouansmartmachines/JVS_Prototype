@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10288173a95c81b47b9de91f5c39fd72, type: 3}
+  m_Name: SORecipe_CounterRotation
+  m_EditorClassIdentifier: Assembly-CSharp::Challenge.Recipe_CounterRotation
+  targetCategories: 000000000100000004000000
+  speedA: 45
+  speedB: 45
+  rotatingCircles: {fileID: 5906794524403342947, guid: 000467571927e0546ad594fb72dbb993,
+    type: 3}
