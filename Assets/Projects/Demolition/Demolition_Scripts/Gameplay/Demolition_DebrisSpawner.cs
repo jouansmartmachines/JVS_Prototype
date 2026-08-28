@@ -23,9 +23,10 @@ namespace Demolition
             for (int i = 0; i < count; i++)
             {
                 GameObject piece = new GameObject("Debris_" + i, typeof(SpriteRenderer), typeof(Rigidbody2D), typeof(BoxCollider2D));
-                piece.transform.position = position + Random.insideUnitSphere * 0.3f;
-                piece.transform.localScale = Vector3.one * Random.Range(0.2f, 0.5f);
-                piece.layer = 0; // Default
+                piece.transform.position = position + Random.insideUnitSphere * 0.5f;
+                float scale = Random.Range(0.8f, 1.8f);
+                piece.transform.localScale = Vector3.one * scale;
+                piece.layer = 0;
 
                 var sr = piece.GetComponent<SpriteRenderer>();
                 sr.sortingOrder = 5;
@@ -36,46 +37,56 @@ namespace Demolition
                 sr.color = tint;
 
                 var rb = piece.GetComponent<Rigidbody2D>();
-                rb.mass = 0.3f;
-                rb.drag = 0.5f;
-                rb.angularDrag = 0.3f;
-                rb.gravityScale = 1.5f;
-                rb.AddForce(new Vector2(Random.Range(-5f, 5f), Random.Range(2f, 8f)), ForceMode2D.Impulse);
-                rb.AddTorque(Random.Range(-10f, 10f));
+                rb.mass = 0.5f;
+                rb.drag = 0.8f;
+                rb.angularDrag = 0.5f;
+                rb.gravityScale = 1.2f;
+                rb.AddForce(new Vector2(Random.Range(-6f, 6f), Random.Range(3f, 10f)), ForceMode2D.Impulse);
+                rb.AddTorque(Random.Range(-15f, 15f));
 
                 var col = piece.GetComponent<BoxCollider2D>();
-                col.size = new Vector2(0.3f, 0.3f);
+                col.size = Vector2.one * 0.5f * scale;
 
                 Object.Destroy(piece, Random.Range(2f, 4f));
             }
         }
 
-        public static void SpawnDustCloud(Vector3 position, float radius = 1.5f)
+        public static void SpawnDustCloud(Vector3 position, float radius = 2f)
         {
-            Texture2D tex = Resources.Load<Texture2D>("Textures/impact");
-            if (tex == null) return;
-
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 8; i++)
             {
                 GameObject dust = new GameObject("Dust", typeof(SpriteRenderer));
                 dust.transform.position = position + new Vector3(Random.Range(-radius, radius), Random.Range(-radius, radius), 0);
-                dust.transform.localScale = Vector3.one * Random.Range(0.2f, 0.6f);
+                float dScale = Random.Range(0.5f, 1.5f);
+                dust.transform.localScale = Vector3.one * dScale;
                 dust.transform.rotation = Quaternion.Euler(0, 0, Random.Range(0f, 360f));
 
                 var sr = dust.GetComponent<SpriteRenderer>();
-                sr.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
-                sr.color = new Color(0.8f, 0.8f, 0.8f, 0.6f);
+                // Fallback colored square si texture pas dispo
+                Texture2D tex = Resources.Load<Texture2D>("Textures/impact");
+                if (tex != null)
+                    sr.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
+                else
+                {
+                    // Fallback: cercle blanc
+                    var fallbackTex = new Texture2D(32, 32);
+                    for (int x = 0; x < 32; x++)
+                        for (int y = 0; y < 32; y++)
+                            fallbackTex.SetPixel(x, y, Color.white);
+                    fallbackTex.Apply();
+                    sr.sprite = Sprite.Create(fallbackTex, new Rect(0, 0, 32, 32), new Vector2(0.5f, 0.5f));
+                }
+                sr.color = new Color(0.8f, 0.8f, 0.8f, 0.5f);
                 sr.sortingOrder = 6;
 
                 var rb = dust.AddComponent<Rigidbody2D>();
                 rb.mass = 0.1f;
                 rb.drag = 2f;
-                rb.gravityScale = -0.5f; // monte
+                rb.gravityScale = -0.3f;
                 rb.AddForce(new Vector2(Random.Range(-2f, 2f), Random.Range(1f, 3f)), ForceMode2D.Impulse);
 
-                // Fade out puis destroy
                 var fade = dust.AddComponent<Demolition_FadeOut>();
-                fade.duration = Random.Range(0.5f, 1.2f);
+                fade.duration = Random.Range(0.8f, 1.5f);
             }
         }
     }
