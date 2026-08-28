@@ -19,7 +19,8 @@ namespace Demolition
         private float totalDist;
         private bool launched = false;
         private float flightTime;
-        private Vector3 hitPoint; // point X,Y où l'oiseau va exploser
+        private Vector3 hitPoint;
+        private float rotationSpeed;
 
         void Awake()
         {
@@ -46,6 +47,7 @@ namespace Demolition
 
             totalDist = Mathf.Abs(zTarget - startZ);
             flightTime = 0f;
+            rotationSpeed = Random.Range(-360f, 360f); // rotation aleatoire
             launched = true;
         }
 
@@ -75,6 +77,9 @@ namespace Demolition
             // Rétrécit progressivement (effet de profondeur)
             float scale = Mathf.Lerp(scaleMax, scaleMin, t);
             transform.localScale = Vector3.one * scale;
+
+            // Rotation (spirale)
+            transform.rotation = Quaternion.Euler(0, 0, flightTime * rotationSpeed);
 
             transform.position = pos;
         }

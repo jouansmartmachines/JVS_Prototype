@@ -275,6 +275,24 @@ namespace Demolition
             Camera.main.transform.position = originalPos;
         }
 
+        public IEnumerator BigShake()
+        {
+            Vector3 originalPos = Camera.main.transform.position;
+            for (int i = 0; i < 10; i++)
+            {
+                Camera.main.transform.position = originalPos + (Vector3)Random.insideUnitCircle * 0.6f;
+                yield return new WaitForSeconds(0.03f);
+            }
+            Camera.main.transform.position = originalPos;
+        }
+
+        public IEnumerator CollapseSlowMo()
+        {
+            Time.timeScale = 0.3f;
+            yield return new WaitForSecondsRealtime(0.4f);
+            Time.timeScale = 1f;
+        }
+
         void SpawnTableau(Vector3 origin)
         {
             Demolition_StructureBuilder.BuildRandomStructure(structuresParent, origin);

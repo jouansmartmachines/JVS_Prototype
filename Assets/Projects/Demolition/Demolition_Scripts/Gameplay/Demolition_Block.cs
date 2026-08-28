@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 namespace Demolition
 {
@@ -12,7 +13,7 @@ namespace Demolition
         public MaterialType materialType = MaterialType.Bois;
 
         [Header("Apparence")]
-        public Sprite[] damageSprites;  // 0 = intact, 1 = fissuré, 2 = très fissuré
+        public Sprite[] damageSprites;
         public SpriteRenderer spriteRenderer;
 
         [Header("Débris")]
@@ -22,12 +23,13 @@ namespace Demolition
         private Rigidbody2D rb;
         private int maxHp;
         private bool isDestroyed = false;
+        private Demolition_Structure parentStructure;
 
         public enum MaterialType { Bois, Verre, Pierre, Cochon }
     
         [Header("Cible spéciale")]
         public bool isTarget = false;
-        public int starValue = 0;  // 1-3 si c'est un cochon/cible
+        public int starValue = 0;
         public GameObject popupTextPrefab;
 
         void Awake()
@@ -38,12 +40,11 @@ namespace Demolition
 
             maxHp = hp;
 
-            // Charger les sprites depuis Resources si non assignes (Texture2D -> Sprite)
+            // Charger les sprites depuis Resources
             if (spriteRenderer == null)
                 spriteRenderer = GetComponent<SpriteRenderer>();
             if (spriteRenderer != null && spriteRenderer.sprite == null)
             {
-                // Charger la texture du bloc selon son type
                 string texName = "bois";
                 switch (materialType)
                 {
@@ -67,7 +68,9 @@ namespace Demolition
 
         void Start()
         {
-            // Lier au parent structure
+            parentStructure = GetComponentInParent<Demolition_Structure>();
+
+            // Joint au parent
             FixedJoint2D joint = GetComponent<FixedJoint2D>();
             if (joint == null && transform.parent != null)
             {
@@ -81,7 +84,6 @@ namespace Demolition
             if (isDestroyed) return;
             hp -= amount;
 
-            // Mise à jour visuelle (fissures)
             if (damageSprites.Length > 0 && spriteRenderer != null)
             {
                 float ratio = (float)hp / maxHp;
@@ -89,6 +91,17 @@ namespace Demolition
                     Mathf.FloorToInt(ratio * damageSprites.Length), 0, damageSprites.Length - 1);
                 if (index < damageSprites.Length)
                     spriteRenderer.sprite = damageSprites[index];
+            }
+
+            // Son cochon
+            if (materialType == MaterialType.Cochon)
+            {
+                AudioSource aud = GetComponent<AudioSource>();
+                if (aud != null)
+                {
+                    AudioClip pigHit = Resources.Load<AudioClip>("Sounds/pig_hit");
+                    if (pigHit != null) aud.PlayOneShot(pigHit);
+                }
             }
 
             if (hp <= 0)
@@ -100,22 +113,14 @@ namespace Demolition
             if (isDestroyed) return;
             isDestroyed = true;
 
-            // Particules de débris
-            if (debrisPrefab != null)
-            {
-                GameObject debris = Instantiate(debrisPrefab, transform.position, Quaternion.identity);
-                foreach (Rigidbody2D part in debris.GetComponentsInChildren<Rigidbody2D>())
-                {
-                    part.AddForce(Random.insideUnitCircle * debrisForce, ForceMode2D.Impulse);
-                }
-                Destroy(debris, 3f);
-            }
+            // Débris physiques (4-8 morceaux qui volent)
+            Demolition_DebrisSpawner.SpawnDebris(transform.position, materialType, Random.Range(4, 8));
 
             // Score
             if (Demolition_GameManager.Instance != null)
                 Demolition_GameManager.Instance.AddScore(points, transform.position);
 
-            // Popup de score flottant
+            // Popup flottant
             if (popupTextPrefab != null)
             {
                 GameObject popup = Instantiate(popupTextPrefab, transform.position, Quaternion.identity);
@@ -126,14 +131,35 @@ namespace Demolition
 
             // Son
             AudioSource audio = GetComponent<AudioSource>();
-            if (audio != null) audio.Play();
+            if (audio != null)
+            {
+                if (materialType == MaterialType.Cochon)
+                {
+                    audio.PlayOneShot(Resources.Load<AudioClip>("Sounds/pig_hit"));
+                }
+                else
+                {
+                    AudioClip clip = Resources.Load<AudioClip>("Sounds/destruction");
+                    if (clip != null) audio.PlayOneShot(clip);
+                }
+            }
+
+            // Secousse + ralenti si c'est un cochon
+            if (materialType == MaterialType.Cochon && Demolition_GameManager.Instance != null)
+            {
+                Demolition_GameManager.Instance.StartCoroutine(
+                    Demolition_GameManager.Instance.BigShake());
+            }
+
+            // Si la structure parente existe, elle peut declencher le slow-mo
+            if (parentStructure != null)
+                parentStructure.OnBlockDestroyed(this);
 
             Destroy(gameObject);
         }
 
         void OnCollisionEnter2D(Collision2D collision)
         {
-            // Dégâts par chute/impact
             float force = collision.relativeVelocity.magnitude;
             if (force > 3f)
             {
@@ -141,7 +167,6 @@ namespace Demolition
             }
         }
 
-        // Force du joint qui se brise
         public float GetBreakForce()
         {
             switch (materialType)
