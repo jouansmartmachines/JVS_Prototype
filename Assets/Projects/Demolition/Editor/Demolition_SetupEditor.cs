@@ -43,7 +43,7 @@ public class Demolition_SetupEditor : EditorWindow
         // 2. Sons
         MakeWAV("impact", 0.15f, 200, 0.3f);
         MakeWAV("destruction", 0.3f, 150, 0.5f);
-        MakeWAV("explosion", 0.5f, 100, 0.8f);
+        MakeWAV("gameover", 0.5f, 100, 0.8f);
         Debug.Log("2/6 Sons crees");
 
         AssetDatabase.Refresh();
@@ -225,6 +225,15 @@ public class Demolition_SetupEditor : EditorWindow
             gm.destructionSound = AssetDatabase.LoadAssetAtPath<AudioClip>(_soundPath + "/destruction.wav");
             gm.oiseauPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(_prefabPath + "/Oiseau.prefab");
             gm.impactEffectPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(_prefabPath + "/ImpactExplosion.prefab");
+
+            // Tableaux (structures de blocs)
+            var t1 = Resources.Load<GameObject>("Prefabs/Tableau_1");
+            var t2 = Resources.Load<GameObject>("Prefabs/Tableau_2");
+            var t3 = Resources.Load<GameObject>("Prefabs/Tableau_3");
+            if (t1 != null && t2 != null && t3 != null)
+                gm.tableauPrefabs = new GameObject[] { t1, t2, t3 };
+            else
+                Debug.LogWarning("Tableau prefabs non trouves dans Resources/Prefabs/");
         }
 
         // Canvas avec Score + Timer pour le gameplay
