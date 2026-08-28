@@ -287,3 +287,6 @@ MonoBehaviour:
   spriteRenderer: {fileID: 7775598028175660765}
   debrisPrefab: {fileID: 0}
   debrisForce: 200
+  isTarget: 0
+  starValue: 0
+  popupTextPrefab: {fileID: 0}
