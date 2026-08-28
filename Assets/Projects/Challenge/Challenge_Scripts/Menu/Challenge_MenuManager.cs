@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
-using FileDialogWithinUnity;
 using TMPro;
 using System.IO;
 using UnityEngine.UI;
@@ -39,15 +38,7 @@ namespace Challenge
 
         public void OpenFileBrowser()
         {
-            FolderPath newC = new FolderPath();
 
-            string folderLocation = newC.OpenFolderDialogBox(PlayerPrefs.GetString("Challenge_PicturePath"));
-
-            if (folderLocation != "")
-            {
-                PlayerPrefs.SetString("Challenge_PicturePath", folderLocation + @"\");
-                ChangeFolderIndication();
-            }
         }
 
         public void ChangeFolderIndication()

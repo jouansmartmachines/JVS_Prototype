@@ -12,8 +12,8 @@ GameObject:
   - component: {fileID: 1523287059155351384}
   - component: {fileID: 7659297977132467748}
   - component: {fileID: 8691324960205455356}
-  - component: {fileID: 10158534930307428}
   - component: {fileID: 3399823616201208918}
+  - component: {fileID: 10158534930307428}
   m_Layer: 0
   m_Name: Bloc_Bois
   m_TagString: Untagged
@@ -83,7 +83,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 1
+  m_SortingOrder: 2
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: f91276bc1962ed74db9af89f595640d8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -155,7 +155,7 @@ Rigidbody2D:
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
   m_Mass: 1
-  m_LinearDamping: 0.5
+  m_LinearDamping: 0
   m_AngularDamping: 0.05
   m_GravityScale: 1
   m_Material: {fileID: 0}
@@ -169,28 +169,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
---- !u!114 &10158534930307428
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8585023429763218020}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 974065dd751ede5f40a7b87f1a806f16, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Demolition.Demolition_Block
-  hp: 2
-  points: 50
-  materialType: 0
-  damageSprites:
-  - {fileID: 21300000, guid: f91276bc1962ed74db9af89f595640d8, type: 3}
-  - {fileID: 21300000, guid: f91276bc1962ed74db9af89f595640d8, type: 3}
-  - {fileID: 21300000, guid: f91276bc1962ed74db9af89f595640d8, type: 3}
-  spriteRenderer: {fileID: 1523287059155351384}
-  debrisPrefab: {fileID: 458451971247270732, guid: 5a9dd04ccd0beb248a85fec18ae97ba8, type: 3}
-  debrisForce: 200
 --- !u!82 &3399823616201208918
 AudioSource:
   m_ObjectHideFlags: 0
@@ -288,3 +266,24 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &10158534930307428
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8585023429763218020}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 974065dd751ede5f40a7b87f1a806f16, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Demolition.Demolition_Block
+  hp: 2
+  points: 50
+  materialType: 0
+  damageSprites:
+  - {fileID: 0}
+  - {fileID: 0}
+  spriteRenderer: {fileID: 1523287059155351384}
+  debrisPrefab: {fileID: 0}
+  debrisForce: 200
