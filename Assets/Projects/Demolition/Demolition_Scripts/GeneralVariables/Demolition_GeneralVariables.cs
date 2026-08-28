@@ -25,12 +25,10 @@ namespace Demolition
 
         public override void ReceiveName(string name)
         {
-            float score = PlayerPrefs.GetFloat(HighScoreKey);
-            PlayerData data = new PlayerData() { Name = name, Score = score };
-            PlayerData defaultPlayer = new PlayerData() { Name = Localizer.Get("Unknown"), Score = 0 };
-            _scoreBoardDisplayer.InitScoreBoard(
-                ScoreBoardManager.UpdateScoreBoardDescendingOrder(data, GameScoreBoard.Demolition),
-                Font, _winnerColor, defaultPlayer);
+            if (Demolition_ScoreBoardManager.Instance != null)
+            {
+                Demolition_ScoreBoardManager.Instance.OnReceiveName(name);
+            }
         }
     }
 }

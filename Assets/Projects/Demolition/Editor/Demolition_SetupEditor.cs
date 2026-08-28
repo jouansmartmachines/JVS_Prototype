@@ -42,7 +42,7 @@ public class Demolition_SetupEditor : EditorWindow
 
         // 2. Sons
         MakeWAV("impact", 0.15f, 200, 0.3f);
-        MakeWAV("break", 0.3f, 150, 0.5f);
+        MakeWAV("destruction", 0.3f, 150, 0.5f);
         MakeWAV("explosion", 0.5f, 100, 0.8f);
         Debug.Log("2/6 Sons crees");
 
@@ -178,6 +178,17 @@ public class Demolition_SetupEditor : EditorWindow
             cam.backgroundColor = new Color(0.05f, 0.05f, 0.08f);
             go.transform.position = new Vector3(0, 0, -10);
             go.tag = "MainCamera";
+        }
+
+        if (Object.FindFirstObjectByType<Light>() == null)
+        {
+            var lightGO = new GameObject("Directional Light", typeof(Light));
+            var light = lightGO.GetComponent<Light>();
+            light.type = LightType.Directional;
+            light.color = new Color(1, 0.95686275f, 0.8392157f);
+            light.intensity = 1;
+            lightGO.transform.position = new Vector3(0, 3, 0);
+            lightGO.transform.rotation = Quaternion.Euler(50, -30, 0);
         }
 
         if (Object.FindFirstObjectByType<EventSystem>() == null)

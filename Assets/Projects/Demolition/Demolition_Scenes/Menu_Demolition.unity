@@ -1688,7 +1688,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 80d8235ee31ecf643bd533a0a0964332, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _key: Basket_Sticker
+  _key: Demolition_Sticker
 --- !u!1 &1560288415
 GameObject:
   m_ObjectHideFlags: 0
@@ -3354,7 +3354,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5267f8b19aa52c341aed23c5faecb992, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _key: Basket_Difficulty
+  _key: Demolition_GameTime
 --- !u!114 &6080321823590002978
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3367,7 +3367,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5267f8b19aa52c341aed23c5faecb992, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _key: Basket_Timer
+  _key: Demolition_Timer
 --- !u!114 &6887205879969841264
 MonoBehaviour:
   m_ObjectHideFlags: 0
