@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections;
+using TMPro;
 using MenuSelection;
 using OSC;
 
@@ -38,6 +39,10 @@ namespace Demolition
         public AudioClip destructionSound;
         public AudioClip gameOverSound;
         private AudioSource audioSource;
+
+        [Header("UI")]
+        private TextMeshProUGUI scoreText;
+        private TextMeshProUGUI timerText;
 
         // Coordonnees d impact
         protected bool gotAPt;
@@ -77,6 +82,16 @@ namespace Demolition
 
             gameIsRunning = true;
             StartCoroutine(GameLoop());
+
+            // Trouver les textes UI dans le Canvas
+            var canvasGO = GameObject.Find("Canvas");
+            if (canvasGO != null)
+            {
+                scoreText = GameObject.Find("ScoreText")?.GetComponent<TextMeshProUGUI>();
+                timerText = GameObject.Find("TimerText")?.GetComponent<TextMeshProUGUI>();
+                if (scoreText != null) scoreText.text = "Score: 0";
+                if (timerText != null) timerText.text = Mathf.CeilToInt(gameDuration).ToString();
+            }
         }
 
         void LoadReferences()
@@ -106,6 +121,8 @@ namespace Demolition
 
             // Timer
             currentTime -= Time.deltaTime;
+            if (timerText != null)
+                timerText.text = Mathf.CeilToInt(currentTime).ToString();
             if (currentTime <= 0)
             {
                 EndGame();
@@ -262,6 +279,8 @@ namespace Demolition
         public void AddScore(int points, Vector3 pos)
         {
             score += points;
+            if (scoreText != null)
+                scoreText.text = "Score: " + score;
         }
 
         void EndGame()
