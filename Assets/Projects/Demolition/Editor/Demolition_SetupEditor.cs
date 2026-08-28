@@ -75,12 +75,9 @@ public class Demolition_SetupEditor : EditorWindow
         SetupGameScene();
         Debug.Log("4/6 GameScene configuree");
 
-        // 5. Menu Toggle + Slider
+        // 5. Menu Toggle (ModeOiseau) + Slider (ScrollSpeed) - style SpotTheDif
         SetupMenu();
         Debug.Log("5/6 Menu Toggle+Slider ajoutes");
-
-        // 6. Backgrounds
-        Debug.Log("6/6 Backgrounds OK");
 
         AssetDatabase.Refresh();
         Debug.Log("=== FINI: Demolition completement configure ===");
@@ -172,7 +169,6 @@ public class Demolition_SetupEditor : EditorWindow
         string scenePath = _basePath + "/Demolition_Scenes/GameScene_Demolition.unity";
         var scene = EditorSceneManager.OpenScene(scenePath);
 
-        // Camera
         if (Object.FindFirstObjectByType<Camera>() == null)
         {
             var go = new GameObject("Main Camera", typeof(Camera), typeof(AudioListener));
@@ -182,17 +178,11 @@ public class Demolition_SetupEditor : EditorWindow
             cam.backgroundColor = new Color(0.05f, 0.05f, 0.08f);
             go.transform.position = new Vector3(0, 0, -10);
             go.tag = "MainCamera";
-            Debug.Log("Camera OK");
         }
 
-        // EventSystem
         if (Object.FindFirstObjectByType<EventSystem>() == null)
-        {
             new GameObject("EventSystem", typeof(EventSystem), typeof(StandaloneInputModule));
-            Debug.Log("EventSystem OK");
-        }
 
-        // Background
         if (GameObject.Find("Background") == null)
         {
             var bg = new GameObject("Background", typeof(SpriteRenderer));
@@ -202,25 +192,18 @@ public class Demolition_SetupEditor : EditorWindow
             sr.color = new Color(0.05f, 0.05f, 0.08f);
             bg.transform.position = new Vector3(0, 0, 5);
             sr.sortingOrder = -1;
-            Debug.Log("Background OK");
         }
 
-        // StructuresParent
         if (GameObject.Find("StructuresParent") == null)
-        {
             new GameObject("StructuresParent");
-            Debug.Log("StructuresParent OK");
-        }
 
-        // GeneralVariable
         if (Object.FindFirstObjectByType<Demolition_GeneralVariables>() == null)
         {
             var gvPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(_basePath + "/Demolition_Prefabs/GeneralVariable.prefab");
-            if (gvPrefab != null) { PrefabUtility.InstantiatePrefab(gvPrefab); Debug.Log("GV OK"); }
+            if (gvPrefab != null) { PrefabUtility.InstantiatePrefab(gvPrefab); }
             else Debug.LogWarning("GeneralVariable.prefab manquant");
         }
 
-        // GameManager
         if (Object.FindFirstObjectByType<Demolition_GameManager>() == null)
         {
             var gmGO = new GameObject("Demolition_GameManager", typeof(Demolition_GameManager));
@@ -231,11 +214,9 @@ public class Demolition_SetupEditor : EditorWindow
             gm.destructionSound = AssetDatabase.LoadAssetAtPath<AudioClip>(_soundPath + "/break.wav");
             gm.oiseauPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(_prefabPath + "/Oiseau.prefab");
             gm.impactEffectPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(_prefabPath + "/ImpactExplosion.prefab");
-            Debug.Log("GameManager OK");
         }
 
         EditorSceneManager.SaveScene(scene);
-        Debug.Log("GameScene sauvegardee");
     }
 
     static void SetupMenu()
@@ -246,66 +227,146 @@ public class Demolition_SetupEditor : EditorWindow
         var canvas = Object.FindFirstObjectByType<Canvas>();
         if (canvas == null) { Debug.LogError("Canvas pas trouve!"); return; }
 
-        // Toggle ModeOiseau
+        // === Toggle ModeOiseau (style SpotTheDif Instructions) ===
         if (GameObject.Find("ModeOiseau") == null)
         {
-            var go = new GameObject("ModeOiseau", typeof(RectTransform));
-            go.transform.SetParent(canvas.transform);
-            go.AddComponent<Image>();
-            var toggle = go.AddComponent<Toggle>();
+            // Container (like Instructions)
+            var container = new GameObject("ModeOiseau", typeof(RectTransform));
+            container.transform.SetParent(canvas.transform);
+            var crt = container.GetComponent<RectTransform>();
+            crt.anchorMin = Vector2.one * 0.5f;
+            crt.anchorMax = Vector2.one * 0.5f;
+            crt.anchoredPosition = new Vector2(386, -153);
+            crt.sizeDelta = new Vector2(1221, 150);
+            crt.localScale = Vector3.one * 0.5f;
+
+            // Label "Mode Oiseau"
+            var label = new GameObject("Label", typeof(RectTransform));
+            label.transform.SetParent(container.transform);
+            var lrt = label.GetComponent<RectTransform>();
+            lrt.anchorMin = Vector2.zero;
+            lrt.anchorMax = Vector2.one;
+            lrt.offsetMin = Vector2.zero;
+            lrt.offsetMax = Vector2.zero;
+            var txt = label.AddComponent<TextMeshProUGUI>();
+            txt.text = "Mode Oiseau :";
+            txt.fontSize = 102;
+            txt.color = Color.white;
+            txt.alignment = TextAlignmentOptions.MidlineLeft;
+            txt.margin = new Vector4(5, 0, 0, 0);
+            label.AddComponent<CanvasRenderer>();
+
+            // Toggle
+            var toggleGO = new GameObject("Toggle", typeof(RectTransform));
+            toggleGO.transform.SetParent(container.transform);
+            var trt = toggleGO.GetComponent<RectTransform>();
+            trt.anchorMin = Vector2.one * 0.5f;
+            trt.anchorMax = Vector2.one * 0.5f;
+            trt.anchoredPosition = new Vector2(548, -12.5f);
+            trt.sizeDelta = new Vector2(125, 125);
+            var toggle = toggleGO.AddComponent<Toggle>();
             toggle.isOn = PlayerPrefs.GetInt(Demolition_GeneralVariables.ModeOiseauKey, 1) == 1;
+            toggleGO.AddComponent<CanvasRenderer>();
+            var bgImg = toggleGO.AddComponent<Image>();
+            bgImg.color = new Color(0.96f, 0.64f, 0);
 
-            var chk = new GameObject("Checkmark", typeof(RectTransform));
-            chk.transform.SetParent(go.transform);
-            var ci = chk.AddComponent<Image>();
-            ci.sprite = LoadSprite("bois");
-            chk.AddComponent<CanvasRenderer>();
-            toggle.graphic = ci;
+            // Checkmark
+            var check = new GameObject("Checkmark", typeof(RectTransform));
+            check.transform.SetParent(toggleGO.transform);
+            var crt2 = check.GetComponent<RectTransform>();
+            crt2.anchorMin = Vector2.zero;
+            crt2.anchorMax = Vector2.one;
+            crt2.offsetMin = Vector2.zero;
+            crt2.offsetMax = Vector2.zero;
+            var checkImg = check.AddComponent<Image>();
+            checkImg.sprite = LoadSprite("bois");
+            check.AddComponent<CanvasRenderer>();
+            toggle.graphic = checkImg;
+            toggle.targetGraphic = bgImg;
 
-            var lbl = new GameObject("Label", typeof(RectTransform));
-            lbl.transform.SetParent(go.transform);
-            var txt = lbl.AddComponent<TextMeshProUGUI>();
-            txt.text = "Mode Oiseau"; txt.fontSize = 24;
-
-            var rt = go.GetComponent<RectTransform>();
-            rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
-            rt.anchoredPosition = new Vector2(-100, 150);
-            rt.sizeDelta = new Vector2(200, 50);
-            Debug.Log("Toggle OK");
+            Debug.Log("Toggle ModeOiseau cree avec positions SpotTheDif");
         }
 
-        // Slider
+        // === Slider ScrollSpeed (style SpotTheDif ScenesNumber) ===
         if (GameObject.Find("ScrollSpeed") == null)
         {
-            var go = new GameObject("ScrollSpeed", typeof(RectTransform));
-            go.transform.SetParent(canvas.transform);
-            var slider = go.AddComponent<Slider>();
-            go.AddComponent<Image>();
+            // Container (like ScenesNumber)
+            var container = new GameObject("ScrollSpeed", typeof(RectTransform));
+            container.transform.SetParent(canvas.transform);
+            var crt = container.GetComponent<RectTransform>();
+            crt.anchorMin = Vector2.one * 0.5f;
+            crt.anchorMax = Vector2.one * 0.5f;
+            crt.anchoredPosition = new Vector2(-691, -73);
+            crt.sizeDelta = new Vector2(500, 400);
+            crt.localScale = Vector3.one * 0.8f;
 
-            var bg = new GameObject("Background", typeof(RectTransform));
-            bg.transform.SetParent(go.transform); bg.AddComponent<Image>();
+            // Label "Vitesse"
+            var label = new GameObject("Label", typeof(RectTransform));
+            label.transform.SetParent(container.transform);
+            var lrt = label.GetComponent<RectTransform>();
+            lrt.anchorMin = Vector2.one * 0.5f;
+            lrt.anchorMax = Vector2.one * 0.5f;
+            lrt.anchoredPosition = new Vector2(0, -19.2f);
+            lrt.sizeDelta = new Vector2(200, 50);
+            var txt = label.AddComponent<TextMeshProUGUI>();
+            txt.text = "Vitesse";
+            txt.fontSize = 77;
+            txt.color = new Color(0.745f, 0.643f, 0.431f);
+            txt.alignment = TextAlignmentOptions.Center;
+            label.AddComponent<CanvasRenderer>();
 
+            // Slider
+            var sliderGO = new GameObject("Slider", typeof(RectTransform));
+            sliderGO.transform.SetParent(container.transform);
+            var srt = sliderGO.GetComponent<RectTransform>();
+            srt.anchorMin = new Vector2(0, 1);
+            srt.anchorMax = Vector2.one;
+            srt.anchoredPosition = Vector2.zero;
+            srt.sizeDelta = new Vector2(0, 200);
+            var slider = sliderGO.AddComponent<Slider>();
+            sliderGO.AddComponent<CanvasRenderer>();
+            var sliderImg = sliderGO.AddComponent<Image>();
+            sliderImg.color = Color.white;
+
+            // Fill
             var fill = new GameObject("Fill", typeof(RectTransform));
-            fill.transform.SetParent(go.transform); fill.AddComponent<Image>();
+            fill.transform.SetParent(sliderGO.transform);
+            fill.AddComponent<Image>();
+            var fillImg = fill.GetComponent<Image>();
+            fillImg.color = new Color(0.745f, 0.643f, 0.431f);
+            var frt = fill.GetComponent<RectTransform>();
+            frt.anchorMin = new Vector2(0, 0.25f);
+            frt.anchorMax = new Vector2(1, 0.75f);
+            frt.sizeDelta = Vector2.zero;
+            slider.fillRect = frt;
 
-            var hdl = new GameObject("Handle", typeof(RectTransform));
-            hdl.transform.SetParent(go.transform); hdl.AddComponent<Image>();
+            // Handle
+            var handle = new GameObject("Handle", typeof(RectTransform));
+            handle.transform.SetParent(sliderGO.transform);
+            handle.AddComponent<Image>();
+            var hrt = handle.GetComponent<RectTransform>();
+            hrt.anchorMin = new Vector2(0, 0);
+            hrt.anchorMax = Vector2.one;
+            hrt.pivot = new Vector2(0.5f, 0.5f);
+            hrt.anchoredPosition = Vector2.zero;
+            hrt.sizeDelta = new Vector2(20, 20);
+            slider.handleRect = hrt;
+            slider.targetGraphic = handle.GetComponent<Image>();
 
-            slider.fillRect = fill.GetComponent<RectTransform>();
-            slider.handleRect = hdl.GetComponent<RectTransform>();
             slider.minValue = 1; slider.maxValue = 5; slider.wholeNumbers = true;
             slider.value = PlayerPrefs.GetFloat(Demolition_GeneralVariables.ScrollSpeedKey, 2f);
 
-            var lbl = new GameObject("Label", typeof(RectTransform));
-            lbl.transform.SetParent(canvas.transform);
-            var txt = lbl.AddComponent<TextMeshProUGUI>();
-            txt.text = "Vitesse"; txt.fontSize = 24;
+            // Background of slider
+            var bg = new GameObject("Background", typeof(RectTransform));
+            bg.transform.SetParent(sliderGO.transform);
+            var brt = bg.GetComponent<RectTransform>();
+            brt.anchorMin = new Vector2(0, 0.25f);
+            brt.anchorMax = new Vector2(1, 0.75f);
+            brt.sizeDelta = Vector2.zero;
+            bg.AddComponent<Image>();
+            bg.GetComponent<Image>().color = new Color(0.5f, 0.5f, 0.5f);
 
-            var rt = go.GetComponent<RectTransform>();
-            rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
-            rt.anchoredPosition = new Vector2(-100, 50);
-            rt.sizeDelta = new Vector2(300, 50);
-            Debug.Log("Slider OK");
+            Debug.Log("Slider ScrollSpeed cree avec positions SpotTheDif");
         }
 
         EditorSceneManager.SaveScene(scene);
