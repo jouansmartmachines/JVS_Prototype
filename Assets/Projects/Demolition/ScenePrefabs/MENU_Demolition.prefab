@@ -2602,8 +2602,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 'Sticker :'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee,
+  m_fontAsset: {fileID: 11400000, guid: c52c6ebb2419dc645bdd18cae4d930d8, type: 2}
+  m_sharedMaterial: {fileID: -4131467079041988626, guid: c52c6ebb2419dc645bdd18cae4d930d8,
     type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
