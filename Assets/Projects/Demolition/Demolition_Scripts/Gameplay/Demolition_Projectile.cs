@@ -28,6 +28,22 @@ namespace Demolition
         private float flightTime;
         private float startX;
 
+        void Awake()
+        {
+            spriteRenderer = GetComponent<SpriteRenderer>();
+            if (spriteRenderer == null)
+                spriteRenderer = gameObject.AddComponent<SpriteRenderer>();
+
+            // Charger le sprite depuis le fichier PNG en Resources
+            Texture2D tex = Resources.Load<Texture2D>("Textures/oiseau_dos");
+            if (tex != null)
+            {
+                oiseauDos = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
+                spriteRenderer.sprite = oiseauDos;
+            }
+            spriteRenderer.sortingOrder = 3;
+        }
+
         public void Launch(Transform targetParent, float bgScrollSpeed)
         {
             cible = targetParent;
@@ -41,7 +57,11 @@ namespace Demolition
             if (spriteRenderer == null)
                 spriteRenderer = GetComponent<SpriteRenderer>();
             if (oiseauDos == null)
-                oiseauDos = Resources.Load<Sprite>("Textures/oiseau_dos");
+            {
+                Texture2D tex = Resources.Load<Texture2D>("Textures/oiseau_dos");
+                if (tex != null)
+                    oiseauDos = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
+            }
             if (spriteRenderer != null && oiseauDos != null)
                 spriteRenderer.sprite = oiseauDos;
 

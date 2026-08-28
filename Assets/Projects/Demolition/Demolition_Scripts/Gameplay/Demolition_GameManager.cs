@@ -228,10 +228,14 @@ namespace Demolition
             if (impactEffectPrefab != null)
             {
                 GameObject effect = Instantiate(impactEffectPrefab, worldPos, Quaternion.identity);
-                // Charger le sprite impact depuis Resources
+                // Charger le sprite impact depuis Resources (Texture2D -> Sprite)
                 var sr = effect.GetComponent<SpriteRenderer>();
                 if (sr != null && sr.sprite == null)
-                    sr.sprite = Resources.Load<Sprite>("Textures/impact");
+                {
+                    Texture2D tex = Resources.Load<Texture2D>("Textures/impact");
+                    if (tex != null)
+                        sr.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
+                }
                 Destroy(effect, 2f);
             }
 

@@ -38,14 +38,30 @@ namespace Demolition
 
             maxHp = hp;
 
-            // Charger les sprites depuis Resources si non assignes
+            // Charger les sprites depuis Resources si non assignes (Texture2D -> Sprite)
             if (spriteRenderer == null)
                 spriteRenderer = GetComponent<SpriteRenderer>();
-            if (damageSprites == null || damageSprites.Length == 0)
+            if (spriteRenderer != null && spriteRenderer.sprite == null)
+            {
+                // Charger la texture du bloc selon son type
+                string texName = "bois";
+                switch (materialType)
+                {
+                    case MaterialType.Verre: texName = "verre"; break;
+                    case MaterialType.Pierre: texName = "pierre"; break;
+                    case MaterialType.Cochon: texName = "cochon"; break;
+                }
+                Texture2D tex = Resources.Load<Texture2D>("Textures/" + texName);
+                if (tex != null)
+                    spriteRenderer.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
+            }
+            if (damageSprites == null || damageSprites.Length == 0 || damageSprites[0] == null)
             {
                 damageSprites = new Sprite[2];
-                damageSprites[0] = Resources.Load<Sprite>("Textures/fissure1");
-                damageSprites[1] = Resources.Load<Sprite>("Textures/fissure2");
+                Texture2D f1 = Resources.Load<Texture2D>("Textures/fissure1");
+                Texture2D f2 = Resources.Load<Texture2D>("Textures/fissure2");
+                if (f1 != null) damageSprites[0] = Sprite.Create(f1, new Rect(0, 0, f1.width, f1.height), new Vector2(0.5f, 0.5f));
+                if (f2 != null) damageSprites[1] = Sprite.Create(f2, new Rect(0, 0, f2.width, f2.height), new Vector2(0.5f, 0.5f));
             }
         }
 
