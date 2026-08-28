@@ -15,6 +15,11 @@ public class Demolition_SetupEditor : EditorWindow
     [MenuItem("Tools/Demolition - Tout configurer")]
     static void ConfigurerTout()
     {
+        if (EditorApplication.isPlaying)
+        {
+            Debug.LogError("Arretez le jeu avant de lancer l'outil !");
+            return;
+        }
         _basePath = "Assets/Projects/Demolition";
         string resPath = _basePath + "/Resources";
         _prefabPath = resPath + "/Prefabs";

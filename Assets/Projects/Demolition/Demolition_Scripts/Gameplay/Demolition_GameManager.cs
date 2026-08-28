@@ -122,16 +122,30 @@ namespace Demolition
             for (int i = 0; i < tableauNames.Length; i++)
                 tableauPrefabs[i] = Resources.Load<GameObject>("Prefabs/" + tableauNames[i]);
 
-            // Chercher le sol
+            // Chercher/creer le sol
             if (GameObject.Find("Ground") == null)
             {
-                var groundGO = new GameObject("Ground", typeof(BoxCollider2D));
+                var groundGO = new GameObject("Ground", typeof(BoxCollider2D), typeof(SpriteRenderer));
                 var col = groundGO.GetComponent<BoxCollider2D>();
                 col.size = new Vector2(50, 1);
                 col.offset = new Vector2(0, -0.5f);
-                groundGO.layer = LayerMask.NameToLayer("Default");
                 groundGO.transform.position = new Vector3(0, -4.5f, 0);
-                groundGO.tag = "Ground";
+
+                // Texture sol
+                var sr = groundGO.GetComponent<SpriteRenderer>();
+                var solTex = Resources.Load<Sprite>("Textures/sol");
+                if (solTex != null) sr.sprite = solTex;
+                else
+                {
+                    // Fallback: texture generee
+                    var tex = new Texture2D(128, 32);
+                    for (int x = 0; x < 128; x++)
+                        for (int y = 0; y < 32; y++)
+                            tex.SetPixel(x, y, new Color(0.4f, 0.3f, 0.2f));
+                    tex.Apply();
+                    sr.sprite = Sprite.Create(tex, new Rect(0, 0, 128, 32), new Vector2(0.5f, 0.5f));
+                }
+                sr.sortingOrder = 1;
             }
         }
 
