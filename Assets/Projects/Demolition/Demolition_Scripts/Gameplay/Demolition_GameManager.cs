@@ -20,11 +20,9 @@ namespace Demolition
 
         [Header("Structure")]
         public Transform structuresParent;
-        public GameObject[] tableauPrefabs;
-        public string[] tableauNames = { "Tableau_1", "Tableau_2", "Tableau_3" };
 
         [Header("Défilement")]
-        public float baseScrollSpeed = 2f;
+        public float baseScrollSpeed = 0.8f;
         public float currentScrollSpeed;
         private bool isScrolling = true;
 
@@ -118,26 +116,21 @@ namespace Demolition
 
             popupTextPrefab = Resources.Load<GameObject>("Prefabs/PopupText");
 
-            tableauPrefabs = new GameObject[tableauNames.Length];
-            for (int i = 0; i < tableauNames.Length; i++)
-                tableauPrefabs[i] = Resources.Load<GameObject>("Prefabs/" + tableauNames[i]);
-
-            // Chercher/creer le sol
+            // Chercher/creer le sol (pleine largeur + defilement)
             if (GameObject.Find("Ground") == null)
             {
                 var groundGO = new GameObject("Ground", typeof(BoxCollider2D), typeof(SpriteRenderer));
                 var col = groundGO.GetComponent<BoxCollider2D>();
-                col.size = new Vector2(50, 1);
-                col.offset = new Vector2(0, -0.5f);
-                groundGO.transform.position = new Vector3(0, -4.5f, 0);
+                col.size = new Vector2(200, 2);
+                col.offset = new Vector2(0, 0);
+                groundGO.transform.position = new Vector3(0, -5f, 0);
 
-                // Texture sol
+                // Texture sol en tiling
                 var sr = groundGO.GetComponent<SpriteRenderer>();
                 var solTex = Resources.Load<Sprite>("Textures/sol");
                 if (solTex != null) sr.sprite = solTex;
                 else
                 {
-                    // Fallback: texture generee
                     var tex = new Texture2D(128, 32);
                     for (int x = 0; x < 128; x++)
                         for (int y = 0; y < 32; y++)
@@ -145,7 +138,13 @@ namespace Demolition
                     tex.Apply();
                     sr.sprite = Sprite.Create(tex, new Rect(0, 0, 128, 32), new Vector2(0.5f, 0.5f));
                 }
+                sr.drawMode = SpriteDrawMode.Tiled;
+                sr.size = new Vector2(200, 2);
                 sr.sortingOrder = 1;
+
+                // Ajouter un script pour faire defiler le sol avec le scroll
+                var groundScroll = groundGO.AddComponent<Demolition_GroundScroll>();
+                groundScroll.scrollSpeedRef = () => currentScrollSpeed;
             }
         }
 
@@ -268,11 +267,7 @@ namespace Demolition
 
         void SpawnTableau(Vector3 origin)
         {
-            if (tableauPrefabs.Length == 0) return;
-
-            GameObject prefab = tableauPrefabs[Random.Range(0, tableauPrefabs.Length)];
-            GameObject tableau = Instantiate(prefab, structuresParent);
-            tableau.transform.localPosition = origin;
+            Demolition_StructureBuilder.BuildRandomStructure(structuresParent, origin);
         }
 
         void SetupDifficulty()
@@ -283,15 +278,15 @@ namespace Demolition
             {
                 case "Easy":
                     gameDuration = 90f;
-                    baseScrollSpeed = 1.2f;
+                    baseScrollSpeed = 0.5f;
                     break;
                 case "Normal":
                     gameDuration = 60f;
-                    baseScrollSpeed = 2f;
+                    baseScrollSpeed = 0.8f;
                     break;
                 case "Hard":
                     gameDuration = 45f;
-                    baseScrollSpeed = 3.2f;
+                    baseScrollSpeed = 1.4f;
                     break;
             }
 

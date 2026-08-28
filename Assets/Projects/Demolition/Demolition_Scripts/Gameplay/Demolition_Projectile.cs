@@ -9,10 +9,11 @@ namespace Demolition
         public SpriteRenderer spriteRenderer;
 
         [Header("Mouvement")]
-        public float vitesseDepart = 5f;
-        public float acceleration = 2f;
+        public float vitesseDepart = 1.5f;
+        public float acceleration = 0.3f;
         public float scaleMin = 0.1f;
         public float scaleMax = 1f;
+        public float tempsVolMax = 5f;  // secondes avant auto-destruction
 
         [Header("Destruction à l'arrivée")]
         public GameObject explosionPrefab;
@@ -24,6 +25,8 @@ namespace Demolition
         private bool launched = false;
         private Vector3 direction;
         private float currentSpeed;
+        private float flightTime;
+        private float startX;
 
         public void Launch(Transform targetParent, float bgScrollSpeed)
         {
@@ -31,6 +34,8 @@ namespace Demolition
             scrollSpeed = bgScrollSpeed;
             launched = true;
             currentSpeed = vitesseDepart;
+            flightTime = 0f;
+            startX = transform.position.x;
 
             // De dos
             if (spriteRenderer != null && oiseauDos != null)
@@ -44,9 +49,16 @@ namespace Demolition
         {
             if (!launched) return;
 
-            // Avance vers la structure
+            flightTime += Time.deltaTime;
+
+            // Avance vers la structure - vitesse lisible par le joueur
             currentSpeed += acceleration * Time.deltaTime;
-            transform.position += direction * currentSpeed * Time.deltaTime * 50f;
+            float moveSpeed = Mathf.Lerp(2f, 6f, flightTime / tempsVolMax);
+            transform.position += direction * moveSpeed * Time.deltaTime;
+
+            // Petite ondulation verticale (effet de vol)
+            float wave = Mathf.Sin(flightTime * 3f) * 0.15f;
+            transform.position += Vector3.up * wave * Time.deltaTime;
 
             // Rétrécit progressivement (effet de profondeur)
             float scale = Mathf.Lerp(scaleMax, scaleMin, 
@@ -60,8 +72,8 @@ namespace Demolition
                 Explode();
             }
 
-            // Auto-destruction si trop loin
-            if (transform.position.x < -Camera.main.orthographicSize * 2f)
+            // Auto-destruction si trop loin ou temps ecoule
+            if (flightTime >= tempsVolMax || transform.position.x < -Camera.main.orthographicSize * 2f)
             {
                 Destroy(gameObject);
             }

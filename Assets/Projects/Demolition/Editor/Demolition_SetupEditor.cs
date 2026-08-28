@@ -99,9 +99,8 @@ public class Demolition_SetupEditor : EditorWindow
         CreateStarImages();
         Debug.Log("6/7 Stars images generees");
 
-        // 7. Rebuild
-        RebuildStructures();
-        Debug.Log("7/7 Structures rebuild");
+        // 7.
+        Debug.Log("7/7 Termine");
 
         AssetDatabase.Refresh();
         Debug.Log("=== FINI: Demolition completement configure ===");
@@ -230,12 +229,6 @@ public class Demolition_SetupEditor : EditorWindow
         MakePNG("star_3", 32, 32, new Color(1, 1, 0.4f));
     }
 
-    static void RebuildStructures()
-    {
-        AssetDatabase.Refresh();
-        Debug.Log("Structures rebuild OK");
-    }
-
     static void SetupGameScene()
     {
         string scenePath = _basePath + "/Demolition_Scenes/GameScene_Demolition.unity";
@@ -298,14 +291,7 @@ public class Demolition_SetupEditor : EditorWindow
             gm.oiseauPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(_prefabPath + "/Oiseau.prefab");
             gm.impactEffectPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(_prefabPath + "/ImpactExplosion.prefab");
 
-            // Tableaux (structures de blocs)
-            var t1 = Resources.Load<GameObject>("Prefabs/Tableau_1");
-            var t2 = Resources.Load<GameObject>("Prefabs/Tableau_2");
-            var t3 = Resources.Load<GameObject>("Prefabs/Tableau_3");
-            if (t1 != null && t2 != null && t3 != null)
-                gm.tableauPrefabs = new GameObject[] { t1, t2, t3 };
-            else
-                Debug.LogWarning("Tableau prefabs non trouves dans Resources/Prefabs/");
+            // Tableaux generes au runtime par Demolition_StructureBuilder
         }
 
         // Canvas avec Score + Timer pour le gameplay
