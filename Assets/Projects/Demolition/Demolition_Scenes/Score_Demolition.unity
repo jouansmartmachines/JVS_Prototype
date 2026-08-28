@@ -149,7 +149,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _scoreBoardDisplayer: {fileID: 6357547540014050327}
-  _font: {fileID: 11400000, guid: fa312e8156b4e2841a56bb7c95b62e45, type: 2}
+  _font: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   _winnerColor: {r: 1, g: 0.7254902, b: 0.23529413, a: 1}
 --- !u!4 &512365118
 Transform:

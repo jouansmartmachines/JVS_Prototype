@@ -73,7 +73,7 @@ public class Demolition_SetupEditor : EditorWindow
 
         // 4. GameScene
         SetupGameScene();
-        Debug.Log("4/6 GameScene configuree");
+        Debug.Log("4/6 GameScene + Canvas U configuree");
 
         // 5. Menu Toggle (ModeOiseau) + Slider (ScrollSpeed) - style SpotTheDif
         SetupMenu();
@@ -222,12 +222,79 @@ public class Demolition_SetupEditor : EditorWindow
             var aud = gmGO.AddComponent<AudioSource>();
             aud.playOnAwake = false;
             gm.impactSound = AssetDatabase.LoadAssetAtPath<AudioClip>(_soundPath + "/impact.wav");
-            gm.destructionSound = AssetDatabase.LoadAssetAtPath<AudioClip>(_soundPath + "/break.wav");
+            gm.destructionSound = AssetDatabase.LoadAssetAtPath<AudioClip>(_soundPath + "/destruction.wav");
             gm.oiseauPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(_prefabPath + "/Oiseau.prefab");
             gm.impactEffectPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(_prefabPath + "/ImpactExplosion.prefab");
         }
 
+        // Canvas avec Score + Timer pour le gameplay
+        SetupGameSceneCanvas();
+
         EditorSceneManager.SaveScene(scene);
+    }
+
+    static void SetupGameSceneCanvas()
+    {
+        var canvas = Object.FindFirstObjectByType<Canvas>();
+        if (canvas != null)
+        {
+            // Canvas deja present, verifier les textes
+            if (GameObject.Find("ScoreText") != null && GameObject.Find("TimerText") != null)
+                return;
+        }
+
+        // Creer le Canvas
+        if (canvas == null)
+        {
+            var canvasGO = new GameObject("Canvas", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
+            canvas = canvasGO.GetComponent<Canvas>();
+            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            var scaler = canvasGO.GetComponent<CanvasScaler>();
+            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            scaler.referenceResolution = new Vector2(1920, 1080);
+            scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
+            scaler.matchWidthOrHeight = 0.5f;
+        }
+
+        // Score en haut a gauche
+        if (GameObject.Find("ScoreText") == null)
+        {
+            var scoreGO = new GameObject("ScoreText", typeof(RectTransform));
+            scoreGO.transform.SetParent(canvas.transform);
+            var srt = scoreGO.GetComponent<RectTransform>();
+            srt.anchorMin = new Vector2(0, 1);
+            srt.anchorMax = new Vector2(0, 1);
+            srt.pivot = new Vector2(0, 1);
+            srt.anchoredPosition = new Vector2(30, -30);
+            srt.sizeDelta = new Vector2(300, 80);
+            var scoreTxt = scoreGO.AddComponent<TextMeshProUGUI>();
+            scoreTxt.text = "Score: 0";
+            scoreTxt.fontSize = 48;
+            scoreTxt.color = Color.white;
+            scoreTxt.alignment = TextAlignmentOptions.TopLeft;
+            scoreGO.AddComponent<CanvasRenderer>();
+            Debug.Log("ScoreText cree dans GameScene");
+        }
+
+        // Timer en haut a droite
+        if (GameObject.Find("TimerText") == null)
+        {
+            var timerGO = new GameObject("TimerText", typeof(RectTransform));
+            timerGO.transform.SetParent(canvas.transform);
+            var trt = timerGO.GetComponent<RectTransform>();
+            trt.anchorMin = new Vector2(1, 1);
+            trt.anchorMax = new Vector2(1, 1);
+            trt.pivot = new Vector2(1, 1);
+            trt.anchoredPosition = new Vector2(-30, -30);
+            trt.sizeDelta = new Vector2(200, 80);
+            var timerTxt = timerGO.AddComponent<TextMeshProUGUI>();
+            timerTxt.text = "60";
+            timerTxt.fontSize = 48;
+            timerTxt.color = Color.white;
+            timerTxt.alignment = TextAlignmentOptions.TopRight;
+            timerGO.AddComponent<CanvasRenderer>();
+            Debug.Log("TimerText cree dans GameScene");
+        }
     }
 
     static void SetupMenu()
