@@ -8,21 +8,22 @@ namespace Dame
         public bool isCrowned { get; private set; }
         public Dame_Cell currentCell { get; set; }
         private SpriteRenderer spriteRenderer;
+        private Sprite crownSprite;
 
-        public void Init(int player, Dame_Cell cell, SpriteRenderer sr)
+        public void Init(int player, Dame_Cell cell, SpriteRenderer sr, Sprite dameSprite)
         {
             playerNumber = player;
             currentCell = cell;
             spriteRenderer = sr;
+            crownSprite = dameSprite;
             isCrowned = false;
         }
 
         public void Crown()
         {
             isCrowned = true;
-            Texture2D tex = Resources.Load<Texture2D>(playerNumber == 1 ? "Textures/dame_blanche" : "Textures/dame_noire");
-            if (tex != null)
-                spriteRenderer.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
+            if (crownSprite != null)
+                spriteRenderer.sprite = crownSprite;
         }
     }
 }

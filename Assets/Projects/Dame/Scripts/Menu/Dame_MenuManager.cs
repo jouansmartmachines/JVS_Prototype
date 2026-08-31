@@ -6,11 +6,13 @@ namespace Dame
 {
     public class Dame_MenuManager : MonoBehaviour
     {
-        private void Start()
+        private TMP_Dropdown timeDropdown;
+
+        void Start()
         {
-            // Le Dropdown est géré par DropDownPlayersPref (script universel attaché dans le prefab)
-            // Ses options: 10s/15s/30s/60s, clé: Dame_GameTime
-            // Rien à faire ici car le script universel gère tout
+            // Le dropdown Difficulty est gere par DropDownPlayersPref (cle: Dame_GameTime)
+            // Le dropdown Theme est gere par ThemeSelector
+            // Rien a faire ici — tout est automatique
         }
 
         public void PlayGame()

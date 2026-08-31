@@ -13,6 +13,14 @@ namespace Dame
     {
         public static Dame_GameManager Instance { get; private set; }
 
+        [Header("Sprites (assignes par l'Editor tool)")]
+        public Sprite caseFoncee;
+        public Sprite caseClaire;
+        public Sprite pionBlanc;
+        public Sprite pionNoir;
+        public Sprite dameBlanche;
+        public Sprite dameNoire;
+
         [Header("Board")]
         public Dame_Board board;
         public int boardSize = 10;
@@ -23,7 +31,7 @@ namespace Dame
         public TextMeshProUGUI scoreText;
         public TextMeshProUGUI currentPlayerText;
 
-        [Header("Audio")]
+        [Header("Sons (assignes par l'Editor tool)")]
         public AudioClip moveSound;
         public AudioClip captureSound;
         public AudioClip crownSound;
@@ -52,89 +60,54 @@ namespace Dame
         void Start()
         {
             audioSource = GetComponent<AudioSource>();
-            LoadReferences();
 
             state = GameState.Idle;
             currentPlayer = 1;
             scorePlayer1 = 0;
             scorePlayer2 = 0;
 
-            // Temps par coup depuis PlayerPrefs
             timePerMove = PlayerPrefs.GetFloat(Dame_GeneralVariables.TimePerMoveKey, 15f);
 
-            // Créer le plateau
             boardParent = GameObject.Find("StructuresParent")?.transform;
             if (boardParent == null) boardParent = transform;
 
             var boardGO = new GameObject("Board", typeof(Dame_Board));
             boardGO.transform.SetParent(boardParent);
             board = boardGO.GetComponent<Dame_Board>();
-            board.InitializeBoard(boardSize);
+            board.InitializeBoard(boardSize, caseFoncee, caseClaire, pionBlanc, pionNoir, dameBlanche, dameNoire);
 
-            // UI
             timerText = GameObject.Find("TimerText")?.GetComponent<TextMeshProUGUI>();
             scoreText = GameObject.Find("ScoreText")?.GetComponent<TextMeshProUGUI>();
             currentPlayerText = GameObject.Find("CurrentPlayerText")?.GetComponent<TextMeshProUGUI>();
 
-            if (scoreText != null)
-                scoreText.text = "0 - 0";
-            if (timerText != null)
-                timerText.text = Mathf.CeilToInt(timePerMove).ToString();
-            if (currentPlayerText != null)
-                currentPlayerText.text = "Tour des Blancs";
+            if (scoreText != null) scoreText.text = "0 - 0";
+            if (timerText != null) timerText.text = Mathf.CeilToInt(timePerMove).ToString();
+            if (currentPlayerText != null) currentPlayerText.text = "Tour des Blancs";
 
-            // OSC
             OSC_Manager.Instance.receiveP = this;
-
             gameIsRunning = true;
-        }
-
-        void LoadReferences()
-        {
-            moveSound = Resources.Load<AudioClip>("Sounds/move");
-            captureSound = Resources.Load<AudioClip>("Sounds/capture");
-            crownSound = Resources.Load<AudioClip>("Sounds/crown");
-            winSound = Resources.Load<AudioClip>("Sounds/win");
         }
 
         void Update()
         {
             if (!gameIsRunning) return;
-
             currentTime -= Time.deltaTime;
-            if (timerText != null)
-                timerText.text = Mathf.CeilToInt(currentTime).ToString();
-            if (currentTime <= 0)
-            {
-                EndTurnTimeout();
-            }
+            if (timerText != null) timerText.text = Mathf.CeilToInt(currentTime).ToString();
+            if (currentTime <= 0) EndTurnTimeout();
         }
 
         public override void ReceivePoint(float xPoint, float yPoint)
         {
-            if (!gameIsRunning || state == GameState.Animating) return;
-
-            Vector3 worldPos = Camera.main.ScreenToWorldPoint(new Vector3(
-                xPoint * Screen.width,
-                yPoint * Screen.height,
-                -Camera.main.transform.position.z));
-            worldPos.z = 0;
-
-            var cell = board.GetCellAtWorldPos(worldPos);
-            if (cell != null)
-                OnCellTouched(cell);
+            // Les cases recoivent directement les touches via Universal_Collider2DButton.ReceivePoint
+            // On ne fait rien ici (les cases sont des Universal_Collider2DButton)
         }
 
-        void OnCellTouched(Dame_Cell cell)
+        public void OnCellTouched(Dame_Cell cell)
         {
-            if (state == GameState.Idle)
-            {
-                SelectPiece(cell);
-            }
-            else if (state == GameState.PieceSelected)
-            {
-                TryMove(cell);
-            }
+            if (!gameIsRunning || state == GameState.Animating) return;
+
+            if (state == GameState.Idle) SelectPiece(cell);
+            else if (state == GameState.PieceSelected) TryMove(cell);
         }
 
         void SelectPiece(Dame_Cell cell)
@@ -144,22 +117,13 @@ namespace Dame
 
             selectedCell = cell;
             state = GameState.PieceSelected;
-
             board.ClearHighlights();
             cell.SetHighlight(true);
 
             validMoves = cell.GetValidMoves();
             var captures = cell.GetValidCaptures();
-            if (captures.Count > 0)
-            {
-                validMoves = captures;
-                board.ShowValidMoves(captures);
-            }
-            else
-            {
-                board.ShowValidMoves(validMoves);
-            }
-
+            validMoves = captures.Count > 0 ? captures : validMoves;
+            board.ShowValidMoves(validMoves);
             currentTime = timePerMove;
         }
 
@@ -167,7 +131,6 @@ namespace Dame
         {
             if (!validMoves.Contains(targetCell))
             {
-                // Désélectionner
                 board.ClearHighlights();
                 state = GameState.Idle;
                 selectedCell = null;
@@ -175,11 +138,8 @@ namespace Dame
             }
 
             bool isCapture = selectedCell.GetValidCaptures().Contains(targetCell);
-
-            if (isCapture)
-                ExecuteCapture(selectedCell, targetCell);
-            else
-                ExecuteMove(selectedCell, targetCell);
+            if (isCapture) ExecuteCapture(selectedCell, targetCell);
+            else ExecuteMove(selectedCell, targetCell);
         }
 
         void ExecuteMove(Dame_Cell from, Dame_Cell to)
@@ -189,10 +149,7 @@ namespace Dame
             piece.currentCell = to;
             to.SetPiece(piece);
             piece.transform.position = to.transform.position;
-
-            // Son
             if (moveSound != null) audioSource.PlayOneShot(moveSound);
-
             EndTurn();
         }
 
@@ -203,30 +160,20 @@ namespace Dame
             var enemyCol = (from.col + to.col) / 2;
             var enemyCell = board.GetCell(enemyRow, enemyCol);
             var enemyPiece = enemyCell?.GetPiece();
-
-            if (enemyPiece != null)
-            {
-                Destroy(enemyPiece.gameObject);
-                enemyCell.SetPiece(null);
-            }
+            if (enemyPiece != null) { Destroy(enemyPiece.gameObject); enemyCell.SetPiece(null); }
 
             from.SetPiece(null);
             piece.currentCell = to;
             to.SetPiece(piece);
             piece.transform.position = to.transform.position;
 
-            // Score
             if (currentPlayer == 1) scorePlayer1++;
             else scorePlayer2++;
             UpdateScoreUI();
-
-            // Son
             if (captureSound != null) audioSource.PlayOneShot(captureSound);
 
-            // Vérifier les couronnements
             CheckCrown(piece, to);
 
-            // Capture en chaîne ?
             var moreCaptures = to.GetValidCaptures();
             if (moreCaptures.Count > 0)
             {
@@ -238,19 +185,13 @@ namespace Dame
                 currentTime = timePerMove;
                 return;
             }
-
             EndTurn();
         }
 
         void CheckCrown(Dame_Piece piece, Dame_Cell cell)
         {
             if (piece.isCrowned) return;
-            if (piece.playerNumber == 1 && cell.row == 0)
-            {
-                piece.Crown();
-                if (crownSound != null) audioSource.PlayOneShot(crownSound);
-            }
-            else if (piece.playerNumber == 2 && cell.row == boardSize - 1)
+            if ((piece.playerNumber == 1 && cell.row == 0) || (piece.playerNumber == 2 && cell.row == boardSize - 1))
             {
                 piece.Crown();
                 if (crownSound != null) audioSource.PlayOneShot(crownSound);
@@ -261,69 +202,50 @@ namespace Dame
         {
             currentPlayer = currentPlayer == 1 ? 2 : 1;
             turnCount++;
-
             if (currentPlayerText != null)
                 currentPlayerText.text = $"Tour des {(currentPlayer == 1 ? "Blancs" : "Noirs")}";
-
             state = GameState.Idle;
             selectedCell = null;
             validMoves = null;
             board.ClearHighlights();
             currentTime = timePerMove;
-
-            // Vérifier la victoire
             CheckVictory();
         }
 
-        void EndTurnTimeout()
-        {
-            // Temps écoulé → le joueur perd son tour
-            EndTurn();
-        }
+        void EndTurnTimeout() { EndTurn(); }
 
         void CheckVictory()
         {
-            // Compter les pions du joueur adverse
             int opponent = currentPlayer == 1 ? 2 : 1;
             bool foundPiece = false;
             for (int r = 0; r < boardSize; r++)
-            {
                 for (int c = 0; c < boardSize; c++)
                 {
                     var cell = board.GetCell(r, c);
                     var piece = cell?.GetPiece();
-                    if (piece != null && piece.playerNumber == opponent)
-                        foundPiece = true;
+                    if (piece != null && piece.playerNumber == opponent) foundPiece = true;
                 }
-            }
-
-            if (!foundPiece)
-                EndGame(currentPlayer);
+            if (!foundPiece) EndGame(currentPlayer);
         }
 
         void UpdateScoreUI()
         {
-            if (scoreText != null)
-                scoreText.text = $"{scorePlayer1} - {scorePlayer2}";
+            if (scoreText != null) scoreText.text = $"{scorePlayer1} - {scorePlayer2}";
         }
 
         void EndGame(int winner)
         {
             gameIsRunning = false;
             StopAllCoroutines();
-
             if (winSound != null) audioSource.PlayOneShot(winSound);
-
             PlayerPrefs.SetInt("Dame_FinalScore", winner == 1 ? scorePlayer1 : scorePlayer2);
             PlayerPrefs.SetFloat(Dame_GeneralVariables.HighScoreKey, winner == 1 ? scorePlayer1 : scorePlayer2);
-
             StartCoroutine(TransitionToScore(winner));
         }
 
         IEnumerator TransitionToScore(int winner)
         {
             yield return new WaitForSeconds(2f);
-
             if (BuildState.CurrentState == BuildState.State.normal)
                 SceneManager.LoadScene(Dame_GeneralVariables.Instance.scoreScene);
             else

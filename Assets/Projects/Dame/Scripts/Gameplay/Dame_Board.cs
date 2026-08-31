@@ -7,11 +7,25 @@ namespace Dame
     {
         public int size { get; private set; }
         private Dame_Cell[,] cells;
+        public Sprite caseFonceeSprite { get; set; }
+        public Sprite caseClaireSprite { get; set; }
+        public Sprite pionBlancSprite { get; set; }
+        public Sprite pionNoirSprite { get; set; }
+        public Sprite dameBlancheSprite { get; set; }
+        public Sprite dameNoireSprite { get; set; }
 
-        public void InitializeBoard(int boardSize)
+        public void InitializeBoard(int boardSize, Sprite caseFoncee, Sprite caseClaire, 
+                                    Sprite pionBlanc, Sprite pionNoir, 
+                                    Sprite dameBlanche, Sprite dameNoire)
         {
             size = boardSize;
             cells = new Dame_Cell[size, size];
+            caseFonceeSprite = caseFoncee;
+            caseClaireSprite = caseClaire;
+            pionBlancSprite = pionBlanc;
+            pionNoirSprite = pionNoir;
+            dameBlancheSprite = dameBlanche;
+            dameNoireSprite = dameNoire;
 
             float cellSize = 0.8f;
             float offset = (size - 1) * cellSize / 2f;
@@ -30,9 +44,7 @@ namespace Dame
                     cellGO.transform.localScale = Vector3.one * cellSize;
 
                     var sr = cellGO.GetComponent<SpriteRenderer>();
-                    Texture2D tex = Resources.Load<Texture2D>(isDark ? "Textures/case_foncee" : "Textures/case_claire");
-                    if (tex != null)
-                        sr.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
+                    sr.sprite = isDark ? caseFonceeSprite : caseClaireSprite;
                     sr.sortingOrder = 0;
 
                     var col = cellGO.GetComponent<BoxCollider2D>();
@@ -76,13 +88,11 @@ namespace Dame
             pieceGO.transform.localScale = Vector3.one * 0.7f;
 
             var sr = pieceGO.GetComponent<SpriteRenderer>();
-            Texture2D tex = Resources.Load<Texture2D>(player == 1 ? "Textures/pion_blanc" : "Textures/pion_noir");
-            if (tex != null)
-                sr.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
+            sr.sprite = player == 1 ? pionBlancSprite : pionNoirSprite;
             sr.sortingOrder = 1;
 
             var piece = pieceGO.GetComponent<Dame_Piece>();
-            piece.Init(player, cell, sr);
+            piece.Init(player, cell, sr, player == 1 ? dameBlancheSprite : dameNoireSprite);
 
             cell.SetPiece(piece);
         }
@@ -97,10 +107,8 @@ namespace Dame
         {
             float cellSize = 0.8f;
             float offset = (size - 1) * cellSize / 2f;
-
             int col = Mathf.RoundToInt((pos.x + offset) / cellSize);
             int row = Mathf.RoundToInt((size - 1 - (pos.y + offset) / cellSize));
-
             return GetCell(row, col);
         }
 
@@ -114,10 +122,7 @@ namespace Dame
         public void ShowValidMoves(List<Dame_Cell> moves)
         {
             foreach (var cell in moves)
-            {
-                if (cell != null)
-                    cell.SetValidMove(true);
-            }
+                if (cell != null) cell.SetValidMove(true);
         }
     }
 }

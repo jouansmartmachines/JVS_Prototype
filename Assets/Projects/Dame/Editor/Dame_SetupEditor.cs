@@ -4,10 +4,13 @@ using System.IO;
 using UnityEngine.EventSystems;
 using TMPro;
 using UnityEditor.SceneManagement;
+using Theme;
 
 public class Dame_SetupEditor : EditorWindow
 {
-    static string _basePath, _prefabPath, _texPath, _soundPath;
+    static string _basePath = "Assets/Projects/Dame";
+    static string _spritePath = _basePath + "/Sprites";
+    static string _soundPath = _basePath + "/Sons";
 
     [MenuItem("Tools/Dame - Tout configurer")]
     static void ConfigurerTout()
@@ -18,31 +21,59 @@ public class Dame_SetupEditor : EditorWindow
             return;
         }
 
-        _basePath = "Assets/Projects/Dame";
-        string resPath = _basePath + "/Resources";
-        _prefabPath = resPath + "/Prefabs";
-        _texPath = resPath + "/Textures";
-        _soundPath = resPath + "/Sounds";
-
-        Directory.CreateDirectory(_prefabPath);
-        Directory.CreateDirectory(_texPath);
-        Directory.CreateDirectory(_soundPath);
-
         Debug.Log("=== DEBUT configuration Dame ===");
 
-        // 1. Sons (ne crée que s'ils n'existent pas)
+        // 1. Assigner les sprites et sons dans les scenes
+        AssignSpritesToGameScene();
+        Debug.Log("✓ Sprites assignes a la GameScene");
+
+        // 2. Generer les sons WAV si absents
         MakeWAV("move", 0.1f, 400, 0.3f);
         MakeWAV("capture", 0.2f, 600, 0.5f);
         MakeWAV("crown", 0.3f, 800, 0.4f);
         MakeWAV("win", 0.5f, 200, 0.8f);
-        Debug.Log("✓ Sons OK");
+        Debug.Log("✓ Sons generes");
+
+        // 3. Creer l'infrastructure de themes
+        CreateThemeInfrastructure();
+        Debug.Log("✓ Infrastructure de themes creee");
+
+        // 4. Configurer le menu (dropdown theme)
+        SetupMenu();
+        Debug.Log("✓ Menu configure (theme dropdown)");
 
         AssetDatabase.Refresh();
-        Debug.Log("=== Dame configure ===");
-        Debug.Log("4 scenes (Accueil/Menu/GameScene/Score) dans Dame_Scenes/");
-        Debug.Log("Prefabs dans Dame_Prefabs/");
-        Debug.Log("Presets dans Preset/");
-        Debug.Log("ScenePrefab MENU_Dame.prefab dans ScenePrefabs/");
+        Debug.Log("=== Dame completement configure ===");
+        Debug.Log("Lancez la scene GameScene (Scenes/GameScene_Dame.unity)");
+    }
+
+    static void AssignSpritesToGameScene()
+    {
+        string scenePath = _basePath + "/Scenes/GameScene_Dame.unity";
+        var scene = EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Single);
+
+        var gm = Object.FindFirstObjectByType<Dame.Dame_GameManager>();
+        if (gm == null)
+        {
+            Debug.LogWarning("GameManager pas trouve dans la scene !");
+            return;
+        }
+
+        // Charger et assigner les sprites
+        gm.caseFoncee = AssetDatabase.LoadAssetAtPath<Sprite>(_spritePath + "/case_foncee.png");
+        gm.caseClaire = AssetDatabase.LoadAssetAtPath<Sprite>(_spritePath + "/case_claire.png");
+        gm.pionBlanc = AssetDatabase.LoadAssetAtPath<Sprite>(_spritePath + "/pion_blanc.png");
+        gm.pionNoir = AssetDatabase.LoadAssetAtPath<Sprite>(_spritePath + "/pion_noir.png");
+        gm.dameBlanche = AssetDatabase.LoadAssetAtPath<Sprite>(_spritePath + "/dame_blanche.png");
+        gm.dameNoire = AssetDatabase.LoadAssetAtPath<Sprite>(_spritePath + "/dame_noire.png");
+
+        // Charger et assigner les sons
+        gm.moveSound = AssetDatabase.LoadAssetAtPath<AudioClip>(_soundPath + "/move.wav");
+        gm.captureSound = AssetDatabase.LoadAssetAtPath<AudioClip>(_soundPath + "/capture.wav");
+        gm.crownSound = AssetDatabase.LoadAssetAtPath<AudioClip>(_soundPath + "/crown.wav");
+        gm.winSound = AssetDatabase.LoadAssetAtPath<AudioClip>(_soundPath + "/win.wav");
+
+        EditorSceneManager.SaveScene(scene);
     }
 
     static void MakeWAV(string name, float dur, float freq, float vol)
@@ -66,6 +97,62 @@ public class Dame_SetupEditor : EditorWindow
             bw.Write(samples * 2);
             for (int i = 0; i < samples; i++) bw.Write((short)(audio[i] * 32767));
         }
-        Debug.Log($"✓ Son {name}.wav cree");
+    }
+
+    static void CreateThemeInfrastructure()
+    {
+        // Creer le dossier Themes s'il n'existe pas
+        string themePath = _basePath + "/Themes";
+        Directory.CreateDirectory(themePath + "/Classique");
+        Directory.CreateDirectory(themePath + "/Bois");
+
+        // Chaque theme aura ses SwapEntities (creees manuellement dans Unity)
+        // ThemeManager cree si pas deja present
+        string tmPath = themePath + "/Dame_ThemeManager.asset";
+        if (!File.Exists(tmPath))
+        {
+            var tm = ScriptableObject.CreateInstance<ThemeManager>();
+            AssetDatabase.CreateAsset(tm, tmPath);
+            AssetDatabase.SaveAssets();
+            Debug.Log("✓ ThemeManager cree");
+        }
+    }
+
+    static void SetupMenu()
+    {
+        string scenePath = _basePath + "/Scenes/Menu_Dame.unity";
+        if (!File.Exists(scenePath)) { Debug.LogError("Menu scene manquante !"); return; }
+        var scene = EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Single);
+
+        var canvas = Object.FindFirstObjectByType<Canvas>();
+        if (canvas == null) { Debug.LogError("Canvas pas trouve dans le menu"); return; }
+
+        var diffGO = GameObject.Find("Difficulty");
+        if (diffGO == null) { Debug.LogWarning("Difficulty dropdown pas trouve"); return; }
+
+        if (GameObject.Find("ThemeDropdown") != null) return;
+
+        var themeGO = Object.Instantiate(diffGO, canvas.transform);
+        themeGO.name = "ThemeDropdown";
+        themeGO.GetComponent<RectTransform>().anchoredPosition += Vector2.down * 150f;
+
+        var label = themeGO.transform.Find("Text");
+        if (label != null)
+        {
+            var tmp = label.GetComponent<TextMeshProUGUI>();
+            if (tmp != null) tmp.text = "Theme :";
+        }
+
+        var ts = themeGO.AddComponent<Theme.ThemeSelector>();
+        var tm = AssetDatabase.LoadAssetAtPath<Theme.ThemeManager>(_basePath + "/Themes/Dame_ThemeManager.asset");
+        if (tm != null)
+        {
+            var field = typeof(Theme.ThemeSelector).GetField("_themeManager",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            if (field != null) field.SetValue(ts, tm);
+        }
+
+        EditorSceneManager.SaveScene(scene);
+        Debug.Log("✓ Theme dropdown ajoute au menu");
     }
 }
