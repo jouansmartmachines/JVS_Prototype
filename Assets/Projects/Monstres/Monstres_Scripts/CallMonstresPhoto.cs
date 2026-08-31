@@ -5,6 +5,9 @@ namespace Monstres
 {
     public class CallMonstresPhoto : MonoBehaviour
     {
-
+        void Start()
+        {
+            OSC_Manager.Instance.PhotoMonstresDemo();
+        }
     }
 }

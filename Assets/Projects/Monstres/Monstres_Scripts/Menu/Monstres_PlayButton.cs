@@ -16,7 +16,11 @@ namespace Monstres
 
         protected override void WhenPlayGotPress()
         {
-
+            if (!accueil)
+            {
+                SceneManager.LoadScene(Monstres_GeneralVariables.Instance.introScene);
+                OSC_Manager.Instance.PhotoMonstresDemo();
+            }
         }
     }
 }

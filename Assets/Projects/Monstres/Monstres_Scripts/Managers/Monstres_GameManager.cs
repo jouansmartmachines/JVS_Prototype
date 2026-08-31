@@ -381,6 +381,19 @@ namespace Monstres
         {
             if (OSC_Manager.Instance != null)
             {
+                if (OSC_Manager.Instance.playersSprites.Count > 0)
+                {
+                    if (lastPlayerSpawn < OSC_Manager.Instance.playersSprites.Count - 1)
+                    {
+                        lastPlayerSpawn++;
+                    }
+                    else
+                    {
+                        lastPlayerSpawn = 0;
+                    }
+
+                    return OSC_Manager.Instance.playersSprites[lastPlayerSpawn];
+                }
             }
 
             return noPlayerSprite;

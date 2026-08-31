@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba433e246d09f584e93a82a9bc928ea0, type: 3}
+  m_Name: Monstres_Theme_Halloween_Font
+  m_EditorClassIdentifier: 
+  Theme: {fileID: 11400000, guid: 3bdb1aad48402e841afa6917ff4f40a4, type: 2}
+  _useColor: 1
+  _color: {r: 0.9450981, g: 0.59607846, b: 0, a: 1}
+  Fonts:
+  - {fileID: 11400000, guid: 20ac4e0614460194d9044c3a55abd495, type: 2}

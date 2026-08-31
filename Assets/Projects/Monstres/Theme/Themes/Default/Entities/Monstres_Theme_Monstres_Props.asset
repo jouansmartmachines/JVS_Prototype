@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f69e731b419add4d8bd8b05d105f4a2, type: 3}
+  m_Name: Monstres_Theme_Monstres_Props
+  m_EditorClassIdentifier: 
+  Theme: {fileID: 11400000, guid: c4d5e4b2135ac354496b59587f9a2a99, type: 2}
+  _setNativeSize: 0
+  _useColor: 0
+  _color: {r: 1, g: 1, b: 1, a: 1}
+  Sprites:
+  - {fileID: 21300000, guid: 73820e046f0276c4c8c59da7a478506d, type: 3}
+  - {fileID: 21300000, guid: 5d5d9bdf6e963ab4881d33039a38c881, type: 3}
+  - {fileID: 21300000, guid: e458cd94c264ae54e98b6412a3f60dfb, type: 3}
+  - {fileID: 21300000, guid: 11352c3edba9da048922f96a1e2614af, type: 3}
+  - {fileID: 21300000, guid: 303b01a0b15e7e1449b347dfa1afaeed, type: 3}
+  - {fileID: 21300000, guid: d295ab5aaba70034ab55b39246d8430a, type: 3}
+  - {fileID: 21300000, guid: 47457113b018dd74697dbc139fb3ce1b, type: 3}
+  - {fileID: 21300000, guid: 4ad1526a21ce5bc44bf86e55d84b51e0, type: 3}
+  - {fileID: 21300000, guid: f4466fb99f1599e4f9349883e31a941d, type: 3}
+  - {fileID: 21300000, guid: d7eac7c98af3f58488275655a3d91ca7, type: 3}
+  - {fileID: 21300000, guid: 33b47b1204e99714b9e20c1e82291b98, type: 3}
+  - {fileID: 21300000, guid: 1ab0a1e35d6b9ec4cbd615d7b5d4688b, type: 3}
+  - {fileID: 21300000, guid: 23d1d50cc5720c343bc4e3fc0cef2da2, type: 3}
+  - {fileID: 21300000, guid: 669be6658bca59f41a69a210af190d35, type: 3}
+  - {fileID: 21300000, guid: 5342c19ea87e5284aa40851cea71f364, type: 3}
+  - {fileID: 21300000, guid: 3dfc970c0d6a9264a8cb4bc120b49158, type: 3}
+  - {fileID: 21300000, guid: 0e97f03155b9bd849a53e98833e7c73e, type: 3}
+  - {fileID: 21300000, guid: 79f504addbf135242852115122b451cb, type: 3}
+  - {fileID: 21300000, guid: 6ef8a5e355cb2b1459815a8089805347, type: 3}
