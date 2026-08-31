@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using MenuSelection;
 using OSC;
@@ -9,166 +10,297 @@ namespace Demolition
 {
     public enum LaunchMode { Oiseau, ImpactSimple }
 
+    /// <summary>
+    /// Gestionnaire principal du jeu Démolition : boucle de jeu, réceptions OSC et souris avec protection anti-flood,
+    /// gestion de la caméra (Shake doux, Hitstop léger), background texturé, audio punchy, UI et score.
+    /// </summary>
     public class Demolition_GameManager : ReceiveParent
     {
         public static Demolition_GameManager Instance { get; private set; }
 
-        [Header("Modes de lancement")]
+        [Header("Modes de Tir")]
         public LaunchMode launchMode = LaunchMode.Oiseau;
         public GameObject oiseauPrefab;
         public GameObject impactEffectPrefab;
+        public GameObject popupTextPrefab;
 
-        [Header("Structure")]
+        [Header("Structures & Sol")]
         public Transform structuresParent;
+        public float groundY = -4.0f;
 
         [Header("Défilement")]
-        public float baseScrollSpeed = 0.3f;
+        public float baseScrollSpeed = 0.5f;
         public float currentScrollSpeed;
         private bool isScrolling = true;
 
-        [Header("Gameplay")]
+        [Header("Gameplay & Durée")]
         public float gameDuration = 60f;
         public float currentTime;
         public int score { get; private set; }
         private bool gameIsRunning = false;
 
-        [Header("Audio")]
+        [Header("Cadence de Tir & Anti-Flood")]
+        public float minTimeBetweenShots = 0.12f;
+        private float lastShotTime = -1f;
+
+        [Header("Audio Clips")]
         public AudioClip impactSound;
         public AudioClip destructionSound;
         public AudioClip gameOverSound;
+        public AudioClip pigHitSound;
         private AudioSource audioSource;
 
-        [Header("UI")]
-        private TextMeshProUGUI scoreText;
-        private TextMeshProUGUI timerText;
-        private TextMeshProUGUI starText;
-        public GameObject popupTextPrefab;
+        [Header("Interface Utilisateur (UI)")]
+        public TextMeshProUGUI scoreText;
+        public TextMeshProUGUI timerText;
+        public TextMeshProUGUI starText;
 
         [Header("Étoiles")]
-        public int currentStars = 0;
+        public int currentStars = 1;
 
-        // Coordonnees d impact
-        protected bool gotAPt;
-        protected Vector3 newPt;
-        protected int w, h;
+        // Effets de caméra & Juice doux
+        private Vector3 originalCameraPos;
+        private float shakeIntensity = 0f;
+        private float shakeDecay = 5.0f;
+        private Coroutine hitstopCoroutine;
+
+        // Combo system
+        private float comboTimer = 0f;
+        private int comboMultiplier = 1;
 
         private void Awake()
         {
-            if (Instance == null) Instance = this;
-            else Destroy(gameObject);
-        }
+            if (Instance == null)
+            {
+                Instance = this;
+            }
+            else
+            {
+                Destroy(gameObject);
+                return;
+            }
 
-        float groundY = -2f; // decalage pour poser les structures sur le sol (y=-5 + taille 2, top a y=-4, StructuresParent a y=-2)
+            audioSource = GetComponent<AudioSource>();
+            if (audioSource == null)
+                audioSource = gameObject.AddComponent<AudioSource>();
+
+            audioSource.playOnAwake = false;
+            audioSource.spatialBlend = 0f;
+        }
 
         void Start()
         {
-            w = Screen.width;
-            h = Screen.height;
-            audioSource = GetComponent<AudioSource>();
+            if (Camera.main != null)
+            {
+                originalCameraPos = Camera.main.transform.position;
+            }
 
-            // Charger les references depuis Resources
-            LoadReferences();
-
-            // Mode depuis PlayerPrefs
-            launchMode = PlayerPrefs.GetInt(Demolition_GeneralVariables.ModeOiseauKey, 1) == 1
-                ? LaunchMode.Oiseau : LaunchMode.ImpactSimple;
-
-            // Difficulté
-            SetupDifficulty();
+            LoadResourcesReferences();
+            EnsureSceneElements();
+            SetupPreferencesAndDifficulty();
 
             currentTime = gameDuration;
             score = 0;
+            comboMultiplier = 1;
+            comboTimer = 0f;
 
-            // Spawn du premier tableau SUR le sol
-            SpawnTableau(new Vector3(0, groundY, 0));
-
-            // Enregistrement OSC
-            OSC_Manager.Instance.receiveP = this;
-
-            gameIsRunning = true;
-            StartCoroutine(GameLoop());
-
-            // Trouver les textes UI dans le Canvas
-            var canvasGO = GameObject.Find("Canvas");
-            if (canvasGO != null)
+            if (OSC_Manager.Instance != null)
             {
-                scoreText = GameObject.Find("ScoreText")?.GetComponent<TextMeshProUGUI>();
-                timerText = GameObject.Find("TimerText")?.GetComponent<TextMeshProUGUI>();
-                starText = GameObject.Find("StarText")?.GetComponent<TextMeshProUGUI>();
-                if (scoreText != null) scoreText.text = "Score: 0";
-                if (timerText != null) timerText.text = Mathf.CeilToInt(gameDuration).ToString();
-                if (starText != null) starText.text = "★";
+                OSC_Manager.Instance.receiveP = this;
             }
 
-            // Assigner popupTextPrefab aux blocs
-            foreach (var block in FindObjectsByType<Demolition_Block>(FindObjectsSortMode.None))
+            SpawnStructure(new Vector3(2f, groundY, 0));
+
+            gameIsRunning = true;
+            StartCoroutine(StructureSpawnLoop());
+
+            UpdateUI();
+        }
+
+        private void LoadResourcesReferences()
+        {
+            if (oiseauPrefab == null)
+                oiseauPrefab = Resources.Load<GameObject>("Prefabs/Oiseau");
+            if (impactEffectPrefab == null)
+                impactEffectPrefab = Resources.Load<GameObject>("Prefabs/ImpactExplosion");
+            if (popupTextPrefab == null)
+                popupTextPrefab = Resources.Load<GameObject>("Prefabs/PopupText");
+
+            if (impactSound == null)
+                impactSound = Resources.Load<AudioClip>("Sounds/impact");
+            if (destructionSound == null)
+                destructionSound = Resources.Load<AudioClip>("Sounds/destruction");
+            if (gameOverSound == null)
+                gameOverSound = Resources.Load<AudioClip>("Sounds/gameover");
+            if (pigHitSound == null)
+                pigHitSound = Resources.Load<AudioClip>("Sounds/pig_hit");
+        }
+
+        private void EnsureSceneElements()
+        {
+            if (structuresParent == null)
             {
-                if (block.popupTextPrefab == null)
-                    block.popupTextPrefab = popupTextPrefab;
+                var existingParent = GameObject.Find("StructuresParent");
+                if (existingParent != null)
+                {
+                    structuresParent = existingParent.transform;
+                }
+                else
+                {
+                    structuresParent = new GameObject("StructuresParent").transform;
+                }
+            }
+
+            if (scoreText == null)
+                scoreText = GameObject.Find("ScoreText")?.GetComponent<TextMeshProUGUI>();
+            if (timerText == null)
+                timerText = GameObject.Find("TimerText")?.GetComponent<TextMeshProUGUI>();
+            if (starText == null)
+                starText = GameObject.Find("StarText")?.GetComponent<TextMeshProUGUI>();
+
+            EnsureBackground();
+            EnsureGround();
+        }
+
+        private void EnsureBackground()
+        {
+            var bgGO = GameObject.Find("Background");
+            if (bgGO == null)
+            {
+                bgGO = new GameObject("Background", typeof(SpriteRenderer));
+            }
+
+            bgGO.transform.position = new Vector3(0, 0, 5f);
+            var sr = bgGO.GetComponent<SpriteRenderer>();
+            sr.sortingOrder = -10;
+
+            Texture2D bgTex = Resources.Load<Texture2D>("Textures/bg_game");
+            if (bgTex == null)
+            {
+                bgTex = Resources.Load<Texture2D>("Textures/bg_accueil");
+            }
+
+            if (bgTex != null)
+            {
+                sr.sprite = Sprite.Create(bgTex, new Rect(0, 0, bgTex.width, bgTex.height), new Vector2(0.5f, 0.5f));
+            }
+
+            // Adapter la taille du fond à la vue de la caméra
+            if (Camera.main != null && sr.sprite != null)
+            {
+                float camHeight = Camera.main.orthographicSize * 2f;
+                float camWidth = camHeight * Camera.main.aspect;
+
+                float spriteW = sr.sprite.rect.width / sr.sprite.pixelsPerUnit;
+                float spriteH = sr.sprite.rect.height / sr.sprite.pixelsPerUnit;
+
+                float scaleX = camWidth / spriteW;
+                float scaleY = camHeight / spriteH;
+                float finalScale = Mathf.Max(scaleX, scaleY) * 1.15f; // Légère marge
+
+                bgGO.transform.localScale = new Vector3(finalScale, finalScale, 1f);
             }
         }
 
-        void LoadReferences()
+        private void EnsureGround()
         {
-            oiseauPrefab = Resources.Load<GameObject>("Prefabs/Oiseau");
-            impactEffectPrefab = Resources.Load<GameObject>("Prefabs/ImpactExplosion");
-            impactSound = Resources.Load<AudioClip>("Sounds/impact");
-            destructionSound = Resources.Load<AudioClip>("Sounds/destruction");
-            gameOverSound = Resources.Load<AudioClip>("Sounds/gameover");
-
-            popupTextPrefab = Resources.Load<GameObject>("Prefabs/PopupText");
-
-            // Chercher/creer le sol (pleine largeur + defilement)
-            if (GameObject.Find("Ground") == null)
+            var groundGO = GameObject.Find("Ground");
+            if (groundGO == null)
             {
-                var groundGO = new GameObject("Ground", typeof(BoxCollider2D), typeof(SpriteRenderer));
-                var col = groundGO.GetComponent<BoxCollider2D>();
-                col.size = new Vector2(200, 2);
-                col.offset = new Vector2(0, 0);
-                groundGO.transform.position = new Vector3(0, -5f, 0);
+                groundGO = new GameObject("Ground", typeof(BoxCollider2D), typeof(SpriteRenderer));
+                groundGO.transform.position = new Vector3(0, -5.2f, 0);
 
-                // Texture sol en tiling
+                var col = groundGO.GetComponent<BoxCollider2D>();
+                col.size = new Vector2(300, 2.4f);
+
                 var sr = groundGO.GetComponent<SpriteRenderer>();
-                var solTex = Resources.Load<Sprite>("Textures/sol");
-                if (solTex != null) sr.sprite = solTex;
-                else
+                sr.sortingOrder = 2;
+                Texture2D solTex = Resources.Load<Texture2D>("Textures/sol");
+                if (solTex != null)
                 {
-                    var tex = new Texture2D(128, 32);
-                    for (int x = 0; x < 128; x++)
-                        for (int y = 0; y < 32; y++)
-                            tex.SetPixel(x, y, new Color(0.4f, 0.3f, 0.2f));
-                    tex.Apply();
-                    sr.sprite = Sprite.Create(tex, new Rect(0, 0, 128, 32), new Vector2(0.5f, 0.5f));
+                    sr.sprite = Sprite.Create(solTex, new Rect(0, 0, solTex.width, solTex.height), new Vector2(0.5f, 0.5f));
                 }
                 sr.drawMode = SpriteDrawMode.Tiled;
-                sr.size = new Vector2(200, 2);
-                sr.sortingOrder = 1;
+                sr.size = new Vector2(300, 2.4f);
 
-                // Ajouter un script pour faire defiler le sol avec le scroll
                 var groundScroll = groundGO.AddComponent<Demolition_GroundScroll>();
                 groundScroll.scrollSpeedRef = () => currentScrollSpeed;
             }
+        }
+
+        private void SetupPreferencesAndDifficulty()
+        {
+            launchMode = PlayerPrefs.GetInt(Demolition_GeneralVariables.ModeOiseauKey, 1) == 1
+                ? LaunchMode.Oiseau : LaunchMode.ImpactSimple;
+
+            string diff = PlayerPrefs.GetString(Demolition_GeneralVariables.GameTimeKey, "Normal");
+            switch (diff)
+            {
+                case "Easy":
+                    gameDuration = 90f;
+                    baseScrollSpeed = 0.35f;
+                    break;
+                case "Normal":
+                case "Medium":
+                    gameDuration = 60f;
+                    baseScrollSpeed = 0.5f;
+                    break;
+                case "Hard":
+                    gameDuration = 45f;
+                    baseScrollSpeed = 0.75f;
+                    break;
+                default:
+                    gameDuration = 60f;
+                    baseScrollSpeed = 0.5f;
+                    break;
+            }
+
+            currentScrollSpeed = baseScrollSpeed;
         }
 
         void Update()
         {
             if (!gameIsRunning) return;
 
-            // Défilement
-            if (isScrolling)
+            if (isScrolling && structuresParent != null)
             {
                 Vector3 pos = structuresParent.position;
                 pos.x -= currentScrollSpeed * Time.deltaTime;
                 structuresParent.position = pos;
             }
 
-            // Timer
             currentTime -= Time.deltaTime;
-            if (timerText != null)
-                timerText.text = Mathf.CeilToInt(currentTime).ToString();
             if (currentTime <= 0)
             {
+                currentTime = 0;
                 EndGame();
+            }
+
+            if (comboMultiplier > 1)
+            {
+                comboTimer -= Time.deltaTime;
+                if (comboTimer <= 0)
+                {
+                    comboMultiplier = 1;
+                }
+            }
+
+            UpdateCameraShake();
+            HandlePlayerInput();
+            UpdateUI();
+        }
+
+        private void HandlePlayerInput()
+        {
+            if (Input.GetMouseButtonDown(0))
+            {
+                Vector3 mouseScreen = Input.mousePosition;
+                if (Camera.main != null)
+                {
+                    Vector3 worldPos = Camera.main.ScreenToWorldPoint(new Vector3(mouseScreen.x, mouseScreen.y, -Camera.main.transform.position.z));
+                    worldPos.z = 0;
+                    FireAt(worldPos);
+                }
             }
         }
 
@@ -176,193 +308,212 @@ namespace Demolition
         {
             if (!gameIsRunning) return;
 
-            newPt.x = xPoint * w;
-            newPt.y = yPoint * h;
-            gotAPt = true;
-
-            // Lancer l'action au point d'impact
-            Vector3 worldPos = Camera.main.ScreenToWorldPoint(
-                new Vector3(newPt.x, newPt.y, -Camera.main.transform.position.z));
-            worldPos.z = 0;
-
-            LaunchAt(worldPos);
-        }
-
-        void LaunchAt(Vector3 worldPos)
-        {
-            // Hitstop (appelé avant)
-            StartCoroutine(HitstopCoroutine());
-
-            // Screen shake
-            StartCoroutine(ScreenShake());
-
-            // Son d'impact
-            if (impactSound != null)
-                audioSource.PlayOneShot(impactSound);
-
-            switch (launchMode)
+            if (Camera.main != null)
             {
-                case LaunchMode.Oiseau:
-                    // L'oiseau apparaît au point d'impact, de dos, et rétrécit en s'éloignant
-                    LaunchOiseau(worldPos);
-                    break;
-                case LaunchMode.ImpactSimple:
-                    // Simple explosion visuelle au point d'impact
-                    LaunchImpact(worldPos);
-                    break;
+                float screenX = xPoint * Screen.width;
+                float screenY = yPoint * Screen.height;
+                Vector3 worldPos = Camera.main.ScreenToWorldPoint(new Vector3(screenX, screenY, -Camera.main.transform.position.z));
+                worldPos.z = 0;
+                FireAt(worldPos);
             }
         }
 
-        void LaunchOiseau(Vector3 worldPos)
+        public void FireAt(Vector3 worldPos)
         {
-            if (oiseauPrefab == null) return;
+            if (!gameIsRunning) return;
 
-            GameObject oiseau = Instantiate(oiseauPrefab, worldPos, Quaternion.identity);
-            Demolition_Projectile proj = oiseau.GetComponent<Demolition_Projectile>();
-            if (proj != null)
-                proj.Launch(worldPos);
+            if (Time.unscaledTime - lastShotTime < minTimeBetweenShots)
+            {
+                return;
+            }
+            lastShotTime = Time.unscaledTime;
+
+            if (launchMode == LaunchMode.Oiseau)
+            {
+                if (oiseauPrefab != null)
+                {
+                    GameObject oiseau = Instantiate(oiseauPrefab);
+                    var proj = oiseau.GetComponent<Demolition_Projectile>();
+                    if (proj != null)
+                    {
+                        proj.Launch(worldPos);
+                    }
+                }
+            }
+            else
+            {
+                TriggerDirectImpact(worldPos);
+            }
         }
 
-        void LaunchImpact(Vector3 worldPos)
+        private void TriggerDirectImpact(Vector3 worldPos)
         {
+            TriggerImpactFeel(worldPos, 1);
+
             if (impactEffectPrefab != null)
             {
                 GameObject effect = Instantiate(impactEffectPrefab, worldPos, Quaternion.identity);
-                // Charger le sprite impact depuis Resources (Texture2D -> Sprite)
-                var sr = effect.GetComponent<SpriteRenderer>();
-                if (sr != null && sr.sprite == null)
-                {
-                    Texture2D tex = Resources.Load<Texture2D>("Textures/impact");
-                    if (tex != null)
-                        sr.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
-                }
-                Destroy(effect, 2f);
+                Destroy(effect, 0.25f);
             }
 
-            // Appliquer une force à la structure la plus proche
-            ApplyForceToNearestStructure(worldPos, 500f);
-        }
-
-        void ApplyForceToNearestStructure(Vector3 point, float radius)
-        {
-            Collider2D[] hits = Physics2D.OverlapCircleAll(point, radius);
-            foreach (var hit in hits)
+            Collider2D directHit = Physics2D.OverlapPoint(worldPos);
+            if (directHit == null)
             {
-                Rigidbody2D rb = hit.GetComponent<Rigidbody2D>();
-                if (rb != null)
+                directHit = Physics2D.OverlapCircle(worldPos, 0.4f);
+            }
+
+            if (directHit != null)
+            {
+                var rb = directHit.GetComponent<Rigidbody2D>();
+                if (rb != null && rb.bodyType == RigidbodyType2D.Dynamic)
                 {
-                    Vector2 direction = (hit.transform.position - (Vector3)point).normalized;
-                    rb.AddForceAtPosition(direction * 200f, point, ForceMode2D.Impulse);
+                    Vector2 dir = ((Vector2)directHit.transform.position - (Vector2)worldPos);
+                    if (dir.sqrMagnitude < 0.01f) dir = Vector2.up;
+                    else dir.Normalize();
+
+                    rb.AddForceAtPosition(dir * 2.5f, worldPos, ForceMode2D.Impulse);
+                }
+
+                var blk = directHit.GetComponent<Demolition_Block>();
+                if (blk != null)
+                {
+                    blk.TakeDamage(1, Vector2.up);
                 }
             }
         }
 
-        IEnumerator HitstopCoroutine()
+        public void TriggerImpactFeel(Vector3 worldPos, int hitCount)
         {
-            Time.timeScale = 0.05f;
-            yield return new WaitForSecondsRealtime(0.05f);
+            if (hitstopCoroutine != null) StopCoroutine(hitstopCoroutine);
+            hitstopCoroutine = StartCoroutine(HitstopCoroutine(0.025f));
+
+            AddCameraShake(Mathf.Clamp(0.08f + hitCount * 0.03f, 0.08f, 0.25f));
+
+            if (impactSound != null)
+            {
+                PlaySfx(impactSound, Random.Range(0.95f, 1.1f), 0.65f);
+            }
+        }
+
+        public void TriggerPigDestroyed(int starVal)
+        {
+            AddCameraShake(0.35f);
+            StartCoroutine(CollapseSlowMo());
+            currentStars = Mathf.Clamp(Mathf.Max(currentStars, starVal), 1, 3);
+        }
+
+        public void AddScore(int points, Vector3 pos, Color? customColor = null, float scaleMultiplier = 1f, string prefix = "")
+        {
+            comboTimer = 1.2f;
+            comboMultiplier = Mathf.Min(comboMultiplier + 1, 5);
+
+            int finalPoints = points * comboMultiplier;
+            score += finalPoints;
+
+            if (popupTextPrefab != null)
+            {
+                GameObject popup = Instantiate(popupTextPrefab, pos + Vector3.up * 0.3f, Quaternion.identity);
+                var popupScript = popup.GetComponent<Demolition_PopupText>();
+                if (popupScript != null)
+                {
+                    string label = comboMultiplier > 1 ? $"{prefix}+{finalPoints} (x{comboMultiplier})!" : $"{prefix}+{finalPoints}";
+                    popupScript.SetText(label, customColor, scaleMultiplier);
+                }
+            }
+        }
+
+        public void PlaySfx(AudioClip clip, float pitch = 1f, float volume = 1f)
+        {
+            if (clip == null || audioSource == null) return;
+
+            audioSource.pitch = pitch;
+            audioSource.PlayOneShot(clip, volume);
+        }
+
+        public void AddCameraShake(float intensity)
+        {
+            shakeIntensity = Mathf.Max(shakeIntensity, intensity);
+        }
+
+        private void UpdateCameraShake()
+        {
+            if (Camera.main == null) return;
+
+            if (shakeIntensity > 0.005f)
+            {
+                Vector2 offset = Random.insideUnitCircle * shakeIntensity;
+                Camera.main.transform.position = originalCameraPos + new Vector3(offset.x, offset.y, 0);
+                shakeIntensity = Mathf.MoveTowards(shakeIntensity, 0f, shakeDecay * Time.unscaledDeltaTime);
+            }
+            else
+            {
+                Camera.main.transform.position = originalCameraPos;
+                shakeIntensity = 0f;
+            }
+        }
+
+        private IEnumerator HitstopCoroutine(float duration)
+        {
+            Time.timeScale = 0.1f;
+            yield return new WaitForSecondsRealtime(duration);
             Time.timeScale = 1f;
-        }
-
-        IEnumerator ScreenShake()
-        {
-            Vector3 originalPos = Camera.main.transform.position;
-            for (int i = 0; i < 5; i++)
-            {
-                Camera.main.transform.position = originalPos + (Vector3)Random.insideUnitCircle * 0.3f;
-                yield return new WaitForSeconds(0.02f);
-            }
-            Camera.main.transform.position = originalPos;
-        }
-
-        public IEnumerator BigShake()
-        {
-            Vector3 originalPos = Camera.main.transform.position;
-            for (int i = 0; i < 10; i++)
-            {
-                Camera.main.transform.position = originalPos + (Vector3)Random.insideUnitCircle * 0.6f;
-                yield return new WaitForSeconds(0.03f);
-            }
-            Camera.main.transform.position = originalPos;
         }
 
         public IEnumerator CollapseSlowMo()
         {
-            Time.timeScale = 0.3f;
-            yield return new WaitForSecondsRealtime(0.4f);
+            Time.timeScale = 0.5f;
+            yield return new WaitForSecondsRealtime(0.2f);
             Time.timeScale = 1f;
         }
 
-        void SpawnTableau(Vector3 origin)
+        public IEnumerator BigShake()
         {
-            Demolition_StructureBuilder.BuildRandomStructure(structuresParent, origin);
+            AddCameraShake(0.35f);
+            yield return null;
         }
 
-        void SetupDifficulty()
+        private void SpawnStructure(Vector3 position)
         {
-            string diff = PlayerPrefs.GetString(Demolition_GeneralVariables.GameTimeKey, "Normal");
-
-            switch (diff)
+            if (structuresParent != null)
             {
-                case "Easy":
-                    gameDuration = 90f;
-                    baseScrollSpeed = 0.2f;
-                    break;
-                case "Normal":
-                    gameDuration = 60f;
-                    baseScrollSpeed = 0.3f;
-                    break;
-                case "Hard":
-                    gameDuration = 45f;
-                    baseScrollSpeed = 0.6f;
-                    break;
+                Demolition_StructureBuilder.BuildRandomStructure(structuresParent, position);
             }
-
-            currentScrollSpeed = baseScrollSpeed;
         }
 
-        IEnumerator GameLoop()
+        private IEnumerator StructureSpawnLoop()
         {
-            // Timer avant chargement d'un nouveau tableau
-            float nextTableauTime = 15f;
+            float nextSpawnInterval = 7.0f;
             float elapsed = 0f;
 
             while (gameIsRunning)
             {
                 elapsed += Time.deltaTime;
-                if (elapsed >= nextTableauTime)
+                if (elapsed >= nextSpawnInterval)
                 {
-                    float rightEdge = Camera.main.ViewportToWorldPoint(new Vector3(1, 0, 0)).x;
-                    SpawnTableau(new Vector3(rightEdge + 5f, groundY, 0));
                     elapsed = 0f;
-                    nextTableauTime = Random.Range(12f, 20f);
+                    if (Camera.main != null && structuresParent != null)
+                    {
+                        float rightEdge = Camera.main.ViewportToWorldPoint(new Vector3(1, 0, -Camera.main.transform.position.z)).x;
+                        SpawnStructure(new Vector3(rightEdge + 4f, groundY, 0));
+                    }
+                    nextSpawnInterval = Random.Range(7.0f, 10.0f);
                 }
                 yield return null;
             }
         }
 
-        public void AddScore(int points, Vector3 pos)
+        private void UpdateUI()
         {
-            score += points;
             if (scoreText != null)
-                scoreText.text = "Score: " + score;
-        }
+            {
+                scoreText.text = $"Score: {score}";
+            }
 
-        void EndGame()
-        {
-            gameIsRunning = false;
-            StopAllCoroutines();
-            Time.timeScale = 1f;
+            if (timerText != null)
+            {
+                timerText.text = Mathf.CeilToInt(currentTime).ToString();
+            }
 
-            // Calcul des étoiles (1-3)
-            currentStars = 1;
-            int highScore = PlayerPrefs.GetInt(Demolition_GeneralVariables.HighScoreKey, 0);
-            if (score >= 150 && score < 500)
-                currentStars = 2;
-            else if (score >= 500)
-                currentStars = 3;
-
-            // Afficher les étoiles
             if (starText != null)
             {
                 string stars = "";
@@ -370,30 +521,49 @@ namespace Demolition
                 for (int i = currentStars; i < 3; i++) stars += "☆";
                 starText.text = stars;
             }
+        }
 
-            // Ne pas écraser un meilleur score
+        private void EndGame()
+        {
+            gameIsRunning = false;
+            StopAllCoroutines();
+            Time.timeScale = 1f;
+
+            if (gameOverSound != null)
+            {
+                PlaySfx(gameOverSound, 1f, 1f);
+            }
+
+            int highScore = PlayerPrefs.GetInt(Demolition_GeneralVariables.HighScoreKey, 0);
             if (score > highScore)
             {
                 PlayerPrefs.SetInt(Demolition_GeneralVariables.HighScoreKey, score);
-                PlayerPrefs.SetInt("Demolition_Stars", currentStars);
             }
-
-            if (gameOverSound != null)
-                audioSource.PlayOneShot(gameOverSound);
-
             PlayerPrefs.SetInt("Demolition_FinalScore", score);
+            PlayerPrefs.SetInt("Demolition_Stars", currentStars);
 
             StartCoroutine(TransitionToScore());
         }
 
-        IEnumerator TransitionToScore()
+        private IEnumerator TransitionToScore()
         {
-            yield return new WaitForSeconds(2f);
+            yield return new WaitForSeconds(2.0f);
 
-            if (BuildState.CurrentState == BuildState.State.normal)
-                SceneManager.LoadScene(Demolition_GeneralVariables.Instance.scoreScene);
+            if (Demolition_GeneralVariables.Instance != null && !string.IsNullOrEmpty(Demolition_GeneralVariables.Instance.scoreScene))
+            {
+                if (BuildState.CurrentState == BuildState.State.normal)
+                {
+                    SceneManager.LoadScene(Demolition_GeneralVariables.Instance.scoreScene);
+                }
+                else if (MenuSelectionButton.Instance != null)
+                {
+                    MenuSelectionButton.Instance.gameObject.SetActive(true);
+                }
+            }
             else
-                MenuSelectionButton.Instance.gameObject.SetActive(true);
+            {
+                SceneManager.LoadScene("Score_Demolition");
+            }
         }
     }
 }

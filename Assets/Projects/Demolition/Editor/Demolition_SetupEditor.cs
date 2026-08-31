@@ -77,7 +77,7 @@ public class Demolition_SetupEditor : EditorWindow
 
         CreateBloc("Bloc_Bois", t_bois, Demolition_Block.MaterialType.Bois, 2, 50, t_f1, t_f2);
         CreateBloc("Bloc_Verre", t_verre, Demolition_Block.MaterialType.Verre, 1, 100, t_f1, t_f2);
-        CreateBloc("Bloc_Pierre", t_pierre, Demolition_Block.MaterialType.Pierre, 4, 20, t_f1, t_f2);
+        CreateBloc("Bloc_Pierre", t_pierre, Demolition_Block.MaterialType.Pierre, 3, 30, t_f1, t_f2);
         CreateDebris("Debris_Bois", t_db);
         CreateDebris("Debris_Verre", t_dv);
         CreateDebris("Debris_Pierre", t_dp);
@@ -99,9 +99,7 @@ public class Demolition_SetupEditor : EditorWindow
         CreateStarImages();
         Debug.Log("6/7 Stars images generees");
 
-        // 7.
-        Debug.Log("7/7 Termine");
-
+        // 7. Termine
         AssetDatabase.Refresh();
         Debug.Log("=== FINI: Demolition completement configure ===");
     }
@@ -149,7 +147,7 @@ public class Demolition_SetupEditor : EditorWindow
     static void CreateBloc(string name, Sprite sprite, Demolition_Block.MaterialType mat, int hp, int pts, Sprite f1, Sprite f2)
     {
         var go = new GameObject(name, typeof(SpriteRenderer), typeof(BoxCollider2D), typeof(Rigidbody2D), typeof(AudioSource), typeof(Demolition_Block));
-        var sr = go.GetComponent<SpriteRenderer>(); sr.sprite = sprite; sr.sortingOrder = 2;
+        var sr = go.GetComponent<SpriteRenderer>(); sr.sprite = sprite; sr.sortingOrder = 3;
         var blk = go.GetComponent<Demolition_Block>();
         blk.hp = hp; blk.points = pts; blk.materialType = mat; blk.spriteRenderer = sr;
         blk.damageSprites = new Sprite[] { f1, f2 };
@@ -169,18 +167,20 @@ public class Demolition_SetupEditor : EditorWindow
     {
         var imp = new GameObject("ImpactExplosion", typeof(SpriteRenderer));
         imp.GetComponent<SpriteRenderer>().sprite = imSprite;
-        imp.GetComponent<SpriteRenderer>().sortingOrder = 4;
+        imp.GetComponent<SpriteRenderer>().sortingOrder = 5;
         PrefabUtility.SaveAsPrefabAsset(imp, _prefabPath + "/ImpactExplosion.prefab");
         Object.DestroyImmediate(imp);
 
         var go = new GameObject("Oiseau", typeof(SpriteRenderer), typeof(Demolition_Projectile));
         go.GetComponent<SpriteRenderer>().sprite = oiSprite;
-        go.GetComponent<SpriteRenderer>().sortingOrder = 3;
+        go.GetComponent<SpriteRenderer>().sortingOrder = 8;
         var p = go.GetComponent<Demolition_Projectile>();
-        p.vitesseZ = 3f;
-        p.scaleMin = 0.1f; p.scaleMax = 1;
-        p.explosionRadius = 2f;
-        p.explosionForce = 500f;
+        p.flightDuration = 0.13f;
+        p.scaleStart = 1.5f;
+        p.scaleEnd = 0.55f;
+        p.hitRadius = 0.45f;
+        p.pushForce = 16f;
+        p.directDamage = 2;
         PrefabUtility.SaveAsPrefabAsset(go, _prefabPath + "/Oiseau.prefab");
         Object.DestroyImmediate(go);
     }
@@ -189,11 +189,11 @@ public class Demolition_SetupEditor : EditorWindow
     {
         var t_cochon = LoadSprite("cochon");
         if (t_cochon == null) { Debug.LogWarning("cochon.png pas trouve"); return; }
-        CreateCochonBloc("Cochon", t_cochon, 3, 500, 1);
+        CreateCochonBloc("Cochon", t_cochon, 2, 500, 1);
         var t_cv = LoadSprite("cochon_vert");
-        if (t_cv != null) CreateCochonBloc("Cochon_Vert", t_cv, 5, 1000, 2);
+        if (t_cv != null) CreateCochonBloc("Cochon_Vert", t_cv, 4, 1000, 2);
         var t_cb = LoadSprite("cochon_bleu");
-        if (t_cb != null) CreateCochonBloc("Cochon_Bleu", t_cb, 8, 2000, 3);
+        if (t_cb != null) CreateCochonBloc("Cochon_Bleu", t_cb, 6, 2000, 3);
     }
 
     static void CreateCochonBloc(string name, Sprite sprite, int hp, int pts, int starVal)
@@ -211,7 +211,7 @@ public class Demolition_SetupEditor : EditorWindow
     {
         var go = new GameObject("PopupText", typeof(TextMeshPro), typeof(Demolition_PopupText));
         var tmp = go.GetComponent<TextMeshPro>();
-        tmp.fontSize = 3;
+        tmp.fontSize = 4f;
         tmp.color = Color.yellow;
         tmp.alignment = TextAlignmentOptions.Center;
         tmp.fontStyle = FontStyles.Bold;
@@ -288,11 +288,8 @@ public class Demolition_SetupEditor : EditorWindow
             gm.destructionSound = AssetDatabase.LoadAssetAtPath<AudioClip>(_soundPath + "/destruction.wav");
             gm.oiseauPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(_prefabPath + "/Oiseau.prefab");
             gm.impactEffectPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(_prefabPath + "/ImpactExplosion.prefab");
-
-            // Tableaux generes au runtime par Demolition_StructureBuilder
         }
 
-        // Canvas avec Score + Timer pour le gameplay
         SetupGameSceneCanvas();
 
         EditorSceneManager.SaveScene(scene);
@@ -357,7 +354,6 @@ public class Demolition_SetupEditor : EditorWindow
             Debug.Log("TimerText cree dans GameScene");
         }
 
-        // Etoiles en haut au milieu
         if (GameObject.Find("StarText") == null)
         {
             var starGO = new GameObject("StarText", typeof(RectTransform));
@@ -386,7 +382,6 @@ public class Demolition_SetupEditor : EditorWindow
         var canvas = Object.FindFirstObjectByType<Canvas>();
         if (canvas == null) { Debug.LogError("Canvas pas trouve!"); return; }
 
-        // === Toggle ModeOiseau (style SpotTheDif Instructions) ===
         if (GameObject.Find("ModeOiseau") == null)
         {
             var container = new GameObject("ModeOiseau", typeof(RectTransform));
@@ -438,11 +433,8 @@ public class Demolition_SetupEditor : EditorWindow
             check.AddComponent<CanvasRenderer>();
             toggle.graphic = checkImg;
             toggle.targetGraphic = bgImg;
-
-            Debug.Log("Toggle ModeOiseau cree avec positions SpotTheDif");
         }
 
-        // === Slider ScrollSpeed (style SpotTheDif ScenesNumber) ===
         if (GameObject.Find("ScrollSpeed") == null)
         {
             var container = new GameObject("ScrollSpeed", typeof(RectTransform));
@@ -514,8 +506,6 @@ public class Demolition_SetupEditor : EditorWindow
             brt.sizeDelta = Vector2.zero;
             bg.AddComponent<Image>();
             bg.GetComponent<Image>().color = new Color(0.5f, 0.5f, 0.5f);
-
-            Debug.Log("Slider ScrollSpeed cree avec positions SpotTheDif");
         }
 
         EditorSceneManager.SaveScene(scene);

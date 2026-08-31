@@ -3,13 +3,13 @@ using UnityEngine;
 namespace Demolition
 {
     /// <summary>
-    /// Fait défiler la texture du sol pour suivre le scroll des structures.
+    /// Défilement infini et fluide du sol.
     /// </summary>
     public class Demolition_GroundScroll : MonoBehaviour
     {
         public System.Func<float> scrollSpeedRef;
         private SpriteRenderer sr;
-        private Vector2 offset;
+        private Vector2 offset = Vector2.zero;
 
         void Start()
         {
@@ -19,9 +19,14 @@ namespace Demolition
         void Update()
         {
             if (sr == null || scrollSpeedRef == null) return;
+
             float speed = scrollSpeedRef();
-            offset.x += speed * Time.deltaTime * 0.5f;
-            sr.material.mainTextureOffset = offset;
+            offset.x += speed * Time.deltaTime * 0.25f;
+
+            if (sr.material != null)
+            {
+                sr.material.mainTextureOffset = offset;
+            }
         }
     }
 }

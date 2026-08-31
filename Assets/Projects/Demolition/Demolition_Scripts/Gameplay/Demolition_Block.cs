@@ -3,34 +3,37 @@ using System.Collections;
 
 namespace Demolition
 {
+    /// <summary>
+    /// Bloc destructible avec haute durabilité et Juice avancé (squash & stretch, fissures, comportements cochons).
+    /// </summary>
     public class Demolition_Block : MonoBehaviour
     {
-        [Header("Santé")]
-        public int hp = 1;
+        public enum MaterialType { Bois, Verre, Pierre, Cochon }
+
+        [Header("Matériau & Statistiques")]
+        public MaterialType materialType = MaterialType.Bois;
+        public int hp = 4;
         public int points = 50;
 
-        [Header("Matériau")]
-        public MaterialType materialType = MaterialType.Bois;
+        [Header("Cible Spéciale (Cochon)")]
+        public bool isTarget = false;
+        public int starValue = 1;
 
-        [Header("Apparence")]
-        public Sprite[] damageSprites;
+        [Header("Visuel & Rendu")]
         public SpriteRenderer spriteRenderer;
-
-        [Header("Débris")]
-        public GameObject debrisPrefab;
-        public float debrisForce = 200f;
+        public Sprite[] damageSprites;
+        public GameObject popupTextPrefab;
 
         private Rigidbody2D rb;
         private int maxHp;
         private bool isDestroyed = false;
         private Demolition_Structure parentStructure;
+        private Vector3 originalScale;
+        private Coroutine flashCoroutine;
+        private Coroutine squashCoroutine;
+        private Demolition_PigBehavior pigBehavior;
 
-        public enum MaterialType { Bois, Verre, Pierre, Cochon }
-    
-        [Header("Cible spéciale")]
-        public bool isTarget = false;
-        public int starValue = 0;
-        public GameObject popupTextPrefab;
+        private static PhysicsMaterial2D defaultBlockMat;
 
         void Awake()
         {
@@ -38,28 +41,111 @@ namespace Demolition
             if (rb == null)
                 rb = gameObject.AddComponent<Rigidbody2D>();
 
-            // Gravite active pour que les blocs tombent
-            rb.gravityScale = 3f;
-            rb.mass = 1f;
-            rb.linearDamping = 0.5f;
-            rb.angularDamping = 0.5f;
+            if (defaultBlockMat == null)
+            {
+                defaultBlockMat = new PhysicsMaterial2D("BlockPhysicsMat")
+                {
+                    friction = 0.8f,
+                    bounciness = 0.01f
+                };
+            }
+
+            var col = GetComponent<Collider2D>();
+            if (col != null)
+            {
+                col.sharedMaterial = defaultBlockMat;
+            }
+
+            ConfigurePhysicsAndStats();
 
             maxHp = hp;
+            originalScale = transform.localScale;
+
             if (spriteRenderer == null)
                 spriteRenderer = GetComponent<SpriteRenderer>();
-            if (spriteRenderer != null && spriteRenderer.sprite == null)
+
+            LoadMaterialVisuals();
+
+            if (materialType == MaterialType.Cochon)
+            {
+                pigBehavior = GetComponent<Demolition_PigBehavior>();
+                if (pigBehavior == null)
+                    pigBehavior = gameObject.AddComponent<Demolition_PigBehavior>();
+            }
+        }
+
+        void Start()
+        {
+            parentStructure = GetComponentInParent<Demolition_Structure>();
+            if (popupTextPrefab == null)
+                popupTextPrefab = Resources.Load<GameObject>("Prefabs/PopupText");
+        }
+
+        private void ConfigurePhysicsAndStats()
+        {
+            switch (materialType)
+            {
+                case MaterialType.Verre:
+                    hp = 2;
+                    points = 80;
+                    rb.mass = 0.8f;
+                    rb.linearDamping = 0.8f;
+                    rb.angularDamping = 0.9f;
+                    rb.gravityScale = 2.0f;
+                    break;
+
+                case MaterialType.Pierre:
+                    hp = 8;
+                    points = 40;
+                    rb.mass = 4.0f;
+                    rb.linearDamping = 1.0f;
+                    rb.angularDamping = 1.2f;
+                    rb.gravityScale = 2.5f;
+                    break;
+
+                case MaterialType.Cochon:
+                    hp = starValue >= 3 ? 6 : (starValue == 2 ? 4 : 3);
+                    points = starValue >= 3 ? 2000 : (starValue == 2 ? 1000 : 500);
+                    rb.mass = 1.0f;
+                    rb.linearDamping = 0.8f;
+                    rb.angularDamping = 0.8f;
+                    rb.gravityScale = 2.0f;
+                    break;
+
+                case MaterialType.Bois:
+                default:
+                    hp = 4;
+                    points = 50;
+                    rb.mass = 1.5f;
+                    rb.linearDamping = 0.8f;
+                    rb.angularDamping = 0.9f;
+                    rb.gravityScale = 2.0f;
+                    break;
+            }
+        }
+
+        private void LoadMaterialVisuals()
+        {
+            if (spriteRenderer == null) return;
+
+            if (spriteRenderer.sprite == null)
             {
                 string texName = "bois";
                 switch (materialType)
                 {
                     case MaterialType.Verre: texName = "verre"; break;
                     case MaterialType.Pierre: texName = "pierre"; break;
-                    case MaterialType.Cochon: texName = "cochon"; break;
+                    case MaterialType.Cochon:
+                        texName = starValue >= 3 ? "cochon_bleu" : (starValue == 2 ? "cochon_vert" : "cochon");
+                        break;
                 }
                 Texture2D tex = Resources.Load<Texture2D>("Textures/" + texName);
                 if (tex != null)
+                {
                     spriteRenderer.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
+                }
             }
+
             if (damageSprites == null || damageSprites.Length == 0 || damageSprites[0] == null)
             {
                 damageSprites = new Sprite[2];
@@ -70,115 +156,176 @@ namespace Demolition
             }
         }
 
-        void Start()
-        {
-            parentStructure = GetComponentInParent<Demolition_Structure>();
-
-            // Pas de joint au parent - c'est le StructureBuilder qui connecte
-            // les blocs entre eux (chaque bloc a son voisin du dessous)
-        }
-
-        public void TakeDamage(int amount)
+        public void TakeDamage(int amount, Vector2? hitDirection = null)
         {
             if (isDestroyed) return;
+
             hp -= amount;
 
-            if (damageSprites.Length > 0 && spriteRenderer != null)
+            if (gameObject.activeInHierarchy)
             {
-                float ratio = (float)hp / maxHp;
-                int index = Mathf.Clamp(damageSprites.Length - 1 - 
-                    Mathf.FloorToInt(ratio * damageSprites.Length), 0, damageSprites.Length - 1);
-                if (index < damageSprites.Length)
-                    spriteRenderer.sprite = damageSprites[index];
+                if (squashCoroutine != null) StopCoroutine(squashCoroutine);
+                squashCoroutine = StartCoroutine(AnimateSquash(hitDirection ?? Vector2.down));
+
+                if (flashCoroutine != null) StopCoroutine(flashCoroutine);
+                flashCoroutine = StartCoroutine(AnimateHitFlash());
             }
 
-            // Son cochon
-            if (materialType == MaterialType.Cochon)
+            if (pigBehavior != null)
             {
-                AudioSource aud = GetComponent<AudioSource>();
-                if (aud != null)
-                {
-                    AudioClip pigHit = Resources.Load<AudioClip>("Sounds/pig_hit");
-                    if (pigHit != null) aud.PlayOneShot(pigHit);
-                }
+                pigBehavior.OnDamaged(hp, maxHp);
             }
+
+            UpdateDamageSprite();
+            PlayHitSound();
 
             if (hp <= 0)
-                Destroy();
+            {
+                DestroyBlock();
+            }
         }
 
-        void Destroy()
+        private void UpdateDamageSprite()
+        {
+            if (damageSprites != null && damageSprites.Length > 0 && spriteRenderer != null && materialType != MaterialType.Cochon)
+            {
+                float ratio = (float)hp / maxHp;
+                int index = Mathf.Clamp(damageSprites.Length - 1 - Mathf.FloorToInt(ratio * damageSprites.Length), 0, damageSprites.Length - 1);
+                if (index >= 0 && index < damageSprites.Length && damageSprites[index] != null)
+                {
+                    spriteRenderer.sprite = damageSprites[index];
+                }
+            }
+        }
+
+        private void PlayHitSound()
+        {
+            AudioClip clip = null;
+            if (materialType == MaterialType.Cochon)
+            {
+                clip = Resources.Load<AudioClip>("Sounds/pig_hit");
+            }
+            else
+            {
+                clip = Resources.Load<AudioClip>("Sounds/impact");
+            }
+
+            if (clip != null && Demolition_GameManager.Instance != null)
+            {
+                Demolition_GameManager.Instance.PlaySfx(clip, Random.Range(0.95f, 1.05f), 0.55f);
+            }
+        }
+
+        private IEnumerator AnimateSquash(Vector2 direction)
+        {
+            float duration = 0.08f;
+            float elapsed = 0f;
+
+            Vector3 squashedScale = new Vector3(
+                originalScale.x * (1f + Mathf.Abs(direction.y) * 0.1f - Mathf.Abs(direction.x) * 0.05f),
+                originalScale.y * (1f + Mathf.Abs(direction.x) * 0.1f - Mathf.Abs(direction.y) * 0.05f),
+                originalScale.z
+            );
+
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                float t = elapsed / duration;
+                transform.localScale = Vector3.Lerp(squashedScale, originalScale, t);
+                yield return null;
+            }
+
+            transform.localScale = originalScale;
+        }
+
+        private IEnumerator AnimateHitFlash()
+        {
+            if (spriteRenderer == null) yield break;
+
+            Color originalColor = spriteRenderer.color;
+            spriteRenderer.color = Color.white * 1.3f;
+            yield return new WaitForSeconds(0.03f);
+            if (spriteRenderer != null)
+                spriteRenderer.color = originalColor;
+        }
+
+        public void DestroyBlock()
         {
             if (isDestroyed) return;
             isDestroyed = true;
 
-            // Casser nos joints (blocs relies a nous)
             var joints = GetComponents<FixedJoint2D>();
-            foreach (var j in joints) Destroy(j);
+            foreach (var j in joints)
+            {
+                if (j != null) Destroy(j);
+            }
 
-            // Debris physiques
-            Demolition_DebrisSpawner.SpawnDebris(transform.position, materialType, Random.Range(4, 8));
+            if (pigBehavior != null)
+            {
+                pigBehavior.OnDefeated();
+            }
 
-            // Score
+            Demolition_DebrisSpawner.SpawnDebris(transform.position, materialType, Random.Range(2, 4));
+            Demolition_DebrisSpawner.SpawnDustCloud(transform.position, 0.4f);
+
+            Color popupColor = Color.yellow;
+            float popupScale = 1f;
+            string prefix = "";
+            switch (materialType)
+            {
+                case MaterialType.Verre:
+                    popupColor = new Color(0.4f, 0.9f, 1f);
+                    break;
+                case MaterialType.Pierre:
+                    popupColor = new Color(0.9f, 0.9f, 0.9f);
+                    break;
+                case MaterialType.Cochon:
+                    popupColor = new Color(1f, 0.85f, 0.2f);
+                    popupScale = 1.35f;
+                    prefix = starValue >= 3 ? "👑 BOSS DOWN! " : (starValue == 2 ? "★ PIG CLEAR! " : "PIG HIT! ");
+                    break;
+                default:
+                    popupColor = new Color(1f, 0.75f, 0.3f);
+                    break;
+            }
+
             if (Demolition_GameManager.Instance != null)
-                Demolition_GameManager.Instance.AddScore(points, transform.position);
-
-            // Popup flottant
-            if (popupTextPrefab != null)
             {
-                GameObject popup = Instantiate(popupTextPrefab, transform.position, Quaternion.identity);
-                var popupText = popup.GetComponent<Demolition_PopupText>();
-                if (popupText != null)
-                    popupText.SetText("+" + points);
+                Demolition_GameManager.Instance.AddScore(points, transform.position, popupColor, popupScale, prefix);
             }
 
-            // Son
-            AudioSource audio = GetComponent<AudioSource>();
-            if (audio != null)
+            if (Demolition_GameManager.Instance != null)
             {
-                if (materialType == MaterialType.Cochon)
+                AudioClip destClip = materialType == MaterialType.Cochon
+                    ? Resources.Load<AudioClip>("Sounds/pig_hit")
+                    : Resources.Load<AudioClip>("Sounds/destruction");
+
+                if (destClip != null)
                 {
-                    audio.PlayOneShot(Resources.Load<AudioClip>("Sounds/pig_hit"));
-                }
-                else
-                {
-                    AudioClip clip = Resources.Load<AudioClip>("Sounds/destruction");
-                    if (clip != null) audio.PlayOneShot(clip);
+                    Demolition_GameManager.Instance.PlaySfx(destClip, Random.Range(0.95f, 1.05f), 0.65f);
                 }
             }
 
-            // Secousse + ralenti si c'est un cochon
             if (materialType == MaterialType.Cochon && Demolition_GameManager.Instance != null)
             {
-                Demolition_GameManager.Instance.StartCoroutine(
-                    Demolition_GameManager.Instance.BigShake());
+                Demolition_GameManager.Instance.TriggerPigDestroyed(starValue);
             }
 
-            // Si la structure parente existe, elle peut declencher le slow-mo
             if (parentStructure != null)
+            {
                 parentStructure.OnBlockDestroyed(this);
+            }
 
             Destroy(gameObject);
         }
 
         void OnCollisionEnter2D(Collision2D collision)
         {
-            float force = collision.relativeVelocity.magnitude;
-            if (force > 3f)
-            {
-                TakeDamage(Mathf.FloorToInt(force / 3f));
-            }
-        }
+            if (isDestroyed) return;
 
-        public float GetBreakForce()
-        {
-            switch (materialType)
+            if (collision.gameObject.name == "Ground" && collision.relativeVelocity.magnitude > 22f)
             {
-                case MaterialType.Verre: return 50f;
-                case MaterialType.Bois: return 200f;
-                case MaterialType.Pierre: return 500f;
-                case MaterialType.Cochon: return 800f;
-                default: return 200f;
+                TakeDamage(1, collision.relativeVelocity.normalized);
             }
         }
     }

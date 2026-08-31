@@ -1,9 +1,11 @@
 using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace Demolition
 {
+    /// <summary>
+    /// Gère le cycle de vie d'une structure générée, le déclenchement de ralentis d'effondrement et le nettoyage hors écran.
+    /// </summary>
     public class Demolition_Structure : MonoBehaviour
     {
         public List<Demolition_Block> blocks = new List<Demolition_Block>();
@@ -12,7 +14,6 @@ namespace Demolition
 
         void Start()
         {
-            // Enregistrer tous les blocs enfants
             blocks.AddRange(GetComponentsInChildren<Demolition_Block>());
         }
 
@@ -21,33 +22,36 @@ namespace Demolition
             destroyedCount++;
             blocks.Remove(block);
 
-            // Si assez de blocs detruits rapidement -> effondrement
-            if (destroyedCount >= 2 && !collapseTriggered)
+            // Déclenchement d'un ralenti spectaculaire lors d'effondrements majeurs
+            if (destroyedCount >= 3 && !collapseTriggered)
             {
                 collapseTriggered = true;
                 Demolition_GameManager gm = Demolition_GameManager.Instance;
                 if (gm != null)
                 {
                     gm.StartCoroutine(gm.CollapseSlowMo());
-                    // Nuage de poussière
-                    Demolition_DebrisSpawner.SpawnDustCloud(transform.position, 2f);
+                    Demolition_DebrisSpawner.SpawnDustCloud(transform.position, 2.5f);
                 }
             }
 
-            // Si tous les blocs detruits + poussiere
+            // Nuage de poussière final quand toute la structure est rasée
             if (blocks.Count == 0 && !collapseTriggered)
             {
                 collapseTriggered = true;
-                Demolition_DebrisSpawner.SpawnDustCloud(transform.position, 1.5f);
+                Demolition_DebrisSpawner.SpawnDustCloud(transform.position, 2f);
             }
         }
 
         void Update()
         {
-            // Auto-destruction si trop loin
-            if (transform.position.x < Camera.main.ViewportToWorldPoint(new Vector3(0, 0, 0)).x - 15f)
+            // Nettoyage automatique dès que la structure sort complètement de l'écran à gauche
+            if (Camera.main != null)
             {
-                Destroy(gameObject);
+                float leftEdge = Camera.main.ViewportToWorldPoint(new Vector3(0, 0, -Camera.main.transform.position.z)).x;
+                if (transform.position.x < leftEdge - 15f)
+                {
+                    Destroy(gameObject);
+                }
             }
         }
     }
