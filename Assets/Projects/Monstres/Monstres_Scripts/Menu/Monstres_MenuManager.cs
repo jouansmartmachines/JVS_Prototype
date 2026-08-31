@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
-using FileDialogWithinUnity;
+
 using TMPro;
 using System.IO;
 using UnityEngine.UI;
@@ -40,15 +40,7 @@ namespace Monstres
 
         public void OpenFileBrowser()
         {
-            FolderPath newC = new FolderPath();
-
-            string folderLocation = newC.OpenFolderDialogBox(PlayerPrefs.GetString("Monstres_PicturePath"));
-
-            if (folderLocation != "")
-            {
-                PlayerPrefs.SetString("Monstres_PicturePath", folderLocation + @"\");
-                ChangeFolderIndication();
-            }
+         
         }
 
         public void ChangeFolderIndication()

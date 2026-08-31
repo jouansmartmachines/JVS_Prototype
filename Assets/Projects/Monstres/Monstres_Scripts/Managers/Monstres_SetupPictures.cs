@@ -30,10 +30,7 @@ namespace Monstres
             folderPath = $"{Path.GetFullPath(Path.Combine(appPath, @"../../../../../"))}Documents\\Capteur\\Personnalisation\\Monstres";
             #endif
             Debug.Log(folderPath);
-            if (OSC_Manager.Instance != null)
-            {
-                OSC_Manager.Instance.playersSprites.Clear();
-            }
+
 
             //if (PlayerPrefs.HasKey(Monstres_GeneralVariables.UseDefaultPictureKEY))
             //    if(PlayerPrefs.GetInt(Monstres_GeneralVariables.UseDefaultPictureKEY) == 1)
@@ -92,8 +89,7 @@ namespace Monstres
                     pictureConfirmedDisplayers[pictureIdx].sprite = secondPicture;
                     questionMarkPicture[pictureIdx].SetActive(false);
 
-                    OSC_Manager.Instance.playersSprites.Add(firstPicture);
-                    OSC_Manager.Instance.playersSprites.Add(secondPicture);
+
 
                     if (pictureIdx < pictureConfirmedDisplayers.Count - 1)
                     {

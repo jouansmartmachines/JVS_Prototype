@@ -4,13 +4,12 @@ using MenuSelection;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using DG.Tweening;
 using TMPro;
 using Tool;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-//using static OnlineMapsGooglePlacesAutocompleteResult;
+
 
 namespace Basket
 {
@@ -90,7 +89,9 @@ namespace Basket
                     IEnumerator Transition()
                     {
                         team.NetCount++;
-                       
+                        team.Target.SetActive(false);
+                      
+                        team.Ball.transform.DOScale(0.75f, 0.125f);
                         team.ThrowManager.CanShot = false;
                         team.PointCountDownHolder.gameObject.SetActive(false);
                         if (team.PointCountDownCoroutine != null) StopCoroutine(team.PointCountDownCoroutine);
@@ -152,7 +153,6 @@ namespace Basket
                             team.Target.transform.DOScale(1f / team.Multiplicator, 0f);
                         }
 
-                  
                         team.Ball.transform.DOScale(1.25f, 0.125f);
 
                         //Debug.Log(team.Ball.color);
@@ -175,6 +175,7 @@ namespace Basket
                     foreach (var t in Teams)
                     {
                         t.Target.SetActive(false);
+                     
                         t.Ball.transform.DOScale(0.75f, 0.25f);
                     }
 
@@ -212,11 +213,12 @@ namespace Basket
         {
             team.PointCountDownHolder.gameObject.SetActive(true);
 
+
             (team.PointCountDownHolder.transform as RectTransform).localScale = Vector3.zero;
             team.PointCountDownText.text = "3";
             team.ScoreMultiplicator = 3;
             team.PointCountDownHolder.fillAmount = 0;
-            
+
 
 
             (team.PointCountDownHolder.transform as RectTransform).localScale = Vector3.zero;
@@ -230,7 +232,7 @@ namespace Basket
             team.PointCountDownText.text = "1";
             team.ScoreMultiplicator = 1;
             team.PointCountDownHolder.fillAmount = 1;
-            yield return new WaitForSeconds(1f);
+            yield return (team.PointCountDownHolder.transform as RectTransform).DOScale(0.5f, 0.5f);
         }
 
         public IEnumerator MoveCameraToPoint(Transform cam, Vector3 end)
@@ -261,6 +263,7 @@ namespace Basket
             else
             {
                 if (t.Score < 4) t.Target.SetActive(true);
+    
                 t.Ball.transform.DOScale(1.25f, 0.25f);
             }
         }
