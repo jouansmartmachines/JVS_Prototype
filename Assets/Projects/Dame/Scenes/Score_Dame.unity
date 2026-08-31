@@ -226,51 +226,51 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 5851241298207517225, guid: s6s8f01aauu5nq10k9o47kad8r3ffhos, type: 3}
+    - target: {fileID: 5851241298207517225, guid: fe18544aacdb4aa1b9b96a6324ad97af, type: 3}
       propertyPath: m_RootOrder
       value: 2
       objectReference: {fileID: 0}
-    - target: {fileID: 5851241298207517225, guid: s6s8f01aauu5nq10k9o47kad8r3ffhos, type: 3}
+    - target: {fileID: 5851241298207517225, guid: fe18544aacdb4aa1b9b96a6324ad97af, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5851241298207517225, guid: s6s8f01aauu5nq10k9o47kad8r3ffhos, type: 3}
+    - target: {fileID: 5851241298207517225, guid: fe18544aacdb4aa1b9b96a6324ad97af, type: 3}
       propertyPath: m_LocalPosition.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5851241298207517225, guid: s6s8f01aauu5nq10k9o47kad8r3ffhos, type: 3}
+    - target: {fileID: 5851241298207517225, guid: fe18544aacdb4aa1b9b96a6324ad97af, type: 3}
       propertyPath: m_LocalPosition.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5851241298207517225, guid: s6s8f01aauu5nq10k9o47kad8r3ffhos, type: 3}
+    - target: {fileID: 5851241298207517225, guid: fe18544aacdb4aa1b9b96a6324ad97af, type: 3}
       propertyPath: m_LocalRotation.w
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 5851241298207517225, guid: s6s8f01aauu5nq10k9o47kad8r3ffhos, type: 3}
+    - target: {fileID: 5851241298207517225, guid: fe18544aacdb4aa1b9b96a6324ad97af, type: 3}
       propertyPath: m_LocalRotation.x
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5851241298207517225, guid: s6s8f01aauu5nq10k9o47kad8r3ffhos, type: 3}
+    - target: {fileID: 5851241298207517225, guid: fe18544aacdb4aa1b9b96a6324ad97af, type: 3}
       propertyPath: m_LocalRotation.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5851241298207517225, guid: s6s8f01aauu5nq10k9o47kad8r3ffhos, type: 3}
+    - target: {fileID: 5851241298207517225, guid: fe18544aacdb4aa1b9b96a6324ad97af, type: 3}
       propertyPath: m_LocalRotation.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5851241298207517225, guid: s6s8f01aauu5nq10k9o47kad8r3ffhos, type: 3}
+    - target: {fileID: 5851241298207517225, guid: fe18544aacdb4aa1b9b96a6324ad97af, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5851241298207517225, guid: s6s8f01aauu5nq10k9o47kad8r3ffhos, type: 3}
+    - target: {fileID: 5851241298207517225, guid: fe18544aacdb4aa1b9b96a6324ad97af, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5851241298207517225, guid: s6s8f01aauu5nq10k9o47kad8r3ffhos, type: 3}
+    - target: {fileID: 5851241298207517225, guid: fe18544aacdb4aa1b9b96a6324ad97af, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5851241298207517226, guid: s6s8f01aauu5nq10k9o47kad8r3ffhos, type: 3}
+    - target: {fileID: 5851241298207517226, guid: fe18544aacdb4aa1b9b96a6324ad97af, type: 3}
       propertyPath: m_Name
       value: "D\xE9molition General Variables"
       objectReference: {fileID: 0}
@@ -278,7 +278,7 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: s6s8f01aauu5nq10k9o47kad8r3ffhos, type: 3}
+  m_SourcePrefab: {fileID: 100100000, guid: fe18544aacdb4aa1b9b96a6324ad97af, type: 3}
 --- !u!1 &622727692
 GameObject:
   m_ObjectHideFlags: 0
@@ -338,7 +338,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: e0643bef4b9093442a1168475cddc8fb, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 811cee8cb7b7f66d6b97b895ac7d5c52, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
