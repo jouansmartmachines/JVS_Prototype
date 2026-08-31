@@ -379,9 +379,6 @@ namespace Monstres
 
         public Sprite GetRandomPlayerSprite()
         {
-            if (OSC_Manager.Instance != null)
-            {
-            }
 
             return noPlayerSprite;
         }

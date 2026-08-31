@@ -1,0 +1,293 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &6226862793592344768
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6226862793592344770}
+  - component: {fileID: 6226862793592344771}
+  - component: {fileID: 4048918534552892397}
+  - component: {fileID: 1866801055335321498}
+  - component: {fileID: 9012396492347357503}
+  m_Layer: 0
+  m_Name: Monstres_GameManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6226862793592344770
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6226862793592344768}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -1.6933184, y: 0.54721546, z: 3.978117}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6226862793592344771
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6226862793592344768}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a00c7643d7e2b245a7553791ed17dac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pathsList:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  targetsOnScene: []
+  littleRocks:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  littleRockToSpawn: 20
+  scoreFeedback: {fileID: 1355858697181627205, guid: a5937123d82d025489c73ef1ca241b6a, type: 3}
+  littleRockHolder: {fileID: 0}
+  noPlayerSprite: {fileID: 21300000, guid: 8443c6360027def4ab7737f4a64e7078, type: 3}
+  scoreToSpeedUp: 3000
+  gameDuration: 60
+  currentGameDuration: 0
+  timeBeforeLeaderboard: 8
+  score: 0
+  difficultiesValues:
+  - difficultyName: Easy
+    timeToMaxSpeed: 60
+    scoreNeedToSpeedUp: 2500
+  - difficultyName: Medium
+    timeToMaxSpeed: 40
+    scoreNeedToSpeedUp: 2000
+  - difficultyName: Hard
+    timeToMaxSpeed: 30
+    scoreNeedToSpeedUp: 1500
+  chanceToStop: 50
+  minTimeBetweenStop: 6
+  timeToResumeInterval: {x: 0.5, y: 1.3}
+  impactSound:
+  - {fileID: 8300000, guid: 1a53fbaf794be5d4fac35ffe756a51bf, type: 3}
+  - {fileID: 8300000, guid: 903fee18ee7d3ac4e82b4a434362ce7b, type: 3}
+  - {fileID: 8300000, guid: 0529c32a17a6e654cac7d1371b7b2fc9, type: 3}
+  - {fileID: 8300000, guid: e91af9b2a1835734595a592e4d4388e8, type: 3}
+  impactHumanSound: {fileID: 8300000, guid: 37f19c9296eaccc41b72aee46e378ac9, type: 3}
+  gameOverSound: {fileID: 8300000, guid: 539c66d62266ac347b37c2e3bfcb4ef6, type: 3}
+  stopSound: {fileID: 8300000, guid: 20a033cf804bfcf478117734a0bff2fe, type: 3}
+  impactPrefab: {fileID: 1893386322860184, guid: 4245b2ff0b2a02d4dbdd3ce9f8db1bcb, type: 3}
+--- !u!82 &4048918534552892397
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6226862793592344768}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_PlayOnAwake: 0
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!114 &1866801055335321498
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6226862793592344768}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c51199258aae1446ab4eb51bc2ef733, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bonuses:
+  - monsterEnum: 0
+    speed: 9900
+    flightImpulseAmount: 10000
+    irregularImpulse: 2500
+    minBeforeImpulseTime: 2.5
+    maxBeforeImpulseTime: 4
+    minTimeOfImpulse: 1
+    maxTimeOfImpulse: 1.75
+    minTimeToAscendAgain: 1.25
+    maxTimeToAscendAgain: 2.5
+    gravityStrength: 60
+    timerBeforeImpulse: 2.2515965
+    defaultTimerBeforeImpulse: 3.5315952
+    timeOfImpulse: 1.0754851
+    defaultTimeOfImpulse: 1.0754851
+    timeToAscendAgain: 1.6074238
+    defaultTimeToAscendAgain: 1.6074238
+  - monsterEnum: 1
+    speed: 10000
+    flightImpulseAmount: 9500
+    irregularImpulse: 1000
+    minBeforeImpulseTime: 0.5
+    maxBeforeImpulseTime: 1
+    minTimeOfImpulse: 0.5
+    maxTimeOfImpulse: 1
+    minTimeToAscendAgain: 0.5
+    maxTimeToAscendAgain: 3
+    gravityStrength: 20
+    timerBeforeImpulse: 0
+    defaultTimerBeforeImpulse: 0
+    timeOfImpulse: 0
+    defaultTimeOfImpulse: 0
+    timeToAscendAgain: 0
+    defaultTimeToAscendAgain: 0
+  - monsterEnum: 2
+    speed: 9000
+    flightImpulseAmount: 10000
+    irregularImpulse: 2000
+    minBeforeImpulseTime: 1
+    maxBeforeImpulseTime: 3.5
+    minTimeOfImpulse: 1.25
+    maxTimeOfImpulse: 2.75
+    minTimeToAscendAgain: 1.5
+    maxTimeToAscendAgain: 2.5
+    gravityStrength: 50
+    timerBeforeImpulse: 0
+    defaultTimerBeforeImpulse: 0
+    timeOfImpulse: 0
+    defaultTimeOfImpulse: 0
+    timeToAscendAgain: 0
+    defaultTimeToAscendAgain: 0
+--- !u!114 &9012396492347357503
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6226862793592344768}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62bd1cb7ef41b9e4e89cf8ff960f4d68, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bonusValues:
+    monsterEnum: 1
+    speed: 10000
+    flightImpulseAmount: 9500
+    irregularImpulse: 3500
+    minBeforeImpulseTime: 0.5
+    maxBeforeImpulseTime: 1
+    minTimeOfImpulse: 0.5
+    maxTimeOfImpulse: 1
+    minTimeToAscendAgain: 0.5
+    maxTimeToAscendAgain: 3
+    gravityStrength: 20
+    timerBeforeImpulse: 0.21509653
+    defaultTimerBeforeImpulse: 0.65509653
+    timeOfImpulse: 0.50272673
+    defaultTimeOfImpulse: 0.50272673
+    timeToAscendAgain: 2.8627503
+    defaultTimeToAscendAgain: 2.8627503
+  alreadyAscended: 0
+  spawnPoints:
+  - {fileID: 0}
+  - {fileID: 0}
+  monsterPref: {fileID: 3157682636619314472, guid: f7e4620cecc5dca40906b766553da9e5, type: 3}
+  monsterSprites:
+  - {fileID: 21300000, guid: 6c562a7c5ad74414ca6cc86392b22681, type: 3}
+  - {fileID: 21300000, guid: c6a4057fc8074a7409c120d0e96f3261, type: 3}
+  - {fileID: 21300000, guid: 8da68389578962640977ade014b04965, type: 3}
+  minAmplitudeY: 15
+  maxAmplitudeY: 75
+  frequency: 15

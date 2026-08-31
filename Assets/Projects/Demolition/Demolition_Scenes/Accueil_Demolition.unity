@@ -794,6 +794,9 @@ MonoBehaviour:
   spriteRenderer: {fileID: 1552249549}
   debrisPrefab: {fileID: 0}
   debrisForce: 200
+  isTarget: 0
+  starValue: 0
+  popupTextPrefab: {fileID: 0}
 --- !u!50 &1552249547
 Rigidbody2D:
   serializedVersion: 5

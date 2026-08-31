@@ -26,6 +26,10 @@ namespace Monstres
             string newPath = Path.GetFullPath(Path.Combine(appPath, @"../../../../"));
             folderPath = newPath + "Personnalisation\\Monstres";
             Debug.Log(folderPath);
+#if UNITY_EDITOR
+            folderPath = $"{Path.GetFullPath(Path.Combine(appPath, @"../../../../../"))}Documents\\Capteur\\Personnalisation\\Monstres";
+            #endif
+            Debug.Log(folderPath);
 
 
             //if (PlayerPrefs.HasKey(Monstres_GeneralVariables.UseDefaultPictureKEY))
@@ -84,6 +88,8 @@ namespace Monstres
                     pictureIdx++;
                     pictureConfirmedDisplayers[pictureIdx].sprite = secondPicture;
                     questionMarkPicture[pictureIdx].SetActive(false);
+
+
 
                     if (pictureIdx < pictureConfirmedDisplayers.Count - 1)
                     {

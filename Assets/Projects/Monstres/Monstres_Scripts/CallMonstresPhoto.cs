@@ -5,6 +5,6 @@ namespace Monstres
 {
     public class CallMonstresPhoto : MonoBehaviour
     {
-
+        
     }
 }

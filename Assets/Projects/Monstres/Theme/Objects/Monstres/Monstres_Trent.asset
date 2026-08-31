@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e48ab837e3b3da46bf64433fee161fd, type: 3}
+  m_Name: Monstres_Trent
+  m_EditorClassIdentifier: 
+  ThemeManager: {fileID: 11400000, guid: 2a0c4db0edd60364aa72cfdc3f63426c, type: 2}
+  _swaps:
+  - {fileID: 11400000, guid: 1be711febc2c68d4f89191f233323a5a, type: 2}
+  - {fileID: 11400000, guid: 0e55445f3e31a4f4987d94af4fb3b558, type: 2}

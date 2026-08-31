@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f69e731b419add4d8bd8b05d105f4a2, type: 3}
+  m_Name: Monstres_Theme_Halloween_Spider
+  m_EditorClassIdentifier: 
+  Theme: {fileID: 11400000, guid: 3bdb1aad48402e841afa6917ff4f40a4, type: 2}
+  _setNativeSize: 0
+  _useColor: 0
+  _color: {r: 1, g: 1, b: 1, a: 1}
+  Sprites:
+  - {fileID: 21300000, guid: ea38bcf57ce43fd46bc458745f5f94af, type: 3}

@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f69e731b419add4d8bd8b05d105f4a2, type: 3}
+  m_Name: Monstres_Theme_Halloween_Props
+  m_EditorClassIdentifier: 
+  Theme: {fileID: 11400000, guid: 3bdb1aad48402e841afa6917ff4f40a4, type: 2}
+  _setNativeSize: 0
+  _useColor: 0
+  _color: {r: 1, g: 1, b: 1, a: 1}
+  Sprites:
+  - {fileID: 21300000, guid: d0bec3c49c514f549a471629c3f93c3b, type: 3}
+  - {fileID: 21300000, guid: 9009412b4fd28c1499a816772b3b3694, type: 3}
+  - {fileID: 21300000, guid: f75c4f88ffe083c47a3791f68b11d0c1, type: 3}
+  - {fileID: 21300000, guid: d82bd6f7241855945929bf407427e68a, type: 3}
+  - {fileID: 21300000, guid: 00b851fb7338163408878d52960a2ac7, type: 3}
+  - {fileID: 21300000, guid: 885ef747fdabe5e45a6e3b14fd57481c, type: 3}
+  - {fileID: 21300000, guid: bcd5b49bf9f6075498d959149e72fd3f, type: 3}
+  - {fileID: 21300000, guid: f64fec8bde487e14e85da121f72aa0e9, type: 3}
+  - {fileID: 21300000, guid: 9ac98c839c5e6de42919fccd4c936487, type: 3}
+  - {fileID: 21300000, guid: b965e8996e8717746977823c8acd7b6e, type: 3}
+  - {fileID: 21300000, guid: 2a4306d6cc24ae447bff320910224235, type: 3}
+  - {fileID: 21300000, guid: bf82bdadd9acd2448a4a5616b76506d8, type: 3}
+  - {fileID: 21300000, guid: cbfd05addd9184641981757d657f7aba, type: 3}
+  - {fileID: 21300000, guid: 1069536b2b6546b4aa93bd0095ada408, type: 3}
+  - {fileID: 21300000, guid: 108ce7fdf38c5c4428e30140d2d4ba5d, type: 3}
+  - {fileID: 21300000, guid: 59ed33dc9a0b4bd46b2ec5fd00cd6d39, type: 3}
+  - {fileID: 21300000, guid: f5dc6b6ffa9e7e749b0bd08d2fa66a74, type: 3}
+  - {fileID: 21300000, guid: 2729fac888cec3e4692df169ab6b2fc8, type: 3}
+  - {fileID: 21300000, guid: 51a62e55e6fa1a244a5617d4e84c45bf, type: 3}
+  - {fileID: 21300000, guid: 9ca7364e8a1ad4f4e8d8a6c85a809bcc, type: 3}
+  - {fileID: 21300000, guid: aebb63b3eaf65874fa1565499be9cd42, type: 3}
+  - {fileID: 21300000, guid: 2ed5d1d7a68bd9849965395f8b35d4cd, type: 3}
+  - {fileID: 21300000, guid: 0d08f197b1dce6b43a618ca5e8f01845, type: 3}
+  - {fileID: 21300000, guid: aa86effac091b7a46908e21e8204e375, type: 3}
+  - {fileID: 21300000, guid: 3a0f382bbc991f242b8f4e2b651b2446, type: 3}
+  - {fileID: 21300000, guid: 88e8032104a7fbb4b9b4117cc5880bba, type: 3}
+  - {fileID: 21300000, guid: 28c2a71f15d92794ab3b7f36724e3bd9, type: 3}
+  - {fileID: 21300000, guid: 1f15e42fe92fa664c8da6e2293f379f3, type: 3}
