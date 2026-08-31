@@ -300,9 +300,10 @@ public class Dame_SetupEditor : EditorWindow
         playerTxt.color = Color.white;
         gm.currentPlayerText = playerTxt;
 
-        // GeneralVariable
-        var gvPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(_basePath + "/Dame_Prefabs/GeneralVariable.prefab");
-        if (gvPrefab != null) PrefabUtility.InstantiatePrefab(gvPrefab);
+        // GeneralVariable - creer directement
+        var gvGO = new GameObject("GeneralVariable", typeof(Dame_GeneralVariables));
+        var gv = gvGO.GetComponent<Dame_GeneralVariables>();
+        gv.gameName = "Dame";
 
         // Board
         var boardGO = new GameObject("Board", typeof(Dame_Board));
