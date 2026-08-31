@@ -1,10 +1,9 @@
 using UnityEngine;
 using System.Collections.Generic;
-using Tool;
 
 namespace Dame
 {
-    public class Dame_Cell : Universal_Collider2DButton
+    public class Dame_Cell : MonoBehaviour
     {
         public int row { get; private set; }
         public int col { get; private set; }
@@ -23,29 +22,13 @@ namespace Dame
             board = b;
             spriteRenderer = GetComponent<SpriteRenderer>();
             originalColor = spriteRenderer.color;
-
-            // Configurer le Collider2D pour les touches
-            var col2d = GetComponent<BoxCollider2D>();
-            if (col2d == null) col2d = gameObject.AddComponent<BoxCollider2D>();
-            col2d.size = Vector2.one;
-
-            IsActive = true;
         }
 
-        public override void ReceivePoint(float xPoint, float yPoint)
+        // Appele par Universal_Collider2DButton via son UnityEvent
+        public void OnTouched()
         {
-            xPoint *= Screen.width;
-            yPoint *= Screen.height;
-            Vector2 hit = new Vector2(xPoint, yPoint);
-            Vector3 pos = Camera.main.ScreenToWorldPoint(new Vector3(hit.x, hit.y, -Camera.main.transform.position.z));
-            pos.z = 0;
-
-            Collider2D col = GetComponent<Collider2D>();
-            if (ToolBox.CheckPos(pos, col) && IsActive)
-            {
-                if (Dame_GameManager.Instance != null)
-                    Dame_GameManager.Instance.OnCellTouched(this);
-            }
+            if (Dame_GameManager.Instance != null)
+                Dame_GameManager.Instance.OnCellTouched(this);
         }
 
         public Dame_Piece GetPiece() => piece;

@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.Events;
 
 namespace Dame
 {
@@ -36,7 +37,7 @@ namespace Dame
                 {
                     bool isDark = (r + c) % 2 == 1;
 
-                    var cellGO = new GameObject($"Cell_{r}_{c}", typeof(SpriteRenderer), typeof(BoxCollider2D), typeof(Dame_Cell));
+                    var cellGO = new GameObject($"Cell_{r}_{c}", typeof(SpriteRenderer), typeof(BoxCollider2D));
                     cellGO.transform.SetParent(transform);
                     float x = c * cellSize - offset;
                     float y = (size - 1 - r) * cellSize - offset;
@@ -50,8 +51,22 @@ namespace Dame
                     var col = cellGO.GetComponent<BoxCollider2D>();
                     col.size = Vector2.one;
 
-                    var cell = cellGO.GetComponent<Dame_Cell>();
+                    // Component de detection de toucher (Universal)
+                    var button = cellGO.AddComponent<Universal_Collider2DButton>();
+                    button.IsActive = true;
+
+                    // Initialiser l'Event (Unity ne le fait pas auto apres AddComponent)
+                    var eventField = typeof(Universal_Button).GetField("_event",
+                        System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                    if (eventField != null && eventField.GetValue(button) == null)
+                        eventField.SetValue(button, new UnityEngine.Events.UnityEvent());
+
+                    // Component de logique métier (Dame)
+                    var cell = cellGO.AddComponent<Dame_Cell>();
                     cell.Init(r, c, isDark, this);
+
+                    // Wired: le bouton universel appelle la cellule
+                    button.Event.AddListener(cell.OnTouched);
 
                     cells[r, c] = cell;
                 }
