@@ -169,7 +169,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 80d8235ee31ecf643bd533a0a0964332, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _key: "D\xE9molition_Instructions"
+  _key: "Dame_Instructions"
 --- !u!114 &2965590
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1583,7 +1583,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5851241298207517226, guid: fe18544aacdb4aa1b9b96a6324ad97af, type: 3}
       propertyPath: m_Name
-      value: "D\xE9molition General Variables"
+      value: "Dame General Variables"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -272,7 +272,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5851241298207517226, guid: fe18544aacdb4aa1b9b96a6324ad97af, type: 3}
       propertyPath: m_Name
-      value: "D\xE9molition General Variables"
+      value: "Dame General Variables"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
