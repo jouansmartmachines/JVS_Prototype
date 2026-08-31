@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using TMPro;
 using UnityEditor.SceneManagement;
+using Dame;
 
 public class Dame_SetupEditor : EditorWindow
 {
@@ -210,7 +211,7 @@ public class Dame_SetupEditor : EditorWindow
         var playImg = playGO.AddComponent<Image>();
         playImg.color = new Color(0.2f, 0.5f, 0.2f, 1f);
         var playBtn = playGO.AddComponent<Button>();
-        playBtn.targetGraphic = playImg;
+        // playBtn.targetGraphic = playImg;  // obsolete property
 
         // EventSystem
         new GameObject("EventSystem", typeof(EventSystem), typeof(StandaloneInputModule));
