@@ -229,6 +229,7 @@ GameObject:
   - component: {fileID: 622727693}
   - component: {fileID: 622727695}
   - component: {fileID: 622727694}
+  - component: {fileID: 622727696}
   m_Layer: 5
   m_Name: BackGround
   m_TagString: Untagged
@@ -295,6 +296,22 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 622727692}
   m_CullTransparentMesh: 1
+--- !u!114 &622727696
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 622727692}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11fa8774e8e041b48bbc4a8a82b7eeb8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Theme.SwapImageBehaviour
+  swapOnAwake: 1
+  swapOnStart: 0
+  _swapObject: {fileID: 0}
+  _image: {fileID: 0}
 --- !u!1 &802624181
 GameObject:
   m_ObjectHideFlags: 0
@@ -728,8 +745,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Score
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: fae285800bf03474aa7502a207efa736, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: fae285800bf03474aa7502a207efa736, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1247,8 +1264,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "Bravo ! \nEntrez votre nom sur l'\xE9cran tactile."
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: fae285800bf03474aa7502a207efa736, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: fae285800bf03474aa7502a207efa736, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
