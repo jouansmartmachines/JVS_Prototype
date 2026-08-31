@@ -38,8 +38,8 @@ namespace Demolition
 
                 var rb = piece.GetComponent<Rigidbody2D>();
                 rb.mass = 0.5f;
-                rb.drag = 0.8f;
-                rb.angularDrag = 0.5f;
+                rb.linearDamping = 0.8f;
+                rb.angularDamping = 0.5f;
                 rb.gravityScale = 1.2f;
                 rb.AddForce(new Vector2(Random.Range(-6f, 6f), Random.Range(3f, 10f)), ForceMode2D.Impulse);
                 rb.AddTorque(Random.Range(-15f, 15f));
@@ -81,7 +81,7 @@ namespace Demolition
 
                 var rb = dust.AddComponent<Rigidbody2D>();
                 rb.mass = 0.1f;
-                rb.drag = 2f;
+                rb.linearDamping = 2f;
                 rb.gravityScale = -0.3f;
                 rb.AddForce(new Vector2(Random.Range(-2f, 2f), Random.Range(1f, 3f)), ForceMode2D.Impulse);
 
