@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e48ab837e3b3da46bf64433fee161fd, type: 3}
   m_Name: Challenge_MaskManager
   m_EditorClassIdentifier: Assembly-CSharp::Theme.SwapObject
-  ThemeManager: {fileID: 11400000, guid: 468d4346cad626b4cb409c481522c9a1, type: 2}
+  ThemeManager: {fileID: 11400000, guid: 77016554d3a88364e8404a8c3c0c9f7a, type: 2}
   _swaps:
   - {fileID: 11400000, guid: 65e85820f25f5724482c9298a496630b, type: 2}
   - {fileID: 11400000, guid: a684c97149d22974d9b5641435d0942f, type: 2}

@@ -13,32 +13,32 @@ MonoBehaviour:
   m_Name: Challenge_Theme_Foot
   m_EditorClassIdentifier: Assembly-CSharp::Theme.GameTheme
   Name: Foot
-  ThemeManager: {fileID: 11400000, guid: 468d4346cad626b4cb409c481522c9a1, type: 2}
+  ThemeManager: {fileID: 11400000, guid: 77016554d3a88364e8404a8c3c0c9f7a, type: 2}
   _swapEntities:
   - {fileID: 0}
   - {fileID: 0}
-  - {fileID: 11400000, guid: 455900bdf5ec052409d6942dce9ae8fd, type: 2}
-  - {fileID: 11400000, guid: a005c4f3549713f4b9822ea1b498d10d, type: 2}
-  - {fileID: 11400000, guid: 058cd8f343f07454798e8847778febda, type: 2}
-  - {fileID: 11400000, guid: bf608f58d87ddb740be41b4da870da86, type: 2}
-  - {fileID: 11400000, guid: 8a4790d18d7168141ab308201a131099, type: 2}
-  - {fileID: 11400000, guid: 39488363986a61241bf960d2ca633980, type: 2}
-  - {fileID: 11400000, guid: bf2c296d011c1dc4fb6724a84d596689, type: 2}
-  - {fileID: 11400000, guid: bad9a9765cb533143abbca6b7e8f6b91, type: 2}
-  - {fileID: 11400000, guid: 730e89c4b183155489e031760d383a11, type: 2}
-  - {fileID: 11400000, guid: 5a1d2ea36277337478feed32b4ace4b7, type: 2}
-  - {fileID: 11400000, guid: 9d9885ffc255aa147bc6c5114c70ca1d, type: 2}
   - {fileID: 11400000, guid: ef20c85dd7604c0439e345caa10794ab, type: 2}
-  - {fileID: 11400000, guid: 101e9c78dc0a96748bd734da50027bdf, type: 2}
-  - {fileID: 11400000, guid: d2888648b3add6541a2b2bfda43f326c, type: 2}
-  - {fileID: 11400000, guid: 30a1fd9cbae9ae348b0306a5551446e9, type: 2}
-  - {fileID: 11400000, guid: 65e85820f25f5724482c9298a496630b, type: 2}
-  - {fileID: 11400000, guid: 24e97e1fce547ce4dbd787d7f1cfe623, type: 2}
-  - {fileID: 11400000, guid: fe19bb9e48f337649922579a6d4ecf9b, type: 2}
-  - {fileID: 11400000, guid: aa2d6568280eb6440b00ccd603e2030f, type: 2}
-  - {fileID: 11400000, guid: 9e0f1d16511239b4498f3aa1ceebbb79, type: 2}
-  - {fileID: 11400000, guid: e59ac97d20f415d4aa2f99dce0cf4fe2, type: 2}
-  - {fileID: 11400000, guid: 919be3924b011d7428d1ff4f653eac3c, type: 2}
-  - {fileID: 11400000, guid: e625d89e3611c074bb42aa269ce5c45f, type: 2}
+  - {fileID: 11400000, guid: a005c4f3549713f4b9822ea1b498d10d, type: 2}
+  - {fileID: 11400000, guid: bf608f58d87ddb740be41b4da870da86, type: 2}
+  - {fileID: 11400000, guid: 39488363986a61241bf960d2ca633980, type: 2}
   - {fileID: 11400000, guid: 008fa9681ac366b4e80713c233a05086, type: 2}
+  - {fileID: 11400000, guid: bad9a9765cb533143abbca6b7e8f6b91, type: 2}
+  - {fileID: 11400000, guid: d2888648b3add6541a2b2bfda43f326c, type: 2}
+  - {fileID: 11400000, guid: 730e89c4b183155489e031760d383a11, type: 2}
+  - {fileID: 11400000, guid: 058cd8f343f07454798e8847778febda, type: 2}
+  - {fileID: 11400000, guid: fe19bb9e48f337649922579a6d4ecf9b, type: 2}
+  - {fileID: 11400000, guid: e625d89e3611c074bb42aa269ce5c45f, type: 2}
+  - {fileID: 11400000, guid: e59ac97d20f415d4aa2f99dce0cf4fe2, type: 2}
+  - {fileID: 11400000, guid: 24e97e1fce547ce4dbd787d7f1cfe623, type: 2}
+  - {fileID: 11400000, guid: 9e0f1d16511239b4498f3aa1ceebbb79, type: 2}
+  - {fileID: 11400000, guid: 65e85820f25f5724482c9298a496630b, type: 2}
+  - {fileID: 11400000, guid: 8a4790d18d7168141ab308201a131099, type: 2}
+  - {fileID: 11400000, guid: 455900bdf5ec052409d6942dce9ae8fd, type: 2}
+  - {fileID: 11400000, guid: 9d9885ffc255aa147bc6c5114c70ca1d, type: 2}
+  - {fileID: 11400000, guid: bf2c296d011c1dc4fb6724a84d596689, type: 2}
+  - {fileID: 11400000, guid: 30a1fd9cbae9ae348b0306a5551446e9, type: 2}
+  - {fileID: 11400000, guid: 101e9c78dc0a96748bd734da50027bdf, type: 2}
+  - {fileID: 11400000, guid: aa2d6568280eb6440b00ccd603e2030f, type: 2}
   - {fileID: 11400000, guid: 676fdcee6b4750a4ca83d768a64c4ecb, type: 2}
+  - {fileID: 11400000, guid: 919be3924b011d7428d1ff4f653eac3c, type: 2}
+  - {fileID: 11400000, guid: 5a1d2ea36277337478feed32b4ace4b7, type: 2}

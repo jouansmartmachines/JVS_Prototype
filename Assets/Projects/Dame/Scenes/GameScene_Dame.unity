@@ -676,22 +676,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6492b5e82d743e4781072a2c7cbb543, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Dame.Dame_GameManager
-  launchMode: 0
-  oiseauPrefab: {fileID: 4778636932907053998, guid: 98670adc6e21c644abbaa8412104767b, type: 3}
-  impactEffectPrefab: {fileID: 8637732324076961834, guid: b374cb26f89bd3f4ba74c2513bc08f04, type: 3}
-  structuresParent: {fileID: 1173445717}
-  tableauPrefabs: []
-  tableauNames:
-  - Tableau_1
-  - Tableau_2
-  - Tableau_3
-  baseScrollSpeed: 2
-  currentScrollSpeed: 0
-  gameDuration: 60
-  currentTime: 0
-  impactSound: {fileID: 8300000, guid: 13169ca93ce7e2949accf68b7acbd0ed, type: 3}
-  destructionSound: {fileID: 8300000, guid: 073f1d85bc5ebca4fa565df58852ba46, type: 3}
-  gameOverSound: {fileID: 8300000, guid: 34806e543b1d56b419fd641a6822f494, type: 3}
+  caseFoncee: {fileID: 0}
+  caseClaire: {fileID: 0}
+  pionBlanc: {fileID: 0}
+  pionNoir: {fileID: 0}
+  dameBlanche: {fileID: 0}
+  dameNoire: {fileID: 0}
+  board: {fileID: 0}
+  boardSize: 10
+  timerText: {fileID: 0}
+  scoreText: {fileID: 0}
+  currentPlayerText: {fileID: 0}
+  moveSound: {fileID: 8300000, guid: 12c7911f7ecd8b34bb868b8b92ad7996, type: 3}
+  captureSound: {fileID: 8300000, guid: 5b86416b91ddc9540a1ffb0b5d6f99e1, type: 3}
+  crownSound: {fileID: 8300000, guid: 4cb3ef9326237354cafc4b73c2a904e2, type: 3}
+  winSound: {fileID: 8300000, guid: 61c9b3a4605212247b3fe539bbdd093a, type: 3}
 --- !u!4 &1450344021
 Transform:
   m_ObjectHideFlags: 0

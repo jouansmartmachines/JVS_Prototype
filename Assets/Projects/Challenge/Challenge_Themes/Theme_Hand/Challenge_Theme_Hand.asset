@@ -13,20 +13,20 @@ MonoBehaviour:
   m_Name: Challenge_Theme_Hand
   m_EditorClassIdentifier: Assembly-CSharp::Theme.GameTheme
   Name: Hand
-  ThemeManager: {fileID: 11400000, guid: 468d4346cad626b4cb409c481522c9a1, type: 2}
+  ThemeManager: {fileID: 11400000, guid: 77016554d3a88364e8404a8c3c0c9f7a, type: 2}
   _swapEntities:
   - {fileID: 0}
+  - {fileID: 11400000, guid: 95e43eea2e7c0ae438eb366f63cbcab1, type: 2}
+  - {fileID: 11400000, guid: 34a0feb005ac19244b8fc4497839e64c, type: 2}
+  - {fileID: 11400000, guid: d36a9aae278e43d4c95c2db8f38dd528, type: 2}
+  - {fileID: 11400000, guid: aff7284fa7593304abe081c4e4faa0dc, type: 2}
+  - {fileID: 11400000, guid: 62019be6a358f67408cb9a4b73bebfe4, type: 2}
   - {fileID: 11400000, guid: 620b66262db948847af9065040e5622c, type: 2}
   - {fileID: 11400000, guid: d83f4cd42c56465499ed909d5d5f5ad4, type: 2}
   - {fileID: 11400000, guid: a684c97149d22974d9b5641435d0942f, type: 2}
-  - {fileID: 11400000, guid: e18364cbc9b68d745b91ecd381b2ebab, type: 2}
-  - {fileID: 11400000, guid: 62019be6a358f67408cb9a4b73bebfe4, type: 2}
   - {fileID: 11400000, guid: 8ebb752a8b49d70448354d99d70d27e1, type: 2}
-  - {fileID: 11400000, guid: d36a9aae278e43d4c95c2db8f38dd528, type: 2}
-  - {fileID: 11400000, guid: aff7284fa7593304abe081c4e4faa0dc, type: 2}
+  - {fileID: 11400000, guid: 2099a263ef207124aa7905b5d8dc1957, type: 2}
+  - {fileID: 11400000, guid: e18364cbc9b68d745b91ecd381b2ebab, type: 2}
+  - {fileID: 11400000, guid: 95ba20a1a5c0679478969bd0128ea4d4, type: 2}
   - {fileID: 11400000, guid: eede2eb792c1b904d91b91401e67337f, type: 2}
   - {fileID: 11400000, guid: ae4603546a96905409b4393f95620aa0, type: 2}
-  - {fileID: 11400000, guid: 34a0feb005ac19244b8fc4497839e64c, type: 2}
-  - {fileID: 11400000, guid: 95e43eea2e7c0ae438eb366f63cbcab1, type: 2}
-  - {fileID: 11400000, guid: 95ba20a1a5c0679478969bd0128ea4d4, type: 2}
-  - {fileID: 11400000, guid: 2099a263ef207124aa7905b5d8dc1957, type: 2}

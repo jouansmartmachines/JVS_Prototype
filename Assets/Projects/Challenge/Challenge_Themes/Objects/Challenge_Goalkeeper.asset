@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e48ab837e3b3da46bf64433fee161fd, type: 3}
   m_Name: Challenge_Goalkeeper
   m_EditorClassIdentifier: Assembly-CSharp::Theme.SwapObject
-  ThemeManager: {fileID: 11400000, guid: 468d4346cad626b4cb409c481522c9a1, type: 2}
+  ThemeManager: {fileID: 11400000, guid: 77016554d3a88364e8404a8c3c0c9f7a, type: 2}
   _swaps:
   - {fileID: 11400000, guid: ef20c85dd7604c0439e345caa10794ab, type: 2}
   - {fileID: 11400000, guid: 2099a263ef207124aa7905b5d8dc1957, type: 2}

@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e48ab837e3b3da46bf64433fee161fd, type: 3}
   m_Name: Challenge_PopupLevel
   m_EditorClassIdentifier: Assembly-CSharp::Theme.SwapObject
-  ThemeManager: {fileID: 11400000, guid: 468d4346cad626b4cb409c481522c9a1, type: 2}
+  ThemeManager: {fileID: 11400000, guid: 77016554d3a88364e8404a8c3c0c9f7a, type: 2}
   _swaps:
   - {fileID: 11400000, guid: 730e89c4b183155489e031760d383a11, type: 2}
   - {fileID: 11400000, guid: 80912ffdd9d64a746b820146c969441c, type: 2}
