@@ -6,19 +6,25 @@ namespace Dame
 {
     public class Dame_MenuManager : MonoBehaviour
     {
-        public TMP_Dropdown timeDropdown;
-        public TMP_Dropdown themeDropdown;
+        private TMP_Dropdown timeDropdown;
+        private TMP_Dropdown themeDropdown;
 
         private void Start()
         {
             Universal_GeneralVariables.OnPlayerPrefs += SetTime;
             SetTime();
 
+            // Trouver le dropdown automatiquement (instancie depuis prefab universel)
+            var ddGO = GameObject.Find("TimeDropdown");
+            if (ddGO != null)
+                timeDropdown = ddGO.GetComponentInChildren<TMP_Dropdown>();
+
             if (timeDropdown != null)
             {
                 int savedTime = Mathf.RoundToInt(PlayerPrefs.GetFloat(Dame_GeneralVariables.TimePerMoveKey, 15f));
                 int index = savedTime == 10 ? 0 : savedTime == 15 ? 1 : savedTime == 30 ? 2 : 3;
                 timeDropdown.value = index;
+                timeDropdown.onValueChanged.AddListener(OnTimeChanged);
             }
 
             // Thèmes

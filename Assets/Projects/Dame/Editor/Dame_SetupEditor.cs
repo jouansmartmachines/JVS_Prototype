@@ -158,60 +158,54 @@ public class Dame_SetupEditor : EditorWindow
         titleTxt.alignment = TextAlignmentOptions.Center;
         titleTxt.color = Color.white;
 
-        // Dropdown - Temps par coup
+        // Label du dropdown
         var timeLabel = new GameObject("TimeLabel", typeof(RectTransform));
         timeLabel.transform.SetParent(canvasGO.transform);
         var tlrt = timeLabel.GetComponent<RectTransform>();
         tlrt.anchorMin = new Vector2(0.5f, 0.5f);
         tlrt.anchorMax = new Vector2(0.5f, 0.5f);
-        tlrt.anchoredPosition = new Vector2(-200, 50);
+        tlrt.anchoredPosition = new Vector2(-150, 50);
         tlrt.sizeDelta = new Vector2(300, 60);
         var timeLblTxt = timeLabel.AddComponent<TextMeshProUGUI>();
-        timeLblTxt.text = "Temps par coup :";
+        timeLblTxt.text = "Duree par coup :";
         timeLblTxt.fontSize = 36;
         timeLblTxt.alignment = TextAlignmentOptions.MidlineRight;
+        timeLblTxt.color = Color.white;
 
-        var timeDropdownGO = new GameObject("TimeDropdown", typeof(RectTransform));
-        timeDropdownGO.transform.SetParent(canvasGO.transform);
-        var tdrt = timeDropdownGO.GetComponent<RectTransform>();
-        tdrt.anchorMin = new Vector2(0.5f, 0.5f);
-        tdrt.anchorMax = new Vector2(0.5f, 0.5f);
-        tdrt.anchoredPosition = new Vector2(200, 50);
-        tdrt.sizeDelta = new Vector2(250, 60);
-        var dropdown = timeDropdownGO.AddComponent<TMP_Dropdown>();
-        dropdown.AddOptions(new System.Collections.Generic.List<string> { "10s", "15s", "30s", "60s" });
-        var ddImg = timeDropdownGO.AddComponent<Image>();
-        ddImg.color = new Color(0.2f, 0.2f, 0.2f, 0.8f);
-        var ddLabel = new GameObject("Label", typeof(RectTransform));
-        ddLabel.transform.SetParent(timeDropdownGO.transform);
-        var dlrt = ddLabel.GetComponent<RectTransform>();
-        dlrt.anchorMin = Vector2.zero; dlrt.anchorMax = Vector2.one;
-        dlrt.sizeDelta = Vector2.zero;
-        var ddLabelTxt = ddLabel.AddComponent<TextMeshProUGUI>();
-        ddLabelTxt.fontSize = 28;
-        ddLabelTxt.text = "15s";
-        dropdown.captionText = ddLabelTxt;
-        var ddTemplate = new GameObject("Template", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster), typeof(Image), typeof(ScrollRect), typeof(Mask));
-        ddTemplate.transform.SetParent(timeDropdownGO.transform);
-        // On s'arrête là pour le template - l'utilisateur finira dans Unity
+        // Dropdown via prefab universel (au lieu de AddComponent<TMP_Dropdown>)
+        var ddPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Universal/Prefab/DropDown Template.prefab");
+        if (ddPrefab != null)
+        {
+            var ddGO = (GameObject)PrefabUtility.InstantiatePrefab(ddPrefab, canvasGO.transform);
+            ddGO.name = "TimeDropdown";
+            var ddrt = ddGO.GetComponent<RectTransform>();
+            ddrt.anchorMin = new Vector2(0.5f, 0.5f);
+            ddrt.anchorMax = new Vector2(0.5f, 0.5f);
+            ddrt.anchoredPosition = new Vector2(150, 50);
+            ddrt.sizeDelta = new Vector2(300, 60);
 
-        // Jouer
-        var playGO = new GameObject("PlayButton", typeof(RectTransform));
-        playGO.transform.SetParent(canvasGO.transform);
-        var prt = playGO.GetComponent<RectTransform>();
-        prt.anchorMin = new Vector2(0.5f, 0.5f);
-        prt.anchorMax = new Vector2(0.5f, 0.5f);
-        prt.anchoredPosition = new Vector2(0, -100);
-        prt.sizeDelta = new Vector2(300, 80);
-        var playTxt = playGO.AddComponent<TextMeshProUGUI>();
-        playTxt.text = "JOUER";
-        playTxt.fontSize = 48;
-        playTxt.alignment = TextAlignmentOptions.Center;
-        playTxt.color = Color.white;
-        var playImg = playGO.AddComponent<Image>();
-        playImg.color = new Color(0.2f, 0.5f, 0.2f, 1f);
-        var playBtn = playGO.AddComponent<Button>();
-        // playBtn.targetGraphic = playImg;  // obsolete property
+            var dropdown = ddGO.GetComponentInChildren<TMP_Dropdown>();
+            if (dropdown != null)
+            {
+                dropdown.ClearOptions();
+                dropdown.AddOptions(new System.Collections.Generic.List<string> { "10s", "15s", "30s", "60s" });
+                dropdown.value = 1; // 15s par defaut
+            }
+        }
+        else
+            Debug.LogWarning("DropDown Template.prefab pas trouve, dropdown non cree");
+
+        // Bouton Jouer (Sprite + Collider + Universal_PlayButton comme dans Accueil)
+        var playGO = new GameObject("PlayButton", typeof(SpriteRenderer), typeof(BoxCollider2D), typeof(Universal.Universal_PlayButton));
+        playGO.transform.position = new Vector3(0, -2, 0);
+        var playTex = LoadSprite("dame_blanche");
+        if (playTex != null) playGO.GetComponent<SpriteRenderer>().sprite = playTex;
+        playGO.GetComponent<SpriteRenderer>().sortingOrder = 2;
+        var col = playGO.GetComponent<BoxCollider2D>();
+        col.size = new Vector2(2, 2);
+
+        // Manager du menu
+        var menuGO = new GameObject("Dame_MenuManager", typeof(Dame_MenuManager));
 
         // EventSystem
         new GameObject("EventSystem", typeof(EventSystem), typeof(StandaloneInputModule));
