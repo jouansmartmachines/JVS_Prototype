@@ -47,13 +47,12 @@ namespace Dame
                 spriteRenderer.color = originalColor;
         }
 
-        // Mouvements valides (sans capture)
         public List<Dame_Cell> GetValidMoves()
         {
             var moves = new List<Dame_Cell>();
             if (piece == null) return moves;
 
-            int dir = piece.playerNumber == 1 ? -1 : 1; // 1=blanc monte, 2=noir descend
+            int dir = piece.playerNumber == 1 ? -1 : 1;
             int[] dirs = piece.isCrowned ? new int[] { -1, 1 } : new int[] { dir };
 
             foreach (int d in dirs)
@@ -61,7 +60,6 @@ namespace Dame
                 CheckMove(moves, row + d, col - 1);
                 CheckMove(moves, row + d, col + 1);
             }
-
             return moves;
         }
 
@@ -72,7 +70,6 @@ namespace Dame
                 moves.Add(cell);
         }
 
-        // Captures valides
         public List<Dame_Cell> GetValidCaptures()
         {
             var captures = new List<Dame_Cell>();
@@ -86,7 +83,6 @@ namespace Dame
                 CheckCapture(captures, row + d, col - 1, row + 2 * d, col - 2);
                 CheckCapture(captures, row + d, col + 1, row + 2 * d, col + 2);
             }
-
             return captures;
         }
 
@@ -103,13 +99,6 @@ namespace Dame
             if (landCell.GetPiece() != null) return;
 
             captures.Add(landCell);
-        }
-
-        // Détection du toucher par le GameManager
-        void OnMouseDown()
-        {
-            if (Dame_GameManager.Instance != null)
-                Dame_GameManager.Instance.OnCellTouched(this);
         }
     }
 }

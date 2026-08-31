@@ -13,7 +13,6 @@ namespace Dame
             size = boardSize;
             cells = new Dame_Cell[size, size];
 
-            // Créer le plateau
             float cellSize = 0.8f;
             float offset = (size - 1) * cellSize / 2f;
 
@@ -46,13 +45,11 @@ namespace Dame
                 }
             }
 
-            // Placer les pions
             PlaceInitialPieces();
         }
 
         void PlaceInitialPieces()
         {
-            // Joueur 1 (blanc) : lignes 6-9 (bas)
             for (int r = 6; r < size; r++)
             {
                 for (int c = 0; c < size; c++)
@@ -61,7 +58,6 @@ namespace Dame
                         CreatePiece(cells[r, c], 1);
                 }
             }
-            // Joueur 2 (noir) : lignes 0-3 (haut)
             for (int r = 0; r < 4; r++)
             {
                 for (int c = 0; c < size; c++)
@@ -97,15 +93,22 @@ namespace Dame
             return cells[row, col];
         }
 
+        public Dame_Cell GetCellAtWorldPos(Vector3 pos)
+        {
+            float cellSize = 0.8f;
+            float offset = (size - 1) * cellSize / 2f;
+
+            int col = Mathf.RoundToInt((pos.x + offset) / cellSize);
+            int row = Mathf.RoundToInt((size - 1 - (pos.y + offset) / cellSize));
+
+            return GetCell(row, col);
+        }
+
         public void ClearHighlights()
         {
             for (int r = 0; r < size; r++)
-            {
                 for (int c = 0; c < size; c++)
-                {
                     cells[r, c].SetHighlight(false);
-                }
-            }
         }
 
         public void ShowValidMoves(List<Dame_Cell> moves)

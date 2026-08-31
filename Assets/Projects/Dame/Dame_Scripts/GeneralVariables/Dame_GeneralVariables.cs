@@ -19,7 +19,7 @@ namespace Dame
         [SerializeField] Color _winnerColor;
 
         public const string HighScoreKey = "Dame_HighScore";
-        public const string TimePerMoveKey = "Dame_TimePerMove";
+        public const string TimePerMoveKey = "Dame_GameTime";
         public const string Player1NameKey = "Dame_Player1";
         public const string Player2NameKey = "Dame_Player2";
         public const string ThemeKey = "Dame_Theme";

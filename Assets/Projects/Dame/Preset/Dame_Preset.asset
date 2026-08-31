@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f3045bfa15373542ac5250a6bb392b9, type: 3}
+  m_Name: Dame_Preset
+  m_EditorClassIdentifier: 
+  AllValues:
+  - {fileID: 11400000, guid: d152278a961d5104b8b6436d7f401576, type: 2}
+  - {fileID: 11400000, guid: b2db538b56bcad1f330c9b3d0882ab7c, type: 2}
+  - {fileID: 11400000, guid: e9fba91425e41654b90bf8756a875e3c, type: 2}
+  - {fileID: 11400000, guid: a91a57510892beb41ab6174ee2c34b23, type: 2}
