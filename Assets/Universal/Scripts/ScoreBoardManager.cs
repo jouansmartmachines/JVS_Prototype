@@ -25,7 +25,8 @@ public enum GameScoreBoard
     Monstres,
     Nettoyage,
     Demolition,
-    Dame
+    Dame,
+    Sparks
 }
 
 public static class ScoreBoardManager

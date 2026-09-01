@@ -8,6 +8,7 @@ using System.IO;
 using UnityEngine.UI;
 using TMPro;
 using Demolition;
+using Sparks;
 using Object = UnityEngine.Object;
 
 public class JVS_SetupEditor : EditorWindow
@@ -21,7 +22,7 @@ public class JVS_SetupEditor : EditorWindow
     }
 
     // ── Tab management ────────────────────────────────────────────
-    private enum ProjectTab { Demolition, Dame }
+    private enum ProjectTab { Demolition, Dame, Sparks }
     private ProjectTab _activeTab = ProjectTab.Demolition;
     private Vector2 _scrollPos;
 
@@ -115,6 +116,31 @@ public class JVS_SetupEditor : EditorWindow
     private static bool DameMenuReady() => true;
     private static bool DameScoreReady() => true;
 
+    // ── Sparks checks ──────────────────────────────────────────────
+    private static bool SparksGameSceneReady()
+    {
+        return SceneCheck("Assets/Projects/Sparks/Sparks_Scenes/GameScene_Sparks.unity", scene =>
+            HasComponentInScene<Sparks.Sparks_GameManager>(scene));
+    }
+
+    private static bool SparksAccueilReady()
+    {
+        return SceneCheck("Assets/Projects/Sparks/Sparks_Scenes/Accueil_Sparks.unity", scene =>
+            HasObjInScene(scene, "Background") && HasComponentInScene<Canvas>(scene));
+    }
+
+    private static bool SparksMenuReady()
+    {
+        return SceneCheck("Assets/Projects/Sparks/Sparks_Scenes/Menu_Sparks.unity", scene =>
+            HasObjInScene(scene, "Background") && HasComponentInScene<Canvas>(scene));
+    }
+
+    private static bool SparksScoreReady()
+    {
+        return SceneCheck("Assets/Projects/Sparks/Sparks_Scenes/Score_Sparks.unity", scene =>
+            HasObjInScene(scene, "Background") && HasComponentInScene<Canvas>(scene));
+    }
+
     // ── Init steps ────────────────────────────────────────────────
     private void InitializeSteps()
     {
@@ -197,6 +223,46 @@ public class JVS_SetupEditor : EditorWindow
                 action = Dame_ConfigTout,
             },
         };
+
+        _steps[ProjectTab.Sparks] = new List<SetupStep>
+        {
+            new SetupStep
+            {
+                label = "1. GameScene — Volcan, Caméra, Canvas UI",
+                scenePath = "Assets/Projects/Sparks/Sparks_Scenes/GameScene_Sparks.unity",
+                isDone = SparksGameSceneReady,
+                action = Sparks_SetupGameScene,
+            },
+            new SetupStep
+            {
+                label = "2. Accueil — Background",
+                scenePath = "Assets/Projects/Sparks/Sparks_Scenes/Accueil_Sparks.unity",
+                isDone = SparksAccueilReady,
+                action = Sparks_SetupAccueil,
+            },
+            new SetupStep
+            {
+                label = "3. Menu — Background + UI options",
+                scenePath = "Assets/Projects/Sparks/Sparks_Scenes/Menu_Sparks.unity",
+                isDone = SparksMenuReady,
+                action = Sparks_SetupMenu,
+            },
+            new SetupStep
+            {
+                label = "4. Score — Background",
+                scenePath = "Assets/Projects/Sparks/Sparks_Scenes/Score_Sparks.unity",
+                isDone = SparksScoreReady,
+                action = Sparks_SetupScore,
+                isLast = true,
+            },
+            new SetupStep
+            {
+                label = "★ TOUT CONFIGURER — Assets + 4 scènes",
+                scenePath = null,
+                isDone = () => SparksGameSceneReady() && SparksAccueilReady() && SparksMenuReady() && SparksScoreReady(),
+                action = Sparks_ConfigTout,
+            },
+        };
     }
 
     // ── GUI ────────────────────────────────────────────────────────
@@ -229,7 +295,7 @@ public class JVS_SetupEditor : EditorWindow
         {
             var isActive = _activeTab == tab;
             var bgColor = isActive ? ColorTabActive : ColorTabInactive;
-            var icon = tab == ProjectTab.Demolition ? "💥" : "👑";
+            var icon = tab == ProjectTab.Demolition ? "💥" : tab == ProjectTab.Dame ? "👑" : "✨";
 
             GUI.backgroundColor = bgColor;
             if (GUILayout.Button($"{icon}  {tab}", GUILayout.Height(32), GUILayout.MinWidth(120)))
@@ -357,6 +423,12 @@ public class JVS_SetupEditor : EditorWindow
     private static void Dame_SetupScore() { }
     private static void Dame_ConfigTout() { }
 
+    private static void Sparks_SetupGameScene() { }
+    private static void Sparks_SetupAccueil() { }
+    private static void Sparks_SetupMenu() { }
+    private static void Sparks_SetupScore() { }
+    private static void Sparks_ConfigTout() { }
+
     // ════════════════════════════════════════════════════════════════
     //  SHARED HELPERS — utilitaires réutilisables
     // ════════════════════════════════════════════════════════════════
@@ -370,6 +442,11 @@ public class JVS_SetupEditor : EditorWindow
     private static string _dameSprite => _dameBase + "/Sprites";
     private static string _dameSound => _dameBase + "/Sons";
     private static string _dameFont => _dameBase + "/Font";
+
+    private static string _sparksBase = "Assets/Projects/Sparks";
+    private static string _sparksPrefab => _sparksBase + "/Resources/Prefabs";
+    private static string _sparksTex => _sparksBase + "/Resources/Textures";
+    private static string _sparksSound => _sparksBase + "/Resources/Sounds";
 
     private static void EnsureCamera()
     {
