@@ -1123,7 +1123,7 @@ public class JVS_SetupEditor : EditorWindow
         for (int x = 0; x < w; x++) for (int y = 0; y < h; y++) tex.SetPixel(x, y, c);
         tex.Apply();
         File.WriteAllBytes(path, tex.EncodeToPNG());
-        Object.DestroyImmediate(tex);
+        UnityEngine.Object.DestroyImmediate(tex);
     }
 
     private static Sprite LoadSprite(string basePath, string name)
@@ -1162,7 +1162,7 @@ public class JVS_SetupEditor : EditorWindow
         blk.hp = hp; blk.points = pts; blk.materialType = mat; blk.spriteRenderer = sr;
         blk.damageSprites = new Sprite[] { f1, f2 };
         PrefabUtility.SaveAsPrefabAsset(go, prefabDir + "/" + name + ".prefab");
-        Object.DestroyImmediate(go);
+        UnityEngine.Object.DestroyImmediate(go);
     }
 
     private static void CreateDebris(string prefabDir, string name, Sprite sprite)
@@ -1170,7 +1170,7 @@ public class JVS_SetupEditor : EditorWindow
         var go = new GameObject(name, typeof(SpriteRenderer));
         go.GetComponent<SpriteRenderer>().sprite = sprite;
         PrefabUtility.SaveAsPrefabAsset(go, prefabDir + "/" + name + ".prefab");
-        Object.DestroyImmediate(go);
+        UnityEngine.Object.DestroyImmediate(go);
     }
 
     private static void CreateOiseau(string prefabDir, Sprite oiSprite, Sprite imSprite)
@@ -1179,7 +1179,7 @@ public class JVS_SetupEditor : EditorWindow
         imp.GetComponent<SpriteRenderer>().sprite = imSprite;
         imp.GetComponent<SpriteRenderer>().sortingOrder = 5;
         PrefabUtility.SaveAsPrefabAsset(imp, prefabDir + "/ImpactExplosion.prefab");
-        Object.DestroyImmediate(imp);
+        UnityEngine.Object.DestroyImmediate(imp);
 
         var go = new GameObject("Oiseau", typeof(SpriteRenderer), typeof(Demolition_Projectile));
         go.GetComponent<SpriteRenderer>().sprite = oiSprite;
@@ -1192,7 +1192,7 @@ public class JVS_SetupEditor : EditorWindow
         p.pushForce = 2.2f;
         p.directDamage = 1;
         PrefabUtility.SaveAsPrefabAsset(go, prefabDir + "/Oiseau.prefab");
-        Object.DestroyImmediate(go);
+        UnityEngine.Object.DestroyImmediate(go);
     }
 
     private static void CreateCochonPrefabs()
@@ -1214,7 +1214,7 @@ public class JVS_SetupEditor : EditorWindow
         blk.hp = hp; blk.points = pts; blk.materialType = Demolition_Block.MaterialType.Cochon; blk.spriteRenderer = sr;
         blk.isTarget = true; blk.starValue = starVal;
         PrefabUtility.SaveAsPrefabAsset(go, _demoPrefab + "/" + name + ".prefab");
-        Object.DestroyImmediate(go);
+        UnityEngine.Object.DestroyImmediate(go);
     }
 
     private static void CreatePopupTextPrefab()
@@ -1227,6 +1227,6 @@ public class JVS_SetupEditor : EditorWindow
         tmp.fontStyle = FontStyles.Bold;
         tmp.text = "+50";
         PrefabUtility.SaveAsPrefabAsset(go, _demoPrefab + "/PopupText.prefab");
-        Object.DestroyImmediate(go);
+        UnityEngine.Object.DestroyImmediate(go);
     }
 }
