@@ -801,18 +801,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 974065dd751ede5f40a7b87f1a806f16, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Dame.Dame_Block
+  materialType: 0
   hp: 2
   points: 50
-  materialType: 0
+  isTarget: 0
+  starValue: 0
+  spriteRenderer: {fileID: 1552249549}
   damageSprites:
   - {fileID: 21300000, guid: f91276bc1962ed74db9af89f595640d8, type: 3}
   - {fileID: 21300000, guid: f91276bc1962ed74db9af89f595640d8, type: 3}
   - {fileID: 21300000, guid: f91276bc1962ed74db9af89f595640d8, type: 3}
-  spriteRenderer: {fileID: 1552249549}
-  debrisPrefab: {fileID: 0}
-  debrisForce: 200
-  isTarget: 0
-  starValue: 0
   popupTextPrefab: {fileID: 0}
 --- !u!50 &1552249547
 Rigidbody2D:
