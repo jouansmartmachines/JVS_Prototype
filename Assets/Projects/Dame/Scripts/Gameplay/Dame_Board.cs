@@ -31,6 +31,7 @@ namespace Dame
             float cellSize = 0.8f;
             float offset = (size - 1) * cellSize / 2f;
 
+            int count = 0;
             for (int r = 0; r < size; r++)
             {
                 for (int c = 0; c < size; c++)
@@ -69,9 +70,11 @@ namespace Dame
                     button.Event.AddListener(cell.OnTouched);
 
                     cells[r, c] = cell;
+                    count++;
                 }
             }
 
+            Debug.Log($"<b>[Dame_Board] {count} cells créées. Pieces blanches haut, noires bas.</b>");
             PlaceInitialPieces();
         }
 

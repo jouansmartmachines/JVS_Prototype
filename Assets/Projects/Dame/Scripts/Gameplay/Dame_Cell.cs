@@ -27,8 +27,11 @@ namespace Dame
         // Appele par Universal_Collider2DButton via son UnityEvent
         public void OnTouched()
         {
+            Debug.Log($"<color=lime>[Dame_Cell] OnTouched() Cell({row},{col}) isDark={isDark} piece={piece != null}</color>");
             if (Dame_GameManager.Instance != null)
                 Dame_GameManager.Instance.OnCellTouched(this);
+            else
+                Debug.LogError("<color=red>[Dame_Cell] Dame_GameManager.Instance is NULL!</color>");
         }
 
         public Dame_Piece GetPiece() => piece;

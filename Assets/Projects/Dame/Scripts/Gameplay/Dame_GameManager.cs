@@ -61,6 +61,7 @@ namespace Dame
         void Start()
         {
             audioSource = GetComponent<AudioSource>();
+            Debug.Log("<b>[Dame_GM] Start() appelé</b>");
 
             state = GameState.Idle;
             currentPlayer = 1;
@@ -99,13 +100,15 @@ namespace Dame
 
         public override void ReceivePoint(float xPoint, float yPoint)
         {
+            Debug.Log($"<color=orange>[Dame_GameManager] ReceivePoint({xPoint:F3}, {yPoint:F3}) state={state} gameIsRunning={gameIsRunning}</color>");
             // Les cases recoivent directement les touches via Universal_Collider2DButton.ReceivePoint
             // On ne fait rien ici (les cases sont des Universal_Collider2DButton)
         }
 
         public void OnCellTouched(Dame_Cell cell)
         {
-            if (!gameIsRunning || state == GameState.Animating) return;
+            Debug.Log($"<color=cyan>[Dame_GM] OnCellTouched({cell.row},{cell.col}) state={state} gameIsRunning={gameIsRunning}</color>");
+            if (!gameIsRunning || state == GameState.Animating) { Debug.Log("<color=red>  -> BLOQUE: game not running or animating</color>"); return; }
 
             if (state == GameState.Idle) SelectPiece(cell);
             else if (state == GameState.PieceSelected) TryMove(cell);
@@ -114,7 +117,8 @@ namespace Dame
         void SelectPiece(Dame_Cell cell)
         {
             var piece = cell.GetPiece();
-            if (piece == null || piece.playerNumber != currentPlayer) return;
+            if (piece == null) { Debug.Log($"<color=yellow>[SelectPiece] Cell({cell.row},{cell.col}) -> PAS DE PIECE</color>"); return; }
+            if (piece.playerNumber != currentPlayer) { Debug.Log($"<color=yellow>[SelectPiece] Piece joueur={piece.playerNumber} != currentPlayer={currentPlayer}</color>"); return; }
 
             selectedCell = cell;
             state = GameState.PieceSelected;
@@ -125,13 +129,16 @@ namespace Dame
             var captures = cell.GetValidCaptures();
             validMoves = captures.Count > 0 ? captures : validMoves;
             board.ShowValidMoves(validMoves);
+            Debug.Log($"<color=green>[SelectPiece] OK! Cell({cell.row},{cell.col}) => {validMoves.Count} moves valides</color>");
             currentTime = timePerMove;
         }
 
         void TryMove(Dame_Cell targetCell)
         {
+            Debug.Log($"<color=teal>[TryMove] target=({targetCell.row},{targetCell.col}) validCount={validMoves?.Count ?? 0}</color>");
             if (!validMoves.Contains(targetCell))
             {
+                Debug.Log("<color=red>  -> MOVE INVALIDE, on deselectionne</color>");
                 board.ClearHighlights();
                 state = GameState.Idle;
                 selectedCell = null;
