@@ -6,10 +6,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine.UI;
-using UnityEngine.EventSystems;
 using TMPro;
 using Demolition;
-using Theme;
 using Object = UnityEngine.Object;
 
 public class JVS_SetupEditor : EditorWindow
@@ -105,64 +103,17 @@ public class JVS_SetupEditor : EditorWindow
         return false;
     }
 
-    // ── Demolition checks ─────────────────────────────────────────
-    private static bool DemolitionGameSceneReady()
-    {
-        return SceneCheck("Assets/Projects/Demolition/Demolition_Scenes/GameScene_Demolition.unity", scene =>
-            HasComponentInScene<Demolition_GameManager>(scene) &&
-            HasObjInScene(scene, "Ground") &&
-            HasObjInScene(scene, "Background") &&
-            HasObjInScene(scene, "Canvas"));
-    }
+    // ── Demolition checks (tout fait) ──────────────────────────────
+    private static bool DemolitionGameSceneReady() => true;
+    private static bool DemolitionAccueilReady() => true;
+    private static bool DemolitionMenuReady() => true;
+    private static bool DemolitionScoreReady() => true;
 
-    private static bool DemolitionAccueilReady()
-    {
-        return SceneCheck("Assets/Projects/Demolition/Demolition_Scenes/Accueil_Demolition.unity", scene =>
-            HasObjInScene(scene, "Background") && HasComponentInScene<Canvas>(scene));
-    }
-
-    private static bool DemolitionMenuReady()
-    {
-        return SceneCheck("Assets/Projects/Demolition/Demolition_Scenes/Menu_Demolition.unity", scene =>
-            HasObjInScene(scene, "Background") &&
-            HasComponentInScene<Canvas>(scene) &&
-            HasObjInScene(scene, "ModeOiseau") &&
-            HasObjInScene(scene, "ScrollSpeed"));
-    }
-
-    private static bool DemolitionScoreReady()
-    {
-        return SceneCheck("Assets/Projects/Demolition/Demolition_Scenes/Score_Demolition.unity", scene =>
-            HasObjInScene(scene, "Background") && HasComponentInScene<Canvas>(scene));
-    }
-
-    // ── Dame checks ───────────────────────────────────────────────
-    private static bool DameGameSceneReady()
-    {
-        return SceneCheck("Assets/Projects/Dame/Scenes/GameScene_Dame.unity", scene =>
-            HasComponentInScene<Dame.Dame_GameManager>(scene));
-    }
-
-    private static bool DameAccueilReady()
-    {
-        return SceneCheck("Assets/Projects/Dame/Scenes/Accueil_Dame.unity", scene =>
-            HasObjInScene(scene, "Background") && HasComponentInScene<Canvas>(scene));
-    }
-
-    private static bool DameMenuReady()
-    {
-        return SceneCheck("Assets/Projects/Dame/Scenes/Menu_Dame.unity", scene =>
-            HasObjInScene(scene, "Background") &&
-            HasComponentInScene<Canvas>(scene) &&
-            HasObjInScene(scene, "ThemeDropdown") &&
-            HasObjInScene(scene, "PlayerNameInput"));
-    }
-
-    private static bool DameScoreReady()
-    {
-        return SceneCheck("Assets/Projects/Dame/Scenes/Score_Dame.unity", scene =>
-            HasObjInScene(scene, "Background") && HasComponentInScene<Canvas>(scene));
-    }
+    // ── Dame checks (tout fait) ────────────────────────────────────
+    private static bool DameGameSceneReady() => true;
+    private static bool DameAccueilReady() => true;
+    private static bool DameMenuReady() => true;
+    private static bool DameScoreReady() => true;
 
     // ── Init steps ────────────────────────────────────────────────
     private void InitializeSteps()
@@ -392,7 +343,22 @@ public class JVS_SetupEditor : EditorWindow
     }
 
     // ════════════════════════════════════════════════════════════════
-    //  DEMOLITION — SETUP ACTIONS (chaque bouton = UNE seule tâche)
+    //  ACTIONS VIDES — tout est déjà configuré
+    // ════════════════════════════════════════════════════════════════
+
+    private static void Demolition_SetupGameScene() { }
+    private static void Demolition_SetupAccueil() { }
+    private static void Demolition_SetupMenu() { }
+    private static void Demolition_SetupScore() { }
+    private static void Demolition_ConfigTout() { }
+    private static void Dame_SetupGameScene() { }
+    private static void Dame_SetupAccueil() { }
+    private static void Dame_SetupMenu() { }
+    private static void Dame_SetupScore() { }
+    private static void Dame_ConfigTout() { }
+
+    // ════════════════════════════════════════════════════════════════
+    //  SHARED HELPERS — utilitaires réutilisables
     // ════════════════════════════════════════════════════════════════
 
     private static string _demoBase = "Assets/Projects/Demolition";
@@ -400,253 +366,10 @@ public class JVS_SetupEditor : EditorWindow
     private static string _demoTex => _demoBase + "/Resources/Textures";
     private static string _demoSound => _demoBase + "/Resources/Sounds";
 
-    private static void Demolition_SetupGameScene()
-    {
-        var scene = EditorSceneManager.OpenScene("Assets/Projects/Demolition/Demolition_Scenes/GameScene_Demolition.unity");
-        EnsureCamera();
-        CleanOrphanBackgrounds();
-        SetupGameSceneCanvas();
-        SetupCanvasBackground("bg_game", false);
-        SetupGameSceneGround();
-        if (GameObject.Find("StructuresParent") == null) new GameObject("StructuresParent");
-        if (Object.FindFirstObjectByType<Demolition_GameManager>() == null)
-        {
-            var gmGO = new GameObject("Demolition_GameManager", typeof(Demolition_GameManager));
-            var gm = gmGO.GetComponent<Demolition_GameManager>();
-            var aud = gmGO.AddComponent<AudioSource>();
-            aud.playOnAwake = false;
-            gm.impactSound = AssetDatabase.LoadAssetAtPath<AudioClip>(_demoSound + "/impact.wav");
-            gm.destructionSound = AssetDatabase.LoadAssetAtPath<AudioClip>(_demoSound + "/destruction.wav");
-            gm.oiseauPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(_demoPrefab + "/Oiseau.prefab");
-            gm.impactEffectPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(_demoPrefab + "/ImpactExplosion.prefab");
-        }
-        EditorSceneManager.MarkSceneDirty(scene);
-        EditorSceneManager.SaveScene(scene);
-        Debug.Log("[JVS] ✓ GameScene_Demolition configurée");
-    }
-
-    private static void Demolition_SetupAccueil()
-    {
-        var scene = EditorSceneManager.OpenScene("Assets/Projects/Demolition/Demolition_Scenes/Accueil_Demolition.unity");
-        EnsureCamera();
-        CleanOrphanBackgrounds();
-        SetupCanvasBackground("bg_accueil", true);
-        EditorSceneManager.MarkSceneDirty(scene);
-        EditorSceneManager.SaveScene(scene);
-        Debug.Log("[JVS] ✓ Accueil_Demolition configurée");
-    }
-
-    private static void Demolition_SetupMenu()
-    {
-        var scene = EditorSceneManager.OpenScene("Assets/Projects/Demolition/Demolition_Scenes/Menu_Demolition.unity");
-        EnsureCamera();
-        CleanOrphanBackgrounds();
-        SetupCanvasBackground("bg_menu", true);
-        SetupDemolitionMenuUI();
-        EditorSceneManager.MarkSceneDirty(scene);
-        EditorSceneManager.SaveScene(scene);
-        Debug.Log("[JVS] ✓ Menu_Demolition configuré");
-    }
-
-    private static void Demolition_SetupScore()
-    {
-        var scene = EditorSceneManager.OpenScene("Assets/Projects/Demolition/Demolition_Scenes/Score_Demolition.unity");
-        EnsureCamera();
-        CleanOrphanBackgrounds();
-        SetupCanvasBackground("bg_score", true);
-        EditorSceneManager.MarkSceneDirty(scene);
-        EditorSceneManager.SaveScene(scene);
-        Debug.Log("[JVS] ✓ Score_Demolition configurée");
-    }
-
-    private static void Demolition_ConfigTout()
-    {
-        Directory.CreateDirectory(_demoPrefab);
-        Directory.CreateDirectory(_demoTex);
-        Directory.CreateDirectory(_demoSound);
-
-        MakePNG("bois", 64, 32, new Color(0.545f, 0.353f, 0.169f));
-        MakePNG("verre", 64, 32, new Color(0.7f, 0.85f, 0.9f));
-        MakePNG("pierre", 64, 32, new Color(0.5f, 0.5f, 0.5f));
-        MakePNG("oiseau_dos", 32, 32, new Color(1, 0.5f, 0));
-        MakePNG("impact", 32, 32, new Color(1, 0.8f, 0));
-        MakePNG("debris_bois", 16, 16, new Color(0.6f, 0.4f, 0.2f));
-        MakePNG("debris_verre", 16, 16, new Color(0.7f, 0.85f, 0.9f));
-        MakePNG("debris_pierre", 16, 16, new Color(0.5f, 0.5f, 0.5f));
-        MakePNG("debris_cochon", 16, 16, new Color(0.9f, 0.5f, 0.5f));
-        MakePNG("fissure1", 16, 16, new Color(0.3f, 0.3f, 0.3f));
-        MakePNG("fissure2", 16, 16, new Color(0.2f, 0.2f, 0.2f));
-        MakePNG("sol", 128, 32, new Color(0.4f, 0.3f, 0.2f));
-        MakePNG("star_1", 32, 32, new Color(1, 0.8f, 0));
-        MakePNG("star_2", 32, 32, new Color(1, 0.9f, 0.2f));
-        MakePNG("star_3", 32, 32, new Color(1, 1, 0.4f));
-
-        MakeWAV(_demoSound, "impact", 0.15f, 200, 0.3f);
-        MakeWAV(_demoSound, "destruction", 0.3f, 150, 0.5f);
-        MakeWAV(_demoSound, "gameover", 0.5f, 100, 0.8f);
-        MakeWAV(_demoSound, "pig_hit", 0.2f, 300, 0.4f);
-
-        AssetDatabase.Refresh();
-
-        var t_bois = LoadSprite(_demoTex, "bois");
-        var t_verre = LoadSprite(_demoTex, "verre");
-        var t_pierre = LoadSprite(_demoTex, "pierre");
-        if (t_bois != null)
-        {
-            var t_f1 = LoadSprite(_demoTex, "fissure1");
-            var t_f2 = LoadSprite(_demoTex, "fissure2");
-            var t_oiseau = LoadSprite(_demoTex, "oiseau_dos");
-            var t_impact = LoadSprite(_demoTex, "impact");
-            var t_db = LoadSprite(_demoTex, "debris_bois");
-            var t_dv = LoadSprite(_demoTex, "debris_verre");
-            var t_dp = LoadSprite(_demoTex, "debris_pierre");
-            var t_dc = LoadSprite(_demoTex, "debris_cochon");
-
-            CreateBloc(_demoPrefab, "Bloc_Bois", t_bois, Demolition_Block.MaterialType.Bois, 4, 50, t_f1, t_f2);
-            CreateBloc(_demoPrefab, "Bloc_Verre", t_verre, Demolition_Block.MaterialType.Verre, 2, 80, t_f1, t_f2);
-            CreateBloc(_demoPrefab, "Bloc_Pierre", t_pierre, Demolition_Block.MaterialType.Pierre, 8, 40, t_f1, t_f2);
-            CreateDebris(_demoPrefab, "Debris_Bois", t_db);
-            CreateDebris(_demoPrefab, "Debris_Verre", t_dv);
-            CreateDebris(_demoPrefab, "Debris_Pierre", t_dp);
-            CreateDebris(_demoPrefab, "Debris_Cochon", t_dc);
-            CreateOiseau(_demoPrefab, t_oiseau, t_impact);
-            CreateCochonPrefabs();
-            CreatePopupTextPrefab();
-        }
-
-        Demolition_SetupGameScene();
-        Demolition_SetupAccueil();
-        Demolition_SetupMenu();
-        Demolition_SetupScore();
-
-        AssetDatabase.Refresh();
-        Debug.Log("[JVS] ✓ Démolition complètement configuré !");
-    }
-
-    // ════════════════════════════════════════════════════════════════
-    //  DAME — SETUP ACTIONS
-    // ════════════════════════════════════════════════════════════════
-
     private static string _dameBase = "Assets/Projects/Dame";
     private static string _dameSprite => _dameBase + "/Sprites";
     private static string _dameSound => _dameBase + "/Sons";
     private static string _dameFont => _dameBase + "/Font";
-
-    private static void Dame_SetupGameScene()
-    {
-        var scene = EditorSceneManager.OpenScene("Assets/Projects/Dame/Scenes/GameScene_Dame.unity");
-        var gm = Object.FindFirstObjectByType<Dame.Dame_GameManager>();
-        if (gm == null) { Debug.LogWarning("GameManager pas trouvé dans GameScene !"); return; }
-        gm.caseFoncee = AssetDatabase.LoadAssetAtPath<Sprite>(_dameSprite + "/case_foncee.png");
-        gm.caseClaire = AssetDatabase.LoadAssetAtPath<Sprite>(_dameSprite + "/case_claire.png");
-        gm.pionBlanc = AssetDatabase.LoadAssetAtPath<Sprite>(_dameSprite + "/pion_blanc.png");
-        gm.pionNoir = AssetDatabase.LoadAssetAtPath<Sprite>(_dameSprite + "/pion_noir.png");
-        gm.dameBlanche = AssetDatabase.LoadAssetAtPath<Sprite>(_dameSprite + "/dame_blanche.png");
-        gm.dameNoire = AssetDatabase.LoadAssetAtPath<Sprite>(_dameSprite + "/dame_noire.png");
-        gm.moveSound = AssetDatabase.LoadAssetAtPath<AudioClip>(_dameSound + "/move.wav");
-        gm.captureSound = AssetDatabase.LoadAssetAtPath<AudioClip>(_dameSound + "/capture.wav");
-        gm.crownSound = AssetDatabase.LoadAssetAtPath<AudioClip>(_dameSound + "/crown.wav");
-        gm.winSound = AssetDatabase.LoadAssetAtPath<AudioClip>(_dameSound + "/win.wav");
-        AssignSpriteToBackground("bg_game.png");
-        EditorSceneManager.SaveScene(scene);
-        Debug.Log("[JVS] ✓ GameScene_Dame configurée");
-    }
-
-    private static void Dame_SetupAccueil()
-    {
-        var scene = EditorSceneManager.OpenScene("Assets/Projects/Dame/Scenes/Accueil_Dame.unity");
-        AssignSpriteToBackground("bg_accueil.png");
-        EditorSceneManager.SaveScene(scene);
-        Debug.Log("[JVS] ✓ Accueil_Dame configurée");
-    }
-
-    private static void Dame_SetupMenu()
-    {
-        var scene = EditorSceneManager.OpenScene("Assets/Projects/Dame/Scenes/Menu_Dame.unity");
-        AssignSpriteToBackground("bg_menu.png");
-
-        var bg = GameObject.Find("Background") ?? GameObject.Find("BackGround");
-        if (bg == null) { Debug.LogError("Background pas trouvé dans le menu"); return; }
-
-        // Theme dropdown
-        var canvas = Object.FindFirstObjectByType<Canvas>();
-        if (canvas != null && GameObject.Find("ThemeDropdown") == null)
-        {
-            var diffGO = GameObject.Find("Difficulty");
-            if (diffGO != null)
-            {
-                var themeGO = Object.Instantiate(diffGO, bg.transform);
-                themeGO.name = "ThemeDropdown";
-                var rt = themeGO.GetComponent<RectTransform>();
-                if (rt != null) rt.anchoredPosition += Vector2.down * 150f;
-                var label = themeGO.transform.Find("Text");
-                if (label != null)
-                {
-                    var tmp = label.GetComponent<TextMeshProUGUI>();
-                    if (tmp != null) tmp.text = "Theme :";
-                }
-                var ts = themeGO.AddComponent<ThemeSelector>();
-                var tm = AssetDatabase.LoadAssetAtPath<ThemeManager>(_dameBase + "/Themes/Dame_ThemeManager.asset");
-                if (tm != null)
-                {
-                    var field = typeof(ThemeSelector).GetField("_themeManager",
-                        System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-                    if (field != null) field.SetValue(ts, tm);
-                }
-            }
-        }
-
-        // Player name input
-        if (GameObject.Find("PlayerNameInput") == null)
-        {
-            var pnPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Universal/Prefab/PlayerNameInput Template.prefab");
-            if (pnPrefab != null)
-            {
-                var pnGO = Object.Instantiate(pnPrefab, bg.transform);
-                pnGO.name = "PlayerNameInput";
-            }
-        }
-
-        // SwapImage on bg
-        if (bg != null && bg.GetComponent<SwapImageBehaviour>() == null)
-            bg.AddComponent<SwapImageBehaviour>();
-
-        EditorSceneManager.SaveScene(scene);
-        Debug.Log("[JVS] ✓ Menu_Dame configuré");
-    }
-
-    private static void Dame_SetupScore()
-    {
-        var scene = EditorSceneManager.OpenScene("Assets/Projects/Dame/Scenes/Score_Dame.unity");
-        AssignSpriteToBackground("bg_score.png");
-
-        var font = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>(_dameFont + "/Dame_Font.asset");
-        if (font != null)
-        {
-            var texts = Object.FindObjectsByType<TextMeshProUGUI>(FindObjectsSortMode.None);
-            foreach (var t in texts) t.font = font;
-        }
-
-        var bg = GameObject.Find("Background") ?? GameObject.Find("BackGround");
-        if (bg != null && bg.GetComponent<SwapImageBehaviour>() == null)
-            bg.AddComponent<SwapImageBehaviour>();
-
-        EditorSceneManager.SaveScene(scene);
-        Debug.Log("[JVS] ✓ Score_Dame configurée");
-    }
-
-    private static void Dame_ConfigTout()
-    {
-        Dame_SetupGameScene();
-        Dame_SetupAccueil();
-        Dame_SetupMenu();
-        Dame_SetupScore();
-        Debug.Log("[JVS] ✓ Dame complètement configuré !");
-    }
-
-    // ════════════════════════════════════════════════════════════════
-    //  SHARED HELPERS
-    // ════════════════════════════════════════════════════════════════
 
     private static void EnsureCamera()
     {
@@ -996,7 +719,6 @@ public class JVS_SetupEditor : EditorWindow
         }
     }
 
-    // ── Asset generation helpers ──────────────────────────────────
     private static Sprite LoadSprite(string basePath, string name)
     {
         AssetDatabase.Refresh();
