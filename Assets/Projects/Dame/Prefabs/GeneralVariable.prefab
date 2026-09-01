@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6256d5a0b6ef60d45a4ff3eb5208e537, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameName: Dame 
+  gameName: Dame
   callGameEnCoursAtStart: 1
   dataSaved: []
   margeY: 1
