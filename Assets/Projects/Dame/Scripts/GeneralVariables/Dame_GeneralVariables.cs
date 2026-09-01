@@ -26,8 +26,13 @@ namespace Dame
 
         public override void ReceiveName(string name)
         {
-            if (Dame_ScoreBoardManager.Instance != null)
-                Dame_ScoreBoardManager.Instance.OnReceiveName(name);
+            float score = PlayerPrefs.GetFloat(HighScoreKey);
+            PlayerData data = new PlayerData() { Name = name, Score = score };
+            PlayerData defaultPlayer = new PlayerData() { Name = Localizer.Get("Unknown"), Score = 0 };
+
+            _scoreBoardDisplayer.InitScoreBoard(
+                ScoreBoardManager.UpdateScoreBoardDescendingOrder(data, GameScoreBoard.Dame),
+                Font, _winnerColor, defaultPlayer);
         }
     }
 }
