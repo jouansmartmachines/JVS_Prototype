@@ -31,8 +31,10 @@ public class Universal_Collider2DButton : Universal_Button
         
         // Récupération du Collider
         Collider2D col = GetComponent<Collider2D>();
-
-        bool isInside = ToolBox.CheckPos(pos, col);
+        
+        // Utiliser OverlapPoint en coordonnées monde — contrairement à ToolBox.CheckPos
+        // qui refait WorldToScreenPoint inutilement et casse les éléments hors-Canvas.
+        bool isInside = col != null && col.OverlapPoint((Vector2)pos);
 
         if (isInside && IsActive)
         {
