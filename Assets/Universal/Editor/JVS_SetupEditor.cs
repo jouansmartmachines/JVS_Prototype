@@ -10,6 +10,7 @@ using UnityEngine.EventSystems;
 using TMPro;
 using Demolition;
 using Theme;
+using Object = UnityEngine.Object;
 
 public class JVS_SetupEditor : EditorWindow
 {
