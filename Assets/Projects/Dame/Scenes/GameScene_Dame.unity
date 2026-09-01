@@ -751,25 +751,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6492b5e82d743e4781072a2c7cbb543, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Dame.Dame_GameManager
-  launchMode: 0
-  oiseauPrefab: {fileID: 4778636932907053998, guid: 98670adc6e21c644abbaa8412104767b, type: 3}
-  impactEffectPrefab: {fileID: 8637732324076961834, guid: b374cb26f89bd3f4ba74c2513bc08f04, type: 3}
-  popupTextPrefab: {fileID: 0}
-  structuresParent: {fileID: 1173445717}
-  groundY: -4
-  baseScrollSpeed: 2
-  currentScrollSpeed: 0
-  gameDuration: 60
-  currentTime: 0
-  minTimeBetweenShots: 0.12
-  impactSound: {fileID: 8300000, guid: 13169ca93ce7e2949accf68b7acbd0ed, type: 3}
-  destructionSound: {fileID: 8300000, guid: 073f1d85bc5ebca4fa565df58852ba46, type: 3}
-  gameOverSound: {fileID: 8300000, guid: 34806e543b1d56b419fd641a6822f494, type: 3}
-  pigHitSound: {fileID: 0}
-  scoreText: {fileID: 0}
+  caseFoncee: {fileID: 21300000, guid: 71687636c98d8414a901f6129b73e082, type: 3}
+  caseClaire: {fileID: 21300000, guid: 86b5f929e79ca9648b7ccd11c087de01, type: 3}
+  pionBlanc: {fileID: 21300000, guid: bb8f21dd183e95f47b163b03c0b09fb2, type: 3}
+  pionNoir: {fileID: 21300000, guid: 269b240c18ff39c4c9ecb6857b76772b, type: 3}
+  dameBlanche: {fileID: 21300000, guid: 0475bf133622e3746868b08132d4efb8, type: 3}
+  dameNoire: {fileID: 21300000, guid: 03e233558b00cea4899d610d9f5869ee, type: 3}
+  board: {fileID: 0}
+  boardSize: 10
   timerText: {fileID: 0}
-  starText: {fileID: 0}
-  currentStars: 1
+  scoreText: {fileID: 0}
+  currentPlayerText: {fileID: 0}
+  moveSound: {fileID: 8300000, guid: 13169ca93ce7e2949accf68b7acbd0ed, type: 3}
+  captureSound: {fileID: 8300000, guid: 073f1d85bc5ebca4fa565df58852ba46, type: 3}
+  crownSound: {fileID: 8300000, guid: 34806e543b1d56b419fd641a6822f494, type: 3}
+  winSound: {fileID: 0}
+  state: 0
+  currentPlayer: 1
+  scorePlayer1: 0
+  scorePlayer2: 0
+  timePerMove: 15
+  currentTime: 0
+  gameIsRunning: 0
 --- !u!4 &1450344021
 Transform:
   m_ObjectHideFlags: 0
