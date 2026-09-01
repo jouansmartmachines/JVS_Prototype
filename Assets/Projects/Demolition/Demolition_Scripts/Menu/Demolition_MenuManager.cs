@@ -1,62 +1,25 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using TMPro;
-using UnityEngine.UI;
 
 namespace Demolition
 {
     public class Demolition_MenuManager : MonoBehaviour
     {
-        public TMP_Dropdown difficultyDropdown;
-        public Toggle modeOiseauToggle;
-
         void Start()
         {
-            Universal_GeneralVariables.OnPlayerPrefs += SetDifficulty;
-            SetDifficulty();
-
-            // Mode oiseau par défaut
-            modeOiseauToggle.isOn = PlayerPrefs.GetInt(Demolition_GeneralVariables.ModeOiseauKey, 1) == 1;
-        }
-
-        void OnDestroy()
-        {
-            Universal_GeneralVariables.OnPlayerPrefs -= SetDifficulty;
+            // Les Dropdown, Toggle, Slider sont geres automatiquement
+            // par les scripts universels (DropDownPlayersPref, ToggleSavePlayerPref, etc.)
+            // Rien a faire ici
         }
 
         public void PlayGame()
         {
-            SceneManager.LoadScene(Demolition_GeneralVariables.Instance.gameScene);
+            LoadingManager.LoadScene(Demolition_GeneralVariables.Instance.gameScene);
         }
 
         public void ChangeScene()
         {
             SceneManager.LoadScene(Demolition_GeneralVariables.Instance.accueilScene);
-        }
-
-        void SetDifficulty()
-        {
-            switch (PlayerPrefs.GetString(Demolition_GeneralVariables.GameTimeKey))
-            {
-                case "Easy": difficultyDropdown.value = 0; break;
-                case "Medium": difficultyDropdown.value = 1; break;
-                case "Hard": difficultyDropdown.value = 2; break;
-            }
-        }
-
-        public void SaveDifficulty()
-        {
-            switch (difficultyDropdown.value)
-            {
-                case 0: PlayerPrefs.SetString(Demolition_GeneralVariables.GameTimeKey, "Easy"); break;
-                case 1: PlayerPrefs.SetString(Demolition_GeneralVariables.GameTimeKey, "Medium"); break;
-                case 2: PlayerPrefs.SetString(Demolition_GeneralVariables.GameTimeKey, "Hard"); break;
-            }
-        }
-
-        public void SaveModeOiseau()
-        {
-            PlayerPrefs.SetInt(Demolition_GeneralVariables.ModeOiseauKey, modeOiseauToggle.isOn ? 1 : 0);
         }
     }
 }
