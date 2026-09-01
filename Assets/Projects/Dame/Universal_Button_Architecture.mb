@@ -1,0 +1,172 @@
+# Universal_Button — Guide d'utilisation
+
+## Ce que c'est
+Des **composants** à poser sur un GameObject dans la scène. On ne crée **jamais** de nouveau script bouton — on utilise ceux qui existent et on bind leur Event.
+
+---
+
+## 1. Les composants disponibles
+
+| Composant | Où le poser | Collider requis |
+|---|---|---|
+| `Universal_Button` | Sur un GameObject **3D** (MeshRenderer) ou **UI** (RectTransform) | BoxCollider / MeshCollider 3D |
+| `Universal_Collider2DButton` | Sur un GameObject **2D** (SpriteRenderer) | BoxCollider2D / CircleCollider2D |
+| `Universal_PlayButton` | Sur le bouton Play (Accueil / Score) | Aucun (détection par marge) |
+| `Universal_KeyboardShortcut` | N'importe où dans la scène | Aucun |
+
+---
+
+## 2. Comment binder l'Event (le wiring)
+
+Tous les Universal_Button ont un `UnityEvent` public appelé `_event` (propriété `Event`).
+
+### Dans l'inspecteur Unity
+1. Poser le composant sur le GameObject
+2. Mettre `IsActive = true`
+3. Dans la liste `_event`, cliquer `+`
+4. Glisser le GameManager (ou autre script) dans le slot
+5. Choisir la méthode publique à appeler
+
+### Dans le code (pattern recommandé — Dame)
+```csharp
+// Sur une cellule, créée dynamiquement dans InitializeBoard()
+var button = cellGO.AddComponent<Universal_Collider2DButton>();
+button.IsActive = true;
+
+var cell = cellGO.AddComponent<Dame_Cell>(); // script métier à côté
+
+// Binder l'Event du bouton à la méthode OnTouched de la cellule
+button.Event.AddListener(cell.OnTouched);
+
+// Quand le joueur touche la cellule :
+// Universal_Collider2DButton.ReceivePoint() → ToolBox.CheckPos()
+// → si hit → _event.Invoke() → cell.OnTouched()
+```
+
+```csharp
+public class Dame_Cell : MonoBehaviour
+{
+    public void OnTouched()
+    {
+        Debug.Log("Cellule touchée !");
+        Dame_GameManager.Instance.OnCellTouched(this);
+    }
+}
+```
+
+### Dans le code (variante avec GameManager direct)
+```csharp
+// Sur un bouton de menu qui lance le jeu
+var playBtn = menuGO.AddComponent<Universal_Button>();
+playBtn.Event.AddListener(GameManager.Instance.StartGame);
+
+// Le listener doit être une méthode publique sans paramètre
+public class GameManager : MonoBehaviour
+{
+    public void StartGame() { ... }
+}
+```
+
+---
+
+## 3. Les 2 patterns de détection
+
+### Pattern A — Composant sur chaque objet interactif (Dame, Dobble)
+
+Chaque objet qui peut être touché a son propre `Universal_Collider2DButton` (2D) ou `Universal_Button` (3D/UI).
+
+```
+GameObject("Cell_r_c")
+├── SpriteRenderer
+├── BoxCollider2D
+├── Universal_Collider2DButton   ← détection individuelle
+└── Dame_Cell                     ← script métier
+```
+
+**Quand utiliser :** jeux 2D avec grille, cases, cartes, boutons individuels.
+
+### Pattern B — Un seul récepteur plein écran (Basketball, Demolition)
+
+Le joueur tape **n'importe où sur l'écran**. Pas de bouton par objet — un script central reçoit le point et la **physique Unity** détecte ce qui a été touché.
+
+```
+GameManager (ReceiveParent)
+└── ReceivePoint(x, y) → crée un projectile physique
+
+Projectile (Rigidbody)
+└── OnTriggerEnter / OnCollisionEnter → détecte automatiquement la cible
+   ├── NetSensor.OnTriggerEnter()  → score
+   └── Block.TakeDamage()          → destruction
+```
+
+**Quand utiliser :** jeux 3D, jeux de tir, impacts sur mur interactif, tout ce où on tape dans le vide pour créer un projectile.
+
+**Exemple Basketball :**
+```csharp
+// ThrowSensor (ReceiveParent) — reçoit le toucher
+public override void ReceivePoint(float xPoint, float yPoint)
+{
+    // Crée une balle à l'endroit touché
+    GameObject ball = Instantiate(_ballPref, worldPos, ...);
+}
+
+// NetSensor (MonoBehaviour) — sur le filet, détecte l'entrée
+private void OnTriggerEnter(Collider collider)
+{
+    if (collider.CompareTag("Ball") && IsActive)
+        _event?.Invoke(); // marque un point
+}
+```
+
+**Exemple Demolition :**
+```csharp
+// Demolition_GameManager (ReceiveParent) — reçoit le toucher
+public override void ReceivePoint(float xPoint, float yPoint)
+{
+    FireAt(worldPos); // crée l'oiseau projectile
+}
+
+// Demolition_Block — sur chaque bloc, la physique détecte
+void OnCollisionEnter2D(Collision2D collision)
+{
+    TakeDamage(1, direction); // le bloc encaisse
+}
+```
+
+### Résumé des 2 patterns
+
+| Pattern | Détection | Script | Quand |
+|---|---|---|---|
+| **A — Composant par objet** | `Universal_Collider2DButton` sur chaque GO | `button.Event.AddListener(cell.OnTouched)` | Cases, cartes, grilles, boutons |
+| **B — Récepteur plein écran** | Un ReceiveParent + physique Unity | `ReceivePoint()` crée un projectile, `OnTriggerEnter` / `OnCollisionEnter` détecte | Jeux de tir, impacts, 3D (Basketball, Demolition) |
+
+---
+
+## 4. Ce qu'il ne faut PAS faire
+
+❌ **Créer un nouveau script bouton** — `MonJeu_PlayButton.cs` ou `MonJeu_Button.cs`
+→ Toujours utiliser les composants universels existants.
+
+❌ **Hériter de Universal_Button pour la logique métier**
+→ `Dame_Cell : Universal_Collider2DButton` est interdit. Les 2 composants sont côte à côte.
+
+❌ **Utiliser `Button` Unity standard**
+→ Toujours `Universal_Button` ou ses dérivés.
+
+❌ **Créer un `MonJeu_MenuManager.cs` ou `MonJeu_ScoreBoardManager.cs`**
+→ Les scripts universels (`DropDownPlayersPref`, `ToggleSavePlayerPref`, `ScoreBoardDisplayer`) et le `GeneralVariable` gèrent tout.
+
+---
+
+## 5. Scripts universels du Menu (pas besoin de les recréer)
+
+Ces scripts sont posés directement sur les Toggle/Slider/Dropdown dans la scène. Ils sauvegardent automatiquement dans PlayerPrefs :
+
+| Script | Composant UI | Ce qu'il fait |
+|---|---|---|
+| `ToggleSavePlayerPref` | Toggle | Sauvegarde `MonJeu_ToggleName` en PlayerPrefs |
+| `DropDownPlayersPref` | Dropdown | Sauvegarde la valeur du dropdown |
+| `SliderSavePlayersPref` | Slider | Sauvegarde la valeur du slider |
+| `InputFieldPlayersPref` | InputField | Sauvegarde le texte tapé |
+| `SliderValueText` | Text (TMP) | Affiche la valeur du slider en texte |
+| `TMPPlayersPref` | Text (TMP) | Sauvegarde un texte |
