@@ -6,10 +6,6 @@ using MenuSelection;
 
 namespace Sparks
 {
-    /// <summary>
-    /// Gestionnaire principal de Sparks — boucle de jeu, spawn des primitives, score, timer.
-    /// ReceiveParent pour recevoir les touches OSC (cas 3D : tir libre → spawn projectile/impact).
-    /// </summary>
     public class Sparks_GameManager : ReceiveParent
     {
         public static Sparks_GameManager i { get; private set; }
@@ -42,16 +38,13 @@ namespace Sparks
         public TextMeshProUGUI scoreText;
         public TextMeshProUGUI timerText;
 
-        // Anti-flood
         private float lastShotTime = -1f;
         public float minTimeBetweenShots = 0.12f;
 
         private void Awake()
         {
-            if (i == null)
-                i = this;
-            else
-                { Destroy(gameObject); return; }
+            if (i == null) i = this;
+            else { Destroy(gameObject); return; }
 
             audioSource = GetComponent<AudioSource>();
             if (audioSource == null)
@@ -61,7 +54,6 @@ namespace Sparks
 
         void Start()
         {
-            // Auto-découverte
             if (volcanoOrigin == null)
             {
                 var go = GameObject.Find("VolcanoOrigin");
@@ -74,7 +66,6 @@ namespace Sparks
 
             currentTime = gameDuration;
             score = 0;
-
             gameIsRunning = true;
             StartCoroutine(SpawnLoop());
             UpdateUI();
@@ -111,34 +102,21 @@ namespace Sparks
         void Update()
         {
             if (!gameIsRunning) return;
-
             currentTime -= Time.deltaTime;
-            if (currentTime <= 0)
-            {
-                currentTime = 0;
-                EndGame();
-            }
+            if (currentTime <= 0) { currentTime = 0; EndGame(); }
             UpdateUI();
         }
 
-        // ── OSC / Toucher mur (ReceiveParent) ──
         public override void ReceivePoint(float xPoint, float yPoint)
         {
             if (!gameIsRunning) return;
-
-            // Anti-flood
-            if (Time.unscaledTime - lastShotTime < minTimeBetweenShots)
-                return;
+            if (Time.unscaledTime - lastShotTime < minTimeBetweenShots) return;
             lastShotTime = Time.unscaledTime;
 
-            // Convertir le point normalisé en position monde
             if (Camera.main != null)
             {
                 float screenX = xPoint * Screen.width;
                 float screenY = yPoint * Screen.height;
-                Vector3 worldPos = Camera.main.ScreenToWorldPoint(new Vector3(screenX, screenY, -Camera.main.transform.position.z));
-
-                // Vérifier si on a cliqué sur une primitive (Physics.Raycast 3D)
                 Ray ray = Camera.main.ScreenPointToRay(new Vector3(screenX, screenY));
                 if (Physics.Raycast(ray, out RaycastHit hit, 100f))
                 {
@@ -149,9 +127,6 @@ namespace Sparks
                         return;
                     }
                 }
-
-                // Si pas de clic sur primitive = tir dans le vide (effet visuel léger)
-                // Pour l'instant, rien — les primitives se gèrent via leur Universal_Button
             }
         }
 
@@ -173,18 +148,11 @@ namespace Sparks
             int typeIndex = Random.Range(0, 3);
             GameObject prefab = typeIndex switch
             {
-                0 => spherePrefab,
-                1 => cubePrefab,
-                2 => capsulePrefab,
-                _ => spherePrefab,
+                0 => spherePrefab, 1 => cubePrefab, _ => capsulePrefab,
             };
-
             int pts = typeIndex switch
             {
-                0 => 10,
-                1 => 20,
-                2 => 30,
-                _ => 10,
+                0 => 10, 1 => 20, _ => 30,
             };
 
             if (prefab == null) return;
@@ -194,10 +162,7 @@ namespace Sparks
 
             GameObject go = Instantiate(prefab, origin, Random.rotation);
             var prim = go.GetComponent<Sparks_Primitive>();
-            if (prim != null)
-            {
-                prim.Init(pts, forceMin, forceMax);
-            }
+            if (prim != null) prim.Init(pts, forceMin, forceMax);
         }
 
         public void AddScore(int points)
@@ -210,31 +175,24 @@ namespace Sparks
 
         private void UpdateUI()
         {
-            if (scoreText != null)
-                scoreText.text = $"Score: {score}";
-            if (timerText != null)
-                timerText.text = Mathf.CeilToInt(currentTime).ToString();
+            if (scoreText != null) scoreText.text = $"Score: {score}";
+            if (timerText != null) timerText.text = Mathf.CeilToInt(currentTime).ToString();
         }
 
         private void EndGame()
         {
             gameIsRunning = false;
             StopAllCoroutines();
+            if (gameOverSound != null) audioSource.PlayOneShot(gameOverSound, 1f);
 
-            if (gameOverSound != null)
-                audioSource.PlayOneShot(gameOverSound, 1f);
-
-            // Pattern Dobble : SetFloat direct
             PlayerPrefs.SetFloat(Sparks_GeneralVariable.HighScoreKey, score);
             PlayerPrefs.Save();
-
             StartCoroutine(TransitionToScore());
         }
 
         private IEnumerator TransitionToScore()
         {
             yield return new WaitForSeconds(2.0f);
-
             if (Sparks_GeneralVariable.i != null && !string.IsNullOrEmpty(Sparks_GeneralVariable.i.scoreScene))
             {
                 if (BuildState.CurrentState == BuildState.State.normal)
@@ -243,9 +201,7 @@ namespace Sparks
                     MenuSelectionButton.Instance.gameObject.SetActive(true);
             }
             else
-            {
                 SceneManager.LoadScene("Score_Sparks");
-            }
         }
     }
 }

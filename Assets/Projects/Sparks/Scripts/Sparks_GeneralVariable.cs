@@ -22,12 +22,10 @@ namespace Sparks
         TMP_FontAsset Font() => _font;
         [SerializeField] Color _winnerColor;
 
-        // ── Clés PlayerPrefs ──
         public const string HighScoreKey = "Sparks_HighScore";
         public const string GameTimeKey = "Sparks_GameTime";
         public const string ModeRapideKey = "Sparks_ModeRapide";
 
-        // ── Valeurs par défaut (pattern Dobble) ──
         public static float GetGameDurationFromPrefs()
         {
             int index = PlayerPrefs.GetInt(GameTimeKey, 0);
