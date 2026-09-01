@@ -27,28 +27,23 @@ public class JVS_SetupEditor : EditorWindow
     private ProjectTab _activeTab = ProjectTab.Demolition;
     private Vector2 _scrollPos;
 
+    // ── Colors / styling ──────────────────────────────────────────
+    private static readonly Color ColorTabActive = new Color(0.3f, 0.5f, 0.9f);
+    private static readonly Color ColorTabInactive = new Color(0.25f, 0.25f, 0.25f);
+    private static readonly Color ColorHeader = new Color(0.2f, 0.25f, 0.3f);
+    private static readonly Color ColorDivider = new Color(0.15f, 0.15f, 0.15f);
+
     // ── Setup step definitions ────────────────────────────────────
     private class SetupStep
     {
         public string label;
         public string scenePath;
-        public string sceneName;
-        public string key;               // unique ID for done-key in EditorPrefs
-        public Func<bool> isDone;        // returns true when scene is fully configured
-        public Action action;            // runs the configuration
-        public bool isLast;              // if true, draws a separator after
+        public Func<bool> isDone;   // scoped to target scene only
+        public Action action;       // opens + saves target scene
+        public bool isLast;
     }
 
-    private Dictionary<ProjectTab, List<SetupStep>> _steps;
-    private Dictionary<ProjectTab, string> _basePaths;
-
-    // ── Colors / styling ──────────────────────────────────────────
-    private static readonly Color ColorDone = new Color(0.1f, 0.7f, 0.2f);
-    private static readonly Color ColorLocked = new Color(0.8f, 0.3f, 0.1f);
-    private static readonly Color ColorTabActive = new Color(0.3f, 0.5f, 0.9f);
-    private static readonly Color ColorTabInactive = new Color(0.25f, 0.25f, 0.25f);
-    private static readonly Color ColorHeader = new Color(0.2f, 0.25f, 0.3f);
-    private static readonly Color ColorDivider = new Color(0.15f, 0.15f, 0.15f);
+    private Dictionary<ProjectTab, List<SetupStep>> _steps = new Dictionary<ProjectTab, List<SetupStep>>();
 
     // ── Init ──────────────────────────────────────────────────────
     private void OnEnable()
@@ -56,114 +51,199 @@ public class JVS_SetupEditor : EditorWindow
         InitializeSteps();
     }
 
+    // ════════════════════════════════════════════════════════════════════
+    //  SAFE SCENE CHECK — OUVRE LA SCENE, VERIFIE, REFERME
+    //  Évite les faux positifs quand l'utilisateur est sur une autre scène
+    // ════════════════════════════════════════════════════════════════════
+
+    private static bool SceneCheck(string scenePath, Predicate<Scene> checker)
+    {
+        if (!File.Exists(scenePath)) return false;
+
+        var scene = EditorSceneManager.GetSceneByPath(scenePath);
+        bool opened = false;
+        if (!scene.IsValid() || !scene.isLoaded)
+        {
+            scene = EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Additive);
+            opened = true;
+        }
+
+        bool result = scene.IsValid() && checker(scene);
+
+        if (opened && scene.IsValid())
+            EditorSceneManager.CloseScene(scene, true);
+
+        return result;
+    }
+
+    private static bool HasObjInScene(Scene scene, string objName)
+    {
+        foreach (var root in scene.GetRootGameObjects())
+        {
+            if (FindInChildren(root.transform, objName) != null) return true;
+        }
+        return false;
+    }
+
+    private static Transform FindInChildren(Transform parent, string name)
+    {
+        if (parent.name == name) return parent;
+        for (int i = 0; i < parent.childCount; i++)
+        {
+            var found = FindInChildren(parent.GetChild(i), name);
+            if (found != null) return found;
+        }
+        return null;
+    }
+
+    private static bool HasComponentInScene<T>(Scene scene) where T : Component
+    {
+        foreach (var root in scene.GetRootGameObjects())
+        {
+            if (root.GetComponentInChildren<T>(true) != null) return true;
+        }
+        return false;
+    }
+
+    // ── Demolition checks ─────────────────────────────────────────
+    private static bool DemolitionGameSceneReady()
+    {
+        return SceneCheck("Assets/Projects/Demolition/Demolition_Scenes/GameScene_Demolition.unity", scene =>
+            HasComponentInScene<Demolition_GameManager>(scene) &&
+            HasObjInScene(scene, "Ground") &&
+            HasObjInScene(scene, "Background") &&
+            HasObjInScene(scene, "Canvas"));
+    }
+
+    private static bool DemolitionAccueilReady()
+    {
+        return SceneCheck("Assets/Projects/Demolition/Demolition_Scenes/Accueil_Demolition.unity", scene =>
+            HasObjInScene(scene, "Background") && HasComponentInScene<Canvas>(scene));
+    }
+
+    private static bool DemolitionMenuReady()
+    {
+        return SceneCheck("Assets/Projects/Demolition/Demolition_Scenes/Menu_Demolition.unity", scene =>
+            HasObjInScene(scene, "Background") &&
+            HasComponentInScene<Canvas>(scene) &&
+            HasObjInScene(scene, "ModeOiseau") &&
+            HasObjInScene(scene, "ScrollSpeed"));
+    }
+
+    private static bool DemolitionScoreReady()
+    {
+        return SceneCheck("Assets/Projects/Demolition/Demolition_Scenes/Score_Demolition.unity", scene =>
+            HasObjInScene(scene, "Background") && HasComponentInScene<Canvas>(scene));
+    }
+
+    // ── Dame checks ───────────────────────────────────────────────
+    private static bool DameGameSceneReady()
+    {
+        return SceneCheck("Assets/Projects/Dame/Scenes/GameScene_Dame.unity", scene =>
+            HasComponentInScene<Dame.Dame_GameManager>(scene));
+    }
+
+    private static bool DameAccueilReady()
+    {
+        return SceneCheck("Assets/Projects/Dame/Scenes/Accueil_Dame.unity", scene =>
+            HasObjInScene(scene, "Background") && HasComponentInScene<Canvas>(scene));
+    }
+
+    private static bool DameMenuReady()
+    {
+        return SceneCheck("Assets/Projects/Dame/Scenes/Menu_Dame.unity", scene =>
+            HasObjInScene(scene, "Background") &&
+            HasComponentInScene<Canvas>(scene) &&
+            HasObjInScene(scene, "ThemeDropdown") &&
+            HasObjInScene(scene, "PlayerNameInput"));
+    }
+
+    private static bool DameScoreReady()
+    {
+        return SceneCheck("Assets/Projects/Dame/Scenes/Score_Dame.unity", scene =>
+            HasObjInScene(scene, "Background") && HasComponentInScene<Canvas>(scene));
+    }
+
+    // ── Init steps ────────────────────────────────────────────────
     private void InitializeSteps()
     {
-        _basePaths = new Dictionary<ProjectTab, string>
+        _steps[ProjectTab.Demolition] = new List<SetupStep>
         {
-            [ProjectTab.Demolition] = "Assets/Projects/Demolition",
-            [ProjectTab.Dame] = "Assets/Projects/Dame",
+            new SetupStep
+            {
+                label = "1. GameScene — Background, Sol, Canvas UI",
+                scenePath = "Assets/Projects/Demolition/Demolition_Scenes/GameScene_Demolition.unity",
+                isDone = DemolitionGameSceneReady,
+                action = Demolition_SetupGameScene,
+            },
+            new SetupStep
+            {
+                label = "2. Accueil — Background",
+                scenePath = "Assets/Projects/Demolition/Demolition_Scenes/Accueil_Demolition.unity",
+                isDone = DemolitionAccueilReady,
+                action = Demolition_SetupAccueil,
+            },
+            new SetupStep
+            {
+                label = "3. Menu — Background + UI options",
+                scenePath = "Assets/Projects/Demolition/Demolition_Scenes/Menu_Demolition.unity",
+                isDone = DemolitionMenuReady,
+                action = Demolition_SetupMenu,
+            },
+            new SetupStep
+            {
+                label = "4. Score — Background",
+                scenePath = "Assets/Projects/Demolition/Demolition_Scenes/Score_Demolition.unity",
+                isDone = DemolitionScoreReady,
+                action = Demolition_SetupScore,
+                isLast = true,
+            },
+            new SetupStep
+            {
+                label = "★ TOUT CONFIGURER — Assets + 4 scènes",
+                scenePath = null,
+                isDone = () => DemolitionGameSceneReady() && DemolitionAccueilReady() && DemolitionMenuReady() && DemolitionScoreReady(),
+                action = Demolition_ConfigTout,
+            },
         };
 
-        _steps = new Dictionary<ProjectTab, List<SetupStep>>
+        _steps[ProjectTab.Dame] = new List<SetupStep>
         {
-            [ProjectTab.Demolition] = new List<SetupStep>
+            new SetupStep
             {
-                new SetupStep
-                {
-                    label = "1. GameScene — Background, Sol, Canvas UI",
-                    sceneName = "GameScene_Demolition",
-                    scenePath = "Assets/Projects/Demolition/Demolition_Scenes/GameScene_Demolition.unity",
-                    key = "JVS_Demo_GameScene",
-                    isDone = () => DemolitionGameSceneReady(),
-                    action = () => Demolition_SetupGameScene(),
-                },
-                new SetupStep
-                {
-                    label = "2. Accueil — Background",
-                    sceneName = "Accueil_Demolition",
-                    scenePath = "Assets/Projects/Demolition/Demolition_Scenes/Accueil_Demolition.unity",
-                    key = "JVS_Demo_Accueil",
-                    isDone = () => DemolitionAccueilReady(),
-                    action = () => Demolition_SetupAccueil(),
-                },
-                new SetupStep
-                {
-                    label = "3. Menu — Background + UI options",
-                    sceneName = "Menu_Demolition",
-                    scenePath = "Assets/Projects/Demolition/Demolition_Scenes/Menu_Demolition.unity",
-                    key = "JVS_Demo_Menu",
-                    isDone = () => DemolitionMenuReady(),
-                    action = () => Demolition_SetupMenuOld(),
-                },
-                new SetupStep
-                {
-                    label = "4. Score — Background",
-                    sceneName = "Score_Demolition",
-                    scenePath = "Assets/Projects/Demolition/Demolition_Scenes/Score_Demolition.unity",
-                    key = "JVS_Demo_Score",
-                    isDone = () => DemolitionScoreReady(),
-                    action = () => Demolition_SetupScore(),
-                    isLast = true,
-                },
-                new SetupStep
-                {
-                    label = "★ TOUT CONFIGURER — Assets + 4 scènes",
-                    sceneName = null,
-                    scenePath = null,
-                    key = "JVS_Demo_All",
-                    isDone = () => DemolitionGameSceneReady() && DemolitionAccueilReady() && DemolitionMenuReady() && DemolitionScoreReady(),
-                    action = () => Demolition_ConfigTout(),
-                },
+                label = "1. GameScene — Sprites + Sons",
+                scenePath = "Assets/Projects/Dame/Scenes/GameScene_Dame.unity",
+                isDone = DameGameSceneReady,
+                action = Dame_SetupGameScene,
             },
-
-            [ProjectTab.Dame] = new List<SetupStep>
+            new SetupStep
             {
-                new SetupStep
-                {
-                    label = "1. GameScene — Sprites + Sons",
-                    sceneName = "GameScene_Dame",
-                    scenePath = "Assets/Projects/Dame/Scenes/GameScene_Dame.unity",
-                    key = "JVS_Dame_GameScene",
-                    isDone = () => DameGameSceneReady(),
-                    action = () => Dame_SetupGameScene(),
-                },
-                new SetupStep
-                {
-                    label = "2. Accueil — Background",
-                    sceneName = "Accueil_Dame",
-                    scenePath = "Assets/Projects/Dame/Scenes/Accueil_Dame.unity",
-                    key = "JVS_Dame_Accueil",
-                    isDone = () => DameAccueilReady(),
-                    action = () => Dame_SetupAccueil(),
-                },
-                new SetupStep
-                {
-                    label = "3. Menu — Background + UI options",
-                    sceneName = "Menu_Dame",
-                    scenePath = "Assets/Projects/Dame/Scenes/Menu_Dame.unity",
-                    key = "JVS_Dame_Menu",
-                    isDone = () => DameMenuReady(),
-                    action = () => Dame_SetupMenu(),
-                },
-                new SetupStep
-                {
-                    label = "4. Score — Background + Fontes",
-                    sceneName = "Score_Dame",
-                    scenePath = "Assets/Projects/Dame/Scenes/Score_Dame.unity",
-                    key = "JVS_Dame_Score",
-                    isDone = () => DameScoreReady(),
-                    action = () => Dame_SetupScore(),
-                    isLast = true,
-                },
-                new SetupStep
-                {
-                    label = "★ TOUT CONFIGURER — Assets + 4 scènes",
-                    sceneName = null,
-                    scenePath = null,
-                    key = "JVS_Dame_All",
-                    isDone = () => DameGameSceneReady() && DameAccueilReady() && DameMenuReady() && DameScoreReady(),
-                    action = () => Dame_ConfigTout(),
-                },
+                label = "2. Accueil — Background",
+                scenePath = "Assets/Projects/Dame/Scenes/Accueil_Dame.unity",
+                isDone = DameAccueilReady,
+                action = Dame_SetupAccueil,
+            },
+            new SetupStep
+            {
+                label = "3. Menu — Background + UI options",
+                scenePath = "Assets/Projects/Dame/Scenes/Menu_Dame.unity",
+                isDone = DameMenuReady,
+                action = Dame_SetupMenu,
+            },
+            new SetupStep
+            {
+                label = "4. Score — Background + Fontes",
+                scenePath = "Assets/Projects/Dame/Scenes/Score_Dame.unity",
+                isDone = DameScoreReady,
+                action = Dame_SetupScore,
+                isLast = true,
+            },
+            new SetupStep
+            {
+                label = "★ TOUT CONFIGURER — Assets + 4 scènes",
+                scenePath = null,
+                isDone = () => DameGameSceneReady() && DameAccueilReady() && DameMenuReady() && DameScoreReady(),
+                action = Dame_ConfigTout,
             },
         };
     }
@@ -211,7 +291,6 @@ public class JVS_SetupEditor : EditorWindow
         GUILayout.FlexibleSpace();
         EditorGUILayout.EndHorizontal();
 
-        // divider
         var dividerRect = EditorGUILayout.BeginHorizontal();
         EditorGUI.DrawRect(dividerRect, ColorDivider);
         GUILayout.Space(1);
@@ -223,28 +302,19 @@ public class JVS_SetupEditor : EditorWindow
     {
         var steps = _steps[tab];
         int doneCount = 0;
-        bool showLast = false;
 
-        // Draw all non-done steps
         for (int i = 0; i < steps.Count; i++)
         {
             var step = steps[i];
             if (step.isDone())
             {
                 doneCount++;
-                if (step.isLast) { showLast = false; }
                 continue;
             }
 
-            DrawStepButton(tab, step);
-
-            if (step.isLast)
-            {
-                showLast = true;
-            }
+            DrawStepButton(step);
         }
 
-        // If everything is done, show a completion message
         if (doneCount >= steps.Count)
         {
             EditorGUILayout.Space(10);
@@ -258,7 +328,6 @@ public class JVS_SetupEditor : EditorWindow
             EditorGUILayout.EndVertical();
         }
 
-        // Progress bar
         EditorGUILayout.Space(8);
         float progress = steps.Count > 0 ? (float)doneCount / steps.Count : 0;
         var progressRect = EditorGUILayout.BeginVertical();
@@ -267,9 +336,8 @@ public class JVS_SetupEditor : EditorWindow
         EditorGUILayout.EndVertical();
     }
 
-    private void DrawStepButton(ProjectTab tab, SetupStep step)
+    private void DrawStepButton(SetupStep step)
     {
-        // Scene-open guard
         bool sceneOpen = false;
         if (!string.IsNullOrEmpty(step.scenePath))
         {
@@ -277,68 +345,39 @@ public class JVS_SetupEditor : EditorWindow
             sceneOpen = scene.IsValid() && scene.isLoaded;
         }
 
-        // Check if we're in play mode (always block)
         bool inPlayMode = EditorApplication.isPlaying;
-
         bool disabled = sceneOpen || inPlayMode;
 
-        if (disabled)
-        {
-            GUI.enabled = false;
-        }
+        if (disabled) GUI.enabled = false;
 
-        string lockIcon = "";
         string lockHint = "";
-        if (inPlayMode)
-        {
-            lockIcon = " ⚠";
-            lockHint = "Arrêtez le mode Play d'abord";
-        }
-        else if (sceneOpen)
-        {
-            lockIcon = " 🔒";
-            lockHint = "Fermez la scène avant de cliquer";
-        }
+        if (inPlayMode) lockHint = "Arrêtez le mode Play d'abord";
+        else if (sceneOpen) lockHint = "Fermez la scène avant de cliquer";
 
-        // Styling
-        var defaultBg = GUI.backgroundColor;
-        if (disabled)
-        {
-            GUI.backgroundColor = ColorLocked;
-        }
-        else
-        {
-            GUI.backgroundColor = new Color(0.25f, 0.45f, 0.7f);
-        }
-
-        var btnLabel = step.label;
+        string btnLabel = step.label;
         if (!string.IsNullOrEmpty(lockHint))
-        {
             btnLabel = $"🔒  {step.label}  —  {lockHint}";
-        }
+
+        if (disabled)
+            GUI.backgroundColor = new Color(0.8f, 0.3f, 0.1f);
+        else
+            GUI.backgroundColor = new Color(0.25f, 0.45f, 0.7f);
 
         EditorGUILayout.BeginVertical(EditorStyles.helpBox);
         if (GUILayout.Button($"  {btnLabel}", GUILayout.Height(40)))
         {
             if (!disabled)
             {
-                RunStep(step);
+                step.action();
+                Repaint();
+                EditorApplication.delayCall += Repaint;
             }
         }
         EditorGUILayout.EndVertical();
 
-        GUI.backgroundColor = defaultBg;
+        GUI.backgroundColor = Color.white;
         GUI.enabled = true;
-
         EditorGUILayout.Space(3);
-    }
-
-    private void RunStep(SetupStep step)
-    {
-        step.action();
-        Repaint();
-        // Force Unity to repaint the window after the action completes
-        EditorApplication.delayCall += Repaint;
     }
 
     private void DrawFooter()
@@ -353,168 +392,9 @@ public class JVS_SetupEditor : EditorWindow
     }
 
     // ════════════════════════════════════════════════════════════════
-    //  VERIFICATION HELPERS
+    //  DEMOLITION — SETUP ACTIONS (chaque bouton = UNE seule tâche)
     // ════════════════════════════════════════════════════════════════
 
-    // ── Demolition ────────────────────────────────────────────────
-    private static bool DemolitionGameSceneReady()
-    {
-        string path = "Assets/Projects/Demolition/Demolition_Scenes/GameScene_Demolition.unity";
-        if (!File.Exists(path)) return false;
-
-        var scene = EditorSceneManager.GetSceneByPath(path);
-        bool opened = false;
-        if (!scene.IsValid() || !scene.isLoaded)
-        {
-            scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Additive);
-            opened = true;
-        }
-
-        bool ready =
-            Object.FindFirstObjectByType<Demolition_GameManager>() != null &&
-            GameObject.Find("Ground") != null &&
-            GameObject.Find("Background") != null &&
-            GameObject.Find("Canvas") != null;
-
-        if (opened && scene.IsValid())
-            EditorSceneManager.CloseScene(scene, true);
-
-        return ready;
-    }
-
-    private static bool DemolitionAccueilReady()
-    {
-        string path = "Assets/Projects/Demolition/Demolition_Scenes/Accueil_Demolition.unity";
-        if (!File.Exists(path)) return false;
-
-        var scene = EditorSceneManager.GetSceneByPath(path);
-        bool opened = false;
-        if (!scene.IsValid() || !scene.isLoaded)
-        { scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Additive); opened = true; }
-
-        bool ready = HasCanvasBackground();
-
-        if (opened && scene.IsValid()) EditorSceneManager.CloseScene(scene, true);
-        return ready;
-    }
-
-    private static bool DemolitionMenuReady()
-    {
-        string path = "Assets/Projects/Demolition/Demolition_Scenes/Menu_Demolition.unity";
-        if (!File.Exists(path)) return false;
-
-        var scene = EditorSceneManager.GetSceneByPath(path);
-        bool opened = false;
-        if (!scene.IsValid() || !scene.isLoaded)
-        { scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Additive); opened = true; }
-
-        bool ready = HasCanvasBackground() && GameObject.Find("ModeOiseau") != null && GameObject.Find("ScrollSpeed") != null;
-
-        if (opened && scene.IsValid()) EditorSceneManager.CloseScene(scene, true);
-        return ready;
-    }
-
-    private static bool DemolitionScoreReady()
-    {
-        string path = "Assets/Projects/Demolition/Demolition_Scenes/Score_Demolition.unity";
-        if (!File.Exists(path)) return false;
-
-        var scene = EditorSceneManager.GetSceneByPath(path);
-        bool opened = false;
-        if (!scene.IsValid() || !scene.isLoaded)
-        { scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Additive); opened = true; }
-
-        bool ready = HasCanvasBackground();
-
-        if (opened && scene.IsValid()) EditorSceneManager.CloseScene(scene, true);
-        return ready;
-    }
-
-    // ── Dame ──────────────────────────────────────────────────────
-    private static bool DameGameSceneReady()
-    {
-        string path = "Assets/Projects/Dame/Scenes/GameScene_Dame.unity";
-        if (!File.Exists(path)) return false;
-
-        var scene = EditorSceneManager.GetSceneByPath(path);
-        bool opened = false;
-        if (!scene.IsValid() || !scene.isLoaded)
-        { scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Additive); opened = true; }
-
-        bool ready = false;
-        var gm = Object.FindFirstObjectByType<Dame.Dame_GameManager>();
-        ready = gm != null && gm.caseFoncee != null;
-
-        if (opened && scene.IsValid()) EditorSceneManager.CloseScene(scene, true);
-        return ready;
-    }
-
-    private static bool DameAccueilReady()
-    {
-        string path = "Assets/Projects/Dame/Scenes/Accueil_Dame.unity";
-        if (!File.Exists(path)) return false;
-
-        var scene = EditorSceneManager.GetSceneByPath(path);
-        bool opened = false;
-        if (!scene.IsValid() || !scene.isLoaded)
-        { scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Additive); opened = true; }
-
-        bool ready = HasCanvasBackground();
-
-        if (opened && scene.IsValid()) EditorSceneManager.CloseScene(scene, true);
-        return ready;
-    }
-
-    private static bool DameMenuReady()
-    {
-        string path = "Assets/Projects/Dame/Scenes/Menu_Dame.unity";
-        if (!File.Exists(path)) return false;
-
-        var scene = EditorSceneManager.GetSceneByPath(path);
-        bool opened = false;
-        if (!scene.IsValid() || !scene.isLoaded)
-        { scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Additive); opened = true; }
-
-        bool ready = HasCanvasBackground() &&
-                     GameObject.Find("ThemeDropdown") != null &&
-                     GameObject.Find("PlayerNameInput") != null;
-
-        if (opened && scene.IsValid()) EditorSceneManager.CloseScene(scene, true);
-        return ready;
-    }
-
-    private static bool DameScoreReady()
-    {
-        string path = "Assets/Projects/Dame/Scenes/Score_Dame.unity";
-        if (!File.Exists(path)) return false;
-
-        var scene = EditorSceneManager.GetSceneByPath(path);
-        bool opened = false;
-        if (!scene.IsValid() || !scene.isLoaded)
-        { scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Additive); opened = true; }
-
-        bool ready = HasCanvasBackground();
-
-        if (opened && scene.IsValid()) EditorSceneManager.CloseScene(scene, true);
-        return ready;
-    }
-
-    // ── Shared helpers ────────────────────────────────────────────
-    private static bool HasCanvasBackground()
-    {
-        var canvas = Object.FindFirstObjectByType<Canvas>();
-        if (canvas == null) return false;
-        for (int i = 0; i < canvas.transform.childCount; i++)
-        {
-            if (canvas.transform.GetChild(i).name == "Background")
-                return true;
-        }
-        return false;
-    }
-
-    // ════════════════════════════════════════════════════════════════
-    //  DEMOLITION — SETUP ACTIONS (translated from existing tool)
-    // ════════════════════════════════════════════════════════════════
     private static string _demoBase = "Assets/Projects/Demolition";
     private static string _demoPrefab => _demoBase + "/Resources/Prefabs";
     private static string _demoTex => _demoBase + "/Resources/Textures";
@@ -556,7 +436,7 @@ public class JVS_SetupEditor : EditorWindow
         Debug.Log("[JVS] ✓ Accueil_Demolition configurée");
     }
 
-    private static void Demolition_SetupMenuOld()
+    private static void Demolition_SetupMenu()
     {
         var scene = EditorSceneManager.OpenScene("Assets/Projects/Demolition/Demolition_Scenes/Menu_Demolition.unity");
         EnsureCamera();
@@ -636,7 +516,7 @@ public class JVS_SetupEditor : EditorWindow
 
         Demolition_SetupGameScene();
         Demolition_SetupAccueil();
-        Demolition_SetupMenuOld();
+        Demolition_SetupMenu();
         Demolition_SetupScore();
 
         AssetDatabase.Refresh();
@@ -646,6 +526,7 @@ public class JVS_SetupEditor : EditorWindow
     // ════════════════════════════════════════════════════════════════
     //  DAME — SETUP ACTIONS
     // ════════════════════════════════════════════════════════════════
+
     private static string _dameBase = "Assets/Projects/Dame";
     private static string _dameSprite => _dameBase + "/Sprites";
     private static string _dameSound => _dameBase + "/Sons";
@@ -796,7 +677,7 @@ public class JVS_SetupEditor : EditorWindow
             if (go != null && (go.name == "Background" || go.name.StartsWith("bg_")))
             {
                 if (go.GetComponent<Canvas>() == null)
-                    Undo.DestroyObjectImmediate(go);
+                    Object.DestroyImmediate(go);
             }
         }
     }
@@ -825,7 +706,7 @@ public class JVS_SetupEditor : EditorWindow
             if (child.name == "Background")
             {
                 if (bgTransform == null) bgTransform = child;
-                else Undo.DestroyObjectImmediate(child.gameObject);
+                else Object.DestroyImmediate(child.gameObject);
             }
         }
 
@@ -1115,7 +996,13 @@ public class JVS_SetupEditor : EditorWindow
         }
     }
 
-    // ── Asset generation ──────────────────────────────────────────
+    // ── Asset generation helpers ──────────────────────────────────
+    private static Sprite LoadSprite(string basePath, string name)
+    {
+        AssetDatabase.Refresh();
+        return AssetDatabase.LoadAssetAtPath<Sprite>(basePath + "/" + name + ".png");
+    }
+
     private static void MakePNG(string name, int w, int h, Color c)
     {
         string path = _demoTex + "/" + name + ".png";
@@ -1124,13 +1011,7 @@ public class JVS_SetupEditor : EditorWindow
         for (int x = 0; x < w; x++) for (int y = 0; y < h; y++) tex.SetPixel(x, y, c);
         tex.Apply();
         File.WriteAllBytes(path, tex.EncodeToPNG());
-        UnityEngine.Object.DestroyImmediate(tex);
-    }
-
-    private static Sprite LoadSprite(string basePath, string name)
-    {
-        AssetDatabase.Refresh();
-        return AssetDatabase.LoadAssetAtPath<Sprite>(basePath + "/" + name + ".png");
+        Object.DestroyImmediate(tex);
     }
 
     private static void MakeWAV(string dir, string name, float dur, float freq, float vol)
@@ -1163,7 +1044,7 @@ public class JVS_SetupEditor : EditorWindow
         blk.hp = hp; blk.points = pts; blk.materialType = mat; blk.spriteRenderer = sr;
         blk.damageSprites = new Sprite[] { f1, f2 };
         PrefabUtility.SaveAsPrefabAsset(go, prefabDir + "/" + name + ".prefab");
-        UnityEngine.Object.DestroyImmediate(go);
+        Object.DestroyImmediate(go);
     }
 
     private static void CreateDebris(string prefabDir, string name, Sprite sprite)
@@ -1171,7 +1052,7 @@ public class JVS_SetupEditor : EditorWindow
         var go = new GameObject(name, typeof(SpriteRenderer));
         go.GetComponent<SpriteRenderer>().sprite = sprite;
         PrefabUtility.SaveAsPrefabAsset(go, prefabDir + "/" + name + ".prefab");
-        UnityEngine.Object.DestroyImmediate(go);
+        Object.DestroyImmediate(go);
     }
 
     private static void CreateOiseau(string prefabDir, Sprite oiSprite, Sprite imSprite)
@@ -1180,7 +1061,7 @@ public class JVS_SetupEditor : EditorWindow
         imp.GetComponent<SpriteRenderer>().sprite = imSprite;
         imp.GetComponent<SpriteRenderer>().sortingOrder = 5;
         PrefabUtility.SaveAsPrefabAsset(imp, prefabDir + "/ImpactExplosion.prefab");
-        UnityEngine.Object.DestroyImmediate(imp);
+        Object.DestroyImmediate(imp);
 
         var go = new GameObject("Oiseau", typeof(SpriteRenderer), typeof(Demolition_Projectile));
         go.GetComponent<SpriteRenderer>().sprite = oiSprite;
@@ -1193,7 +1074,7 @@ public class JVS_SetupEditor : EditorWindow
         p.pushForce = 2.2f;
         p.directDamage = 1;
         PrefabUtility.SaveAsPrefabAsset(go, prefabDir + "/Oiseau.prefab");
-        UnityEngine.Object.DestroyImmediate(go);
+        Object.DestroyImmediate(go);
     }
 
     private static void CreateCochonPrefabs()
@@ -1215,7 +1096,7 @@ public class JVS_SetupEditor : EditorWindow
         blk.hp = hp; blk.points = pts; blk.materialType = Demolition_Block.MaterialType.Cochon; blk.spriteRenderer = sr;
         blk.isTarget = true; blk.starValue = starVal;
         PrefabUtility.SaveAsPrefabAsset(go, _demoPrefab + "/" + name + ".prefab");
-        UnityEngine.Object.DestroyImmediate(go);
+        Object.DestroyImmediate(go);
     }
 
     private static void CreatePopupTextPrefab()
@@ -1228,6 +1109,6 @@ public class JVS_SetupEditor : EditorWindow
         tmp.fontStyle = FontStyles.Bold;
         tmp.text = "+50";
         PrefabUtility.SaveAsPrefabAsset(go, _demoPrefab + "/PopupText.prefab");
-        UnityEngine.Object.DestroyImmediate(go);
+        Object.DestroyImmediate(go);
     }
 }
