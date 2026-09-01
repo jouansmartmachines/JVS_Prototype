@@ -10,21 +10,331 @@ using Demolition;
 
 public class Demolition_SetupEditor : EditorWindow
 {
-    static string _basePath, _prefabPath, _texPath, _soundPath;
+    private static string _basePath = "Assets/Projects/Demolition";
+    private static string _prefabPath = "Assets/Projects/Demolition/Resources/Prefabs";
+    private static string _texPath = "Assets/Projects/Demolition/Resources/Textures";
+    private static string _soundPath = "Assets/Projects/Demolition/Resources/Sounds";
 
-    [MenuItem("Tools/Demolition - Tout configurer")]
-    static void ConfigurerTout()
+    [MenuItem("Tools/Demolition - Panneau Configuration Editeur")]
+    public static void ShowWindow()
+    {
+        GetWindow<Demolition_SetupEditor>("Demolition Editor Tool");
+    }
+
+    void OnGUI()
+    {
+        GUILayout.Space(10);
+        GUILayout.Label("Outils de Configuration Hors Play - Demolition", EditorStyles.boldLabel);
+        GUILayout.Space(5);
+
+        EditorGUILayout.HelpBox("Cliquez sur les boutons ci-dessous pour configurer proprement vos scènes HORS Play.\nL'outil nettoie tous les doublons et place le Background en plein écran dans le Canvas.", MessageType.Info);
+        GUILayout.Space(10);
+
+        if (GUILayout.Button("1. Configurer Background & Sol dans GameScene (Hors Play)", GUILayout.Height(35)))
+        {
+            PlacerBackgroundEtSolGameScene();
+        }
+
+        GUILayout.Space(5);
+        if (GUILayout.Button("2. Configurer Background dans Scene Accueil (Hors Play)", GUILayout.Height(30)))
+        {
+            PlacerBackgroundSceneAccueil();
+        }
+
+        GUILayout.Space(5);
+        if (GUILayout.Button("3. Configurer Background dans Scene Menu (Hors Play)", GUILayout.Height(30)))
+        {
+            PlacerBackgroundSceneMenu();
+        }
+
+        GUILayout.Space(5);
+        if (GUILayout.Button("4. Configurer Background dans Scene Score (Hors Play)", GUILayout.Height(30)))
+        {
+            PlacerBackgroundSceneScore();
+        }
+
+        GUILayout.Space(15);
+        if (GUILayout.Button("★ TOUT CONFIGURER (Prefabs, Sons, Scènes, UI)", GUILayout.Height(40)))
+        {
+            ConfigurerTout();
+        }
+    }
+
+    [MenuItem("Tools/Demolition/1. Configurer Background et Sol dans GameScene (Hors Play)")]
+    public static void PlacerBackgroundEtSolGameScene()
     {
         if (EditorApplication.isPlaying)
         {
-            Debug.LogError("Arretez le jeu avant de lancer l'outil !");
+            Debug.LogError("Arrêtez le mode Play avant d'utiliser cet outil !");
             return;
         }
-        _basePath = "Assets/Projects/Demolition";
-        string resPath = _basePath + "/Resources";
-        _prefabPath = resPath + "/Prefabs";
-        _texPath = resPath + "/Textures";
-        _soundPath = resPath + "/Sounds";
+
+        InitPaths();
+        string scenePath = _basePath + "/Demolition_Scenes/GameScene_Demolition.unity";
+        var scene = EditorSceneManager.OpenScene(scenePath);
+
+        // 1. Camera
+        EnsureCamera();
+
+        // 2. Nettoyage des orphelins hors Canvas
+        CleanAllOrphanBackgrounds();
+
+        // 3. UI Canvas & Background plein écran
+        SetupGameSceneCanvas();
+        SetupCanvasBackground("bg_game", false); // raycastTarget = false pour laisser passer les tirs
+
+        // 4. Sol (Ground) avec sprite sol.png, BoxCollider2D et GroundScroll
+        SetupGameSceneGround();
+
+        // 5. StructuresParent
+        if (GameObject.Find("StructuresParent") == null)
+        {
+            new GameObject("StructuresParent");
+        }
+
+        // 6. Demolition_GameManager
+        if (Object.FindFirstObjectByType<Demolition_GameManager>() == null)
+        {
+            var gmGO = new GameObject("Demolition_GameManager", typeof(Demolition_GameManager));
+            var gm = gmGO.GetComponent<Demolition_GameManager>();
+            var aud = gmGO.AddComponent<AudioSource>();
+            aud.playOnAwake = false;
+            gm.impactSound = AssetDatabase.LoadAssetAtPath<AudioClip>(_soundPath + "/impact.wav");
+            gm.destructionSound = AssetDatabase.LoadAssetAtPath<AudioClip>(_soundPath + "/destruction.wav");
+            gm.oiseauPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(_prefabPath + "/Oiseau.prefab");
+            gm.impactEffectPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(_prefabPath + "/ImpactExplosion.prefab");
+        }
+
+        EditorSceneManager.MarkSceneDirty(scene);
+        EditorSceneManager.SaveScene(scene);
+        Debug.Log("[Demolition] GameScene_Demolition configurée avec succès (Background Canvas plein écran + Sol avec sprite sol.png) !");
+    }
+
+    [MenuItem("Tools/Demolition/2. Configurer Background dans Scene Accueil (Hors Play)")]
+    public static void PlacerBackgroundSceneAccueil()
+    {
+        if (EditorApplication.isPlaying)
+        {
+            Debug.LogError("Arrêtez le mode Play avant d'utiliser cet outil !");
+            return;
+        }
+
+        InitPaths();
+        string scenePath = _basePath + "/Demolition_Scenes/Accueil_Demolition.unity";
+        var scene = EditorSceneManager.OpenScene(scenePath);
+
+        EnsureCamera();
+        CleanAllOrphanBackgrounds();
+        SetupCanvasBackground("bg_accueil", true);
+
+        EditorSceneManager.MarkSceneDirty(scene);
+        EditorSceneManager.SaveScene(scene);
+        Debug.Log("[Demolition] Accueil_Demolition configurée avec succès avec son Background dans le Canvas !");
+    }
+
+    [MenuItem("Tools/Demolition/3. Configurer Background dans Scene Menu (Hors Play)")]
+    public static void PlacerBackgroundSceneMenu()
+    {
+        if (EditorApplication.isPlaying)
+        {
+            Debug.LogError("Arrêtez le mode Play avant d'utiliser cet outil !");
+            return;
+        }
+
+        InitPaths();
+        string scenePath = _basePath + "/Demolition_Scenes/Menu_Demolition.unity";
+        var scene = EditorSceneManager.OpenScene(scenePath);
+
+        EnsureCamera();
+        CleanAllOrphanBackgrounds();
+        SetupCanvasBackground("bg_menu", true);
+        SetupMenu();
+
+        EditorSceneManager.MarkSceneDirty(scene);
+        EditorSceneManager.SaveScene(scene);
+        Debug.Log("[Demolition] Menu_Demolition configurée avec succès avec son Background dans le Canvas !");
+    }
+
+    [MenuItem("Tools/Demolition/4. Configurer Background dans Scene Score (Hors Play)")]
+    public static void PlacerBackgroundSceneScore()
+    {
+        if (EditorApplication.isPlaying)
+        {
+            Debug.LogError("Arrêtez le mode Play avant d'utiliser cet outil !");
+            return;
+        }
+
+        InitPaths();
+        string scenePath = _basePath + "/Demolition_Scenes/Score_Demolition.unity";
+        var scene = EditorSceneManager.OpenScene(scenePath);
+
+        EnsureCamera();
+        CleanAllOrphanBackgrounds();
+        SetupCanvasBackground("bg_score", true);
+
+        EditorSceneManager.MarkSceneDirty(scene);
+        EditorSceneManager.SaveScene(scene);
+        Debug.Log("[Demolition] Score_Demolition configurée avec succès avec son Background au bon endroit dans le Canvas !");
+    }
+
+    private static void EnsureCamera()
+    {
+        var cam = Object.FindFirstObjectByType<Camera>();
+        if (cam == null)
+        {
+            var go = new GameObject("Main Camera", typeof(Camera), typeof(AudioListener));
+            cam = go.GetComponent<Camera>();
+            cam.orthographic = true;
+            cam.orthographicSize = 5;
+            cam.clearFlags = CameraClearFlags.Color;
+            cam.backgroundColor = new Color(0.05f, 0.05f, 0.08f);
+            go.transform.position = new Vector3(0, 0, -10);
+            go.tag = "MainCamera";
+        }
+        else
+        {
+            cam.orthographic = true;
+            cam.orthographicSize = 5;
+        }
+    }
+
+    /// <summary>
+    /// Supprime tous les GameObjects Background orphelins à la racine de la scène.
+    /// </summary>
+    private static void CleanAllOrphanBackgrounds()
+    {
+        var rootGOs = SceneManager.GetActiveScene().GetRootGameObjects();
+        foreach (var go in rootGOs)
+        {
+            if (go != null && (go.name == "Background" || go.name == "bg_game" || go.name == "bg_accueil" || go.name == "bg_menu" || go.name == "bg_score"))
+            {
+                if (go.GetComponent<Canvas>() == null)
+                {
+                    Undo.DestroyObjectImmediate(go);
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Place et configure un Background plein écran comme premier enfant du Canvas UI.
+    /// </summary>
+    private static void SetupCanvasBackground(string texName, bool raycastTarget)
+    {
+        var sprite = LoadSprite(texName);
+        if (sprite == null) sprite = LoadSprite("bg_accueil");
+
+        var canvas = Object.FindFirstObjectByType<Canvas>();
+        if (canvas == null)
+        {
+            var canvasGO = new GameObject("Canvas", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
+            canvas = canvasGO.GetComponent<Canvas>();
+            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            var scaler = canvasGO.GetComponent<CanvasScaler>();
+            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            scaler.referenceResolution = new Vector2(1920, 1080);
+            scaler.matchWidthOrHeight = 0.5f;
+        }
+
+        // Trouver ou créer le Background enfant du Canvas
+        Transform bgTransform = null;
+        for (int i = 0; i < canvas.transform.childCount; i++)
+        {
+            var child = canvas.transform.GetChild(i);
+            if (child.name == "Background")
+            {
+                if (bgTransform == null)
+                {
+                    bgTransform = child;
+                }
+                else
+                {
+                    // Doublon supplémentaire dans le Canvas -> détruire
+                    Undo.DestroyObjectImmediate(child.gameObject);
+                }
+            }
+        }
+
+        if (bgTransform == null)
+        {
+            var bgGO = new GameObject("Background", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+            bgGO.transform.SetParent(canvas.transform, false);
+            bgTransform = bgGO.transform;
+        }
+
+        // Toujours en premier enfant (arrière-plan sous les boutons/textes)
+        bgTransform.SetAsFirstSibling();
+
+        var rt = bgTransform.GetComponent<RectTransform>();
+        if (rt != null)
+        {
+            rt.anchorMin = Vector2.zero;
+            rt.anchorMax = Vector2.one;
+            rt.offsetMin = Vector2.zero;
+            rt.offsetMax = Vector2.zero;
+            rt.pivot = new Vector2(0.5f, 0.5f);
+            rt.localScale = Vector3.one;
+        }
+
+        var img = bgTransform.GetComponent<Image>();
+        if (img == null) img = bgTransform.gameObject.AddComponent<Image>();
+        if (sprite != null)
+        {
+            img.sprite = sprite;
+            img.color = Color.white;
+            img.type = Image.Type.Simple;
+            img.preserveAspect = false;
+        }
+        img.raycastTarget = raycastTarget;
+    }
+
+    /// <summary>
+    /// Configure le Sol physique dans GameScene avec le sprite sol.png.
+    /// </summary>
+    private static void SetupGameSceneGround()
+    {
+        var ground = GameObject.Find("Ground");
+        if (ground == null)
+        {
+            ground = new GameObject("Ground", typeof(BoxCollider2D), typeof(SpriteRenderer), typeof(Demolition_GroundScroll));
+        }
+
+        ground.transform.position = new Vector3(0, -5.2f, 0);
+        ground.transform.localScale = Vector3.one;
+
+        var groundCol = ground.GetComponent<BoxCollider2D>();
+        if (groundCol == null) groundCol = ground.AddComponent<BoxCollider2D>();
+        groundCol.size = new Vector2(300, 2.4f);
+        groundCol.offset = Vector2.zero;
+
+        var groundSr = ground.GetComponent<SpriteRenderer>();
+        if (groundSr == null) groundSr = ground.AddComponent<SpriteRenderer>();
+        groundSr.sortingOrder = 2;
+        groundSr.drawMode = SpriteDrawMode.Tiled;
+        groundSr.size = new Vector2(300, 2.4f);
+        groundSr.color = Color.white;
+
+        var solSprite = LoadSprite("sol");
+        if (solSprite != null)
+        {
+            groundSr.sprite = solSprite;
+        }
+
+        if (ground.GetComponent<Demolition_GroundScroll>() == null)
+        {
+            ground.AddComponent<Demolition_GroundScroll>();
+        }
+    }
+
+    [MenuItem("Tools/Demolition/5. Tout configurer (Scenes + Prefabs + Assets)")]
+    public static void ConfigurerTout()
+    {
+        if (EditorApplication.isPlaying)
+        {
+            Debug.LogError("Arrêtez le jeu avant de lancer l'outil !");
+            return;
+        }
+        InitPaths();
 
         Directory.CreateDirectory(_prefabPath);
         Directory.CreateDirectory(_texPath);
@@ -45,14 +355,12 @@ public class Demolition_SetupEditor : EditorWindow
         MakePNG("fissure1", 16, 16, new Color(0.3f, 0.3f, 0.3f));
         MakePNG("fissure2", 16, 16, new Color(0.2f, 0.2f, 0.2f));
         MakePNG("sol", 128, 32, new Color(0.4f, 0.3f, 0.2f));
-        Debug.Log("1/7 Textures creees");
 
         // 2. Sons
         MakeWAV("impact", 0.15f, 200, 0.3f);
         MakeWAV("destruction", 0.3f, 150, 0.5f);
         MakeWAV("gameover", 0.5f, 100, 0.8f);
         MakeWAV("pig_hit", 0.2f, 300, 0.4f);
-        Debug.Log("2/7 Sons crees");
 
         AssetDatabase.Refresh();
 
@@ -63,45 +371,46 @@ public class Demolition_SetupEditor : EditorWindow
         var t_f1 = LoadSprite("fissure1");
         var t_f2 = LoadSprite("fissure2");
         var t_oiseau = LoadSprite("oiseau_dos");
-        var t_sol = LoadSprite("sol");
         var t_impact = LoadSprite("impact");
         var t_db = LoadSprite("debris_bois");
         var t_dv = LoadSprite("debris_verre");
         var t_dp = LoadSprite("debris_pierre");
         var t_dc = LoadSprite("debris_cochon");
-        var t_cochon = LoadSprite("cochon");
-        var t_cochon_vert = LoadSprite("cochon_vert");
-        var t_cochon_bleu = LoadSprite("cochon_bleu");
 
-        if (t_bois == null) { Debug.LogError("Textures non trouvees"); return; }
+        if (t_bois != null)
+        {
+            CreateBloc("Bloc_Bois", t_bois, Demolition_Block.MaterialType.Bois, 4, 50, t_f1, t_f2);
+            CreateBloc("Bloc_Verre", t_verre, Demolition_Block.MaterialType.Verre, 2, 80, t_f1, t_f2);
+            CreateBloc("Bloc_Pierre", t_pierre, Demolition_Block.MaterialType.Pierre, 8, 40, t_f1, t_f2);
+            CreateDebris("Debris_Bois", t_db);
+            CreateDebris("Debris_Verre", t_dv);
+            CreateDebris("Debris_Pierre", t_dp);
+            CreateDebris("Debris_Cochon", t_dc);
+            CreateOiseau(t_oiseau, t_impact);
+            CreateCochonPrefabs();
+            CreatePopupTextPrefab();
+        }
 
-        CreateBloc("Bloc_Bois", t_bois, Demolition_Block.MaterialType.Bois, 2, 50, t_f1, t_f2);
-        CreateBloc("Bloc_Verre", t_verre, Demolition_Block.MaterialType.Verre, 1, 100, t_f1, t_f2);
-        CreateBloc("Bloc_Pierre", t_pierre, Demolition_Block.MaterialType.Pierre, 3, 30, t_f1, t_f2);
-        CreateDebris("Debris_Bois", t_db);
-        CreateDebris("Debris_Verre", t_dv);
-        CreateDebris("Debris_Pierre", t_dp);
-        CreateDebris("Debris_Cochon", t_dc);
-        CreateOiseau(t_oiseau, t_impact);
-        CreateCochonPrefabs();
-        CreatePopupTextPrefab();
-        Debug.Log("3/7 Prefabs gameplay + cochon + popup crees");
+        // 4. Configuration propre des Scènes (nettoyage + remplacement enfants Canvas)
+        PlacerBackgroundEtSolGameScene();
+        PlacerBackgroundSceneAccueil();
+        PlacerBackgroundSceneMenu();
+        PlacerBackgroundSceneScore();
 
-        // 4. GameScene
-        SetupGameScene();
-        Debug.Log("4/7 GameScene + Canvas configuree");
-
-        // 5. Menu Toggle (ModeOiseau) + Slider (ScrollSpeed)
-        SetupMenu();
-        Debug.Log("5/7 Menu Toggle+Slider ajoutes");
-
-        // 6. Creer star images
+        // 5. Star images
         CreateStarImages();
-        Debug.Log("6/7 Stars images generees");
 
-        // 7. Termine
         AssetDatabase.Refresh();
-        Debug.Log("=== FINI: Demolition completement configure ===");
+        Debug.Log("=== FINI: Demolition complètement configuré sans doublons ! ===");
+    }
+
+    private static void InitPaths()
+    {
+        _basePath = "Assets/Projects/Demolition";
+        string resPath = _basePath + "/Resources";
+        _prefabPath = resPath + "/Prefabs";
+        _texPath = resPath + "/Textures";
+        _soundPath = resPath + "/Sounds";
     }
 
     static void MakePNG(string name, int w, int h, Color c)
@@ -175,12 +484,12 @@ public class Demolition_SetupEditor : EditorWindow
         go.GetComponent<SpriteRenderer>().sprite = oiSprite;
         go.GetComponent<SpriteRenderer>().sortingOrder = 8;
         var p = go.GetComponent<Demolition_Projectile>();
-        p.flightDuration = 0.13f;
-        p.scaleStart = 1.5f;
+        p.flightDuration = 0.14f;
+        p.scaleStart = 1.4f;
         p.scaleEnd = 0.55f;
-        p.hitRadius = 0.45f;
-        p.pushForce = 16f;
-        p.directDamage = 2;
+        p.hitRadius = 0.35f;
+        p.pushForce = 2.2f;
+        p.directDamage = 1;
         PrefabUtility.SaveAsPrefabAsset(go, _prefabPath + "/Oiseau.prefab");
         Object.DestroyImmediate(go);
     }
@@ -189,7 +498,7 @@ public class Demolition_SetupEditor : EditorWindow
     {
         var t_cochon = LoadSprite("cochon");
         if (t_cochon == null) { Debug.LogWarning("cochon.png pas trouve"); return; }
-        CreateCochonBloc("Cochon", t_cochon, 2, 500, 1);
+        CreateCochonBloc("Cochon", t_cochon, 3, 500, 1);
         var t_cv = LoadSprite("cochon_vert");
         if (t_cv != null) CreateCochonBloc("Cochon_Vert", t_cv, 4, 1000, 2);
         var t_cb = LoadSprite("cochon_bleu");
@@ -198,7 +507,7 @@ public class Demolition_SetupEditor : EditorWindow
 
     static void CreateCochonBloc(string name, Sprite sprite, int hp, int pts, int starVal)
     {
-        var go = new GameObject(name, typeof(SpriteRenderer), typeof(BoxCollider2D), typeof(Rigidbody2D), typeof(AudioSource), typeof(Demolition_Block));
+        var go = new GameObject(name, typeof(SpriteRenderer), typeof(BoxCollider2D), typeof(Rigidbody2D), typeof(AudioSource), typeof(Demolition_Block), typeof(Demolition_PigBehavior));
         var sr = go.GetComponent<SpriteRenderer>(); sr.sprite = sprite; sr.sortingOrder = 3;
         var blk = go.GetComponent<Demolition_Block>();
         blk.hp = hp; blk.points = pts; blk.materialType = Demolition_Block.MaterialType.Cochon; blk.spriteRenderer = sr;
@@ -227,83 +536,9 @@ public class Demolition_SetupEditor : EditorWindow
         MakePNG("star_3", 32, 32, new Color(1, 1, 0.4f));
     }
 
-    static void SetupGameScene()
-    {
-        string scenePath = _basePath + "/Demolition_Scenes/GameScene_Demolition.unity";
-        var scene = EditorSceneManager.OpenScene(scenePath);
-
-        if (Object.FindFirstObjectByType<Camera>() == null)
-        {
-            var go = new GameObject("Main Camera", typeof(Camera), typeof(AudioListener));
-            var cam = go.GetComponent<Camera>();
-            cam.orthographic = true; cam.orthographicSize = 5;
-            cam.clearFlags = CameraClearFlags.Color;
-            cam.backgroundColor = new Color(0.05f, 0.05f, 0.08f);
-            go.transform.position = new Vector3(0, 0, -10);
-            go.tag = "MainCamera";
-        }
-
-        if (Object.FindFirstObjectByType<Light>() == null)
-        {
-            var lightGO = new GameObject("Directional Light", typeof(Light));
-            var light = lightGO.GetComponent<Light>();
-            light.type = LightType.Directional;
-            light.color = new Color(1, 0.95686275f, 0.8392157f);
-            light.intensity = 1;
-            lightGO.transform.position = new Vector3(0, 3, 0);
-            lightGO.transform.rotation = Quaternion.Euler(50, -30, 0);
-        }
-
-        if (Object.FindFirstObjectByType<EventSystem>() == null)
-            new GameObject("EventSystem", typeof(EventSystem), typeof(StandaloneInputModule));
-
-        if (GameObject.Find("Background") == null)
-        {
-            var bg = new GameObject("Background", typeof(SpriteRenderer));
-            var sr = bg.GetComponent<SpriteRenderer>();
-            var tex = LoadSprite("bg_game");
-            if (tex != null) sr.sprite = tex;
-            sr.color = new Color(0.05f, 0.05f, 0.08f);
-            bg.transform.position = new Vector3(0, 0, 5);
-            sr.sortingOrder = -1;
-        }
-
-        if (GameObject.Find("StructuresParent") == null)
-            new GameObject("StructuresParent");
-
-        if (Object.FindFirstObjectByType<Demolition_GeneralVariables>() == null)
-        {
-            var gvPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(_basePath + "/Demolition_Prefabs/GeneralVariable.prefab");
-            if (gvPrefab != null) { PrefabUtility.InstantiatePrefab(gvPrefab); }
-            else Debug.LogWarning("GeneralVariable.prefab manquant");
-        }
-
-        if (Object.FindFirstObjectByType<Demolition_GameManager>() == null)
-        {
-            var gmGO = new GameObject("Demolition_GameManager", typeof(Demolition_GameManager));
-            var gm = gmGO.GetComponent<Demolition_GameManager>();
-            var aud = gmGO.AddComponent<AudioSource>();
-            aud.playOnAwake = false;
-            gm.impactSound = AssetDatabase.LoadAssetAtPath<AudioClip>(_soundPath + "/impact.wav");
-            gm.destructionSound = AssetDatabase.LoadAssetAtPath<AudioClip>(_soundPath + "/destruction.wav");
-            gm.oiseauPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(_prefabPath + "/Oiseau.prefab");
-            gm.impactEffectPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(_prefabPath + "/ImpactExplosion.prefab");
-        }
-
-        SetupGameSceneCanvas();
-
-        EditorSceneManager.SaveScene(scene);
-    }
-
     static void SetupGameSceneCanvas()
     {
         var canvas = Object.FindFirstObjectByType<Canvas>();
-        if (canvas != null)
-        {
-            if (GameObject.Find("ScoreText") != null && GameObject.Find("TimerText") != null)
-                return;
-        }
-
         if (canvas == null)
         {
             var canvasGO = new GameObject("Canvas", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
@@ -332,7 +567,6 @@ public class Demolition_SetupEditor : EditorWindow
             scoreTxt.color = Color.white;
             scoreTxt.alignment = TextAlignmentOptions.TopLeft;
             scoreGO.AddComponent<CanvasRenderer>();
-            Debug.Log("ScoreText cree dans GameScene");
         }
 
         if (GameObject.Find("TimerText") == null)
@@ -351,7 +585,6 @@ public class Demolition_SetupEditor : EditorWindow
             timerTxt.color = Color.white;
             timerTxt.alignment = TextAlignmentOptions.TopRight;
             timerGO.AddComponent<CanvasRenderer>();
-            Debug.Log("TimerText cree dans GameScene");
         }
 
         if (GameObject.Find("StarText") == null)
@@ -370,7 +603,6 @@ public class Demolition_SetupEditor : EditorWindow
             starTxt.color = Color.yellow;
             starTxt.alignment = TextAlignmentOptions.Center;
             starGO.AddComponent<CanvasRenderer>();
-            Debug.Log("StarText cree dans GameScene");
         }
     }
 
@@ -380,7 +612,7 @@ public class Demolition_SetupEditor : EditorWindow
         var scene = EditorSceneManager.OpenScene(scenePath);
 
         var canvas = Object.FindFirstObjectByType<Canvas>();
-        if (canvas == null) { Debug.LogError("Canvas pas trouve!"); return; }
+        if (canvas == null) return;
 
         if (GameObject.Find("ModeOiseau") == null)
         {

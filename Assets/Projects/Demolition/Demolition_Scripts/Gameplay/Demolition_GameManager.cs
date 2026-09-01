@@ -12,7 +12,8 @@ namespace Demolition
 
     /// <summary>
     /// Gestionnaire principal du jeu Démolition : boucle de jeu, réceptions OSC et souris avec protection anti-flood,
-    /// gestion de la caméra (Shake doux, Hitstop léger), background texturé, audio punchy, UI et score.
+    /// gestion de la caméra (Shake doux, Hitstop léger), audio punchy, UI et score.
+    /// Les éléments de scène (Background, Ground, UI) sont placés hors Play via l'Editor Tool.
     /// </summary>
     public class Demolition_GameManager : ReceiveParent
     {
@@ -96,7 +97,7 @@ namespace Demolition
             }
 
             LoadResourcesReferences();
-            EnsureSceneElements();
+            BindSceneElements();
             SetupPreferencesAndDifficulty();
 
             currentTime = gameDuration;
@@ -136,7 +137,7 @@ namespace Demolition
                 pigHitSound = Resources.Load<AudioClip>("Sounds/pig_hit");
         }
 
-        private void EnsureSceneElements()
+        private void BindSceneElements()
         {
             if (structuresParent == null)
             {
@@ -144,10 +145,6 @@ namespace Demolition
                 if (existingParent != null)
                 {
                     structuresParent = existingParent.transform;
-                }
-                else
-                {
-                    structuresParent = new GameObject("StructuresParent").transform;
                 }
             }
 
@@ -157,75 +154,6 @@ namespace Demolition
                 timerText = GameObject.Find("TimerText")?.GetComponent<TextMeshProUGUI>();
             if (starText == null)
                 starText = GameObject.Find("StarText")?.GetComponent<TextMeshProUGUI>();
-
-            EnsureBackground();
-            EnsureGround();
-        }
-
-        private void EnsureBackground()
-        {
-            var bgGO = GameObject.Find("Background");
-            if (bgGO == null)
-            {
-                bgGO = new GameObject("Background", typeof(SpriteRenderer));
-            }
-
-            bgGO.transform.position = new Vector3(0, 0, 5f);
-            var sr = bgGO.GetComponent<SpriteRenderer>();
-            sr.sortingOrder = -10;
-
-            Texture2D bgTex = Resources.Load<Texture2D>("Textures/bg_game");
-            if (bgTex == null)
-            {
-                bgTex = Resources.Load<Texture2D>("Textures/bg_accueil");
-            }
-
-            if (bgTex != null)
-            {
-                sr.sprite = Sprite.Create(bgTex, new Rect(0, 0, bgTex.width, bgTex.height), new Vector2(0.5f, 0.5f));
-            }
-
-            // Adapter la taille du fond à la vue de la caméra
-            if (Camera.main != null && sr.sprite != null)
-            {
-                float camHeight = Camera.main.orthographicSize * 2f;
-                float camWidth = camHeight * Camera.main.aspect;
-
-                float spriteW = sr.sprite.rect.width / sr.sprite.pixelsPerUnit;
-                float spriteH = sr.sprite.rect.height / sr.sprite.pixelsPerUnit;
-
-                float scaleX = camWidth / spriteW;
-                float scaleY = camHeight / spriteH;
-                float finalScale = Mathf.Max(scaleX, scaleY) * 1.15f; // Légère marge
-
-                bgGO.transform.localScale = new Vector3(finalScale, finalScale, 1f);
-            }
-        }
-
-        private void EnsureGround()
-        {
-            var groundGO = GameObject.Find("Ground");
-            if (groundGO == null)
-            {
-                groundGO = new GameObject("Ground", typeof(BoxCollider2D), typeof(SpriteRenderer));
-                groundGO.transform.position = new Vector3(0, -5.2f, 0);
-
-                var col = groundGO.GetComponent<BoxCollider2D>();
-                col.size = new Vector2(300, 2.4f);
-
-                var sr = groundGO.GetComponent<SpriteRenderer>();
-                sr.sortingOrder = 2;
-                Texture2D solTex = Resources.Load<Texture2D>("Textures/sol");
-                if (solTex != null)
-                {
-                    sr.sprite = Sprite.Create(solTex, new Rect(0, 0, solTex.width, solTex.height), new Vector2(0.5f, 0.5f));
-                }
-                sr.drawMode = SpriteDrawMode.Tiled;
-                sr.size = new Vector2(300, 2.4f);
-
-                var groundScroll = groundGO.AddComponent<Demolition_GroundScroll>();
-                groundScroll.scrollSpeedRef = () => currentScrollSpeed;
-            }
         }
 
         private void SetupPreferencesAndDifficulty()

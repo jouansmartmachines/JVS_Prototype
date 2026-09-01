@@ -83,7 +83,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 2
+  m_SortingOrder: 3
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: 1e13380719970d44187b8dcdd60264fb, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -278,15 +278,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 974065dd751ede5f40a7b87f1a806f16, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Demolition.Demolition_Block
-  hp: 1
-  points: 100
   materialType: 1
+  hp: 2
+  points: 80
+  isTarget: 0
+  starValue: 1
+  spriteRenderer: {fileID: 8969335666587488919}
   damageSprites:
   - {fileID: 0}
   - {fileID: 0}
-  spriteRenderer: {fileID: 8969335666587488919}
-  debrisPrefab: {fileID: 0}
-  debrisForce: 200
-  isTarget: 0
-  starValue: 0
   popupTextPrefab: {fileID: 0}

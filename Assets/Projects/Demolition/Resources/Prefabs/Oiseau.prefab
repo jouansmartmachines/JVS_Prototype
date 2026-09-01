@@ -80,7 +80,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 3
+  m_SortingOrder: 8
   m_MaskInteraction: 0
   m_Sprite: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -105,12 +105,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 20eedd2c6289c6901634e37d3628e911, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Demolition.Demolition_Projectile
-  oiseauDos: {fileID: 0}
-  spriteRenderer: {fileID: 4930826931710589464}
-  vitesseDepart: 5
-  acceleration: 2
-  scaleMin: 0.1
-  scaleMax: 1
-  explosionPrefab: {fileID: 8637732324076961834, guid: b374cb26f89bd3f4ba74c2513bc08f04, type: 3}
-  forceExplosion: 500
-  radiusExplosion: 2
+  spriteRenderer: {fileID: 0}
+  trailRenderer: {fileID: 0}
+  flightDuration: 0.14
+  scaleStart: 1.4
+  scaleEnd: 0.55
+  zStart: -6
+  zTarget: 0
+  hitRadius: 0.35
+  pushForce: 2.2
+  directDamage: 1

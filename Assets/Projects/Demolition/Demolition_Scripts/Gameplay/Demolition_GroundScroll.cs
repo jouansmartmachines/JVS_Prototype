@@ -18,9 +18,18 @@ namespace Demolition
 
         void Update()
         {
-            if (sr == null || scrollSpeedRef == null) return;
+            if (sr == null) return;
 
-            float speed = scrollSpeedRef();
+            float speed = 0.5f;
+            if (scrollSpeedRef != null)
+            {
+                speed = scrollSpeedRef();
+            }
+            else if (Demolition_GameManager.Instance != null)
+            {
+                speed = Demolition_GameManager.Instance.currentScrollSpeed;
+            }
+
             offset.x += speed * Time.deltaTime * 0.25f;
 
             if (sr.material != null)
