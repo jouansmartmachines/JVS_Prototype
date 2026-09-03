@@ -1,57 +1,92 @@
 # Demolition 3D — Setup Guide
 
-## Scripts modifiés / ajoutés
+## Architecture actuelle
 
-### Nouveaux scripts (dans `Scripts/`)
-
-| Script | Description |
-|---|---|
-| `Demolition_Pushable.cs` | Force d'impulsion 3D sur l'objet touché. Binding auto via Event. |
-| `Demolition_ObstacleAnchor.cs` | Zone de spawn. À mettre sur des empty dans chaque scène. |
-| `Demolition_ObstacleSpawner.cs` | Spawn les obstacles au début. Auto-ajoute Universal_Button + Pushable. |
-| `Demolition_Fantome.cs` | HP par force de choc, mort → notifie GameManager. |
-| `Demolition_Destructible.cs` | Caisses/barils destructibles. HP, flash, destruction. |
-
-### Modifiés
-
-| Script | Changement |
-|---|---|
-| `Demolition_GameManager.cs` | Supprimé ReceiveParent, projectile, scrolling. Timer scène+global, score, scènes aléatoires, fondu noir. |
-| `Demolition_GeneralVariables.cs` | Ajouté `SceneTimeKey` et `GlobalTimeKey`. |
+Impact OSC direct (pas de projectile), fantôme se casse par force de choc, obstacles (caisses/barils) avec ObstacleAnchor. Timer scène + global, score, scènes aléatoires, fondu noir.
 
 ---
 
-## Ce que tu dois faire dans Unity
+## Scripts (ce qui est utilisé)
 
-### 1. Dans chaque scène achetée
+| Script | Rôle |
+|---|---|
+| `Demolition_GameManager.cs` | Chef d'orchestre. MonoBehaviour pur (pas ReceiveParent). Singleton. Timers, score, fondu, audio, slow-mo |
+| `Demolition_GeneralVariables.cs` | Constantes PlayerPrefs + helpers statiques (`GetSceneDurationFromPrefs()`, `GetGlobalTimeFromPrefs()`) |
+| `Demolition_Fantome.cs` | Fantôme 3D : HP, dégâts par force de choc (`OnCollisionEnter`), mort → notifie GameManager |
+| `Demolition_ObstacleSpawner.cs` | Au start, lit les ObstacleAnchor, spawn obstacles/fantôme, ajoute Universal_Button + Pushable |
+| `Demolition_ObstacleAnchor.cs` | Zone de spawn (radius, prefabs, min/max count, isFantomeAnchor) |
+| `Demolition_Pushable.cs` | Force d'impulsion 3D, bindé par ObstacleSpawner via `button.Event.AddListener(pushable.OnPushed)` |
+| `Demolition_Destructible.cs` | Caisses/barils destructibles : HP, flash, destruction |
+| `Demolition_PopupText.cs` | Popup score flottant avec overshoot bounce |
+| `Demolition_DebrisSpawner.cs` | Particules, débris, poussière, étoiles |
 
-- Place un empty `ObstacleSpawner` → ajoute `Demolition_ObstacleSpawner`
-- Place un empty `ObstacleAnchors` → ajoute des enfants avec `Demolition_ObstacleAnchor` :
-  - Règle `obstaclePrefabs[]` (tes prefabs : barils, caisses...)
-  - Règle `spawnRadius`, `minCount`, `maxCount`
-  - Un anchor doit avoir `isFantomeAnchor = true` + `fantomePrefab`
-- Place un `GeneralVariable.prefab` (existant)
-- Place un `GameManager` avec `Demolition_GameManager` :
-  - Remplir `sceneNames[]` (noms de toutes les GameScene)
+### Scripts obsolètes (2D — à ne pas utiliser)
 
-### 2. Canvas GameScene
-
-Crée un Canvas avec :
-- `ScoreText` (TMP) — "Score: 0"
-- `TimerText` (TMP) — "60"
-- `GlobalTimerText` (TMP) — "5:00"
-- `FadeCanvas` — Image noire + CanvasGroup (alpha 0)
-
-### 3. Menu
-
-Ajouter un **Dropdown** temps par scène (30/60/90 sec) → clé `Demolition_SceneTime`
-
-### 4. Build Settings
-
-Ajouter toutes les GameScene + Accueil/Menu/Score/Loading/SelectionMenu
+`Demolition_Block.cs`, `Demolition_Structure.cs`, `Demolition_StructureBuilder.cs`, `Demolition_ScrollingBackground.cs`, `Demolition_GroundScroll.cs`, `Demolition_Projectile.cs`, `Demolition_PigBehavior.cs`, `Demolition_DataLoader.cs`
 
 ---
 
-## Binding (automatique)
+## Ce que doit contenir la GameScene
 
-`ObstacleSpawner` ajoute `Universal_Button` + `Pushable` sur chaque obstacle spawné et bind `button.Event.AddListener(pushable.OnPushed)`. Rien à la main.
+```
+GameScene_Demolition.unity
+├── Main Camera (perspective, 3D)
+├── Directional Light
+├── EventSystem
+├── Canvas (Screen Space - Camera)
+│   ├── ScoreText (TMP)          — "Score: 0"
+│   ├── TimerText (TMP)           — "60"
+│   ├── SceneNumberText (TMP)     — "Niveau en cours"
+│   ├── GlobalTimerText (TMP)     — "5:00"
+│   └── FadeCanvas (Image noire + CanvasGroup, alpha=0)
+├── GeneralVariable.prefab        — Demolition_GeneralVariables + OSC_Manager enfant
+├── GameManager (empty)
+│   └── Demolition_GameManager.cs — singleton + AudioSource (auto-ajoutée)
+├── ObstacleSpawner (empty)
+│   └── Demolition_ObstacleSpawner.cs
+├── ObstacleAnchors (empty)
+│   ├── Anchor_Fantome
+│   │   └── Demolition_ObstacleAnchor (isFantomeAnchor=true, fantomePrefab)
+│   └── Anchor_Obstacles_N
+│       └── Demolition_ObstacleAnchor (obstaclePrefabs[], spawnRadius, minCount, maxCount)
+├── Terrain (prefab: Terrain.prefab / TerrainNight.prefab)
+└── Env (prefab: Env1Sun.prefab / Env1Night.prefab / ...)
+```
+
+### GameManager — champs à remplir
+
+| Champ | Type | Description |
+|---|---|---|
+| `sceneDuration` | float | 60 (surchargé par PlayerPrefs) |
+| `useGlobalTimer` | bool | true |
+| `scoreText` | TMP | ScoreText du Canvas |
+| `timerText` | TMP | TimerText du Canvas |
+| `sceneText` | TMP | SceneNumberText du Canvas |
+| `globalTimerText` | TMP | GlobalTimerText du Canvas |
+| `fadeCanvasGroup` | CanvasGroup | FadeCanvas |
+| `sceneClearSound` | AudioClip | Sons/scene_clear.wav |
+| `gameOverSound` | AudioClip | Sons/gameover.wav |
+| `currentScrollSpeed` | float | 2 (non utilisé en 3D) |
+| `structuresParent` | Transform | Empty parent pour les structures |
+| `sceneNames[]` | string[] | Liste de toutes les GameScene (ex: GameScene_Demolition) |
+
+### ObstacleAnchor — configuration
+
+- **Anchor Fantôme** : `isFantomeAnchor=true`, assigner `fantomePrefab` (le prefab 3D du fantôme avec Demolition_Fantome.cs)
+- **Anchor Obstacles** : `obstaclePrefabs[]` (caisses, barils, etc.), `spawnRadius=2`, `minCount=1`, `maxCount=3`
+
+---
+
+## Fonctionnement
+
+1. **OSC** : Universal_Button détecte les touches → appel via `button.Event.AddListener(pushable.OnPushed)`
+2. **Fantôme** : `Demolition_Fantome.OnCollisionEnter` → dégâts par force de choc → mort → `GameManager.OnFantomeKilled()`
+3. **Obstacles** : `Demolition_ObstacleSpawner` spawn à chaque début de scène
+4. **Fin de scène** : timer écoulé ou fantôme vaincu → fondu noire → scène aléatoire suivante
+5. **Fin de partie** : timer global écoulé → transition Score
+
+---
+
+## Canvas — règle
+
+Tous les TextMeshPro sont trouvés automatiquemnt par `GameObject.Find()`. Pas besoin de les assignr si le nom est correct. Mettre `raycastTarget=false` sur l'image FadeCanvas our ne pas blocer les iMPacts.
