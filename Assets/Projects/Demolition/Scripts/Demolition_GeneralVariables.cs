@@ -26,6 +26,23 @@ namespace Demolition
         public const string SceneTimeKey = "Demolition_SceneTime";
         public const string GlobalTimeKey = "Demolition_GlobalTime";
 
+        public static float GetSceneDurationFromPrefs()
+        {
+            int index = PlayerPrefs.GetInt(SceneTimeKey, 1);
+            return index switch
+            {
+                0 => 30f,
+                1 => 60f,
+                2 => 90f,
+                _ => 60f
+            };
+        }
+
+        public static float GetGlobalTimeFromPrefs()
+        {
+            return PlayerPrefs.GetFloat(GlobalTimeKey, 300f);
+        }
+
         public override void ReceiveName(string name)
         {
             float score = PlayerPrefs.GetFloat(HighScoreKey);

@@ -75,16 +75,8 @@ namespace Demolition
 
         private void LoadPreferences()
         {
-            int timeIndex = PlayerPrefs.GetInt(Demolition_GeneralVariables.SceneTimeKey, 1);
-            sceneDuration = timeIndex switch
-            {
-                0 => 30f,
-                1 => 60f,
-                2 => 90f,
-                _ => 60f
-            };
-
-            globalTimer = PlayerPrefs.GetFloat(Demolition_GeneralVariables.GlobalTimeKey, 300f);
+            sceneDuration = Demolition_GeneralVariables.GetSceneDurationFromPrefs();
+            globalTimer = Demolition_GeneralVariables.GetGlobalTimeFromPrefs();
 
             if (sceneNames == null || sceneNames.Length == 0)
                 sceneNames = new string[] { "GameScene_Demolition" };
