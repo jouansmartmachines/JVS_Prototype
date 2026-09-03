@@ -26,7 +26,31 @@ Impact OSC direct (pas de projectile), fantôme se casse par force de choc, obst
 
 ---
 
-## Ce que doit contenir la GameScene
+## Préfabs à créer (dans Prefabs/)
+
+Ces préfabs sont instanciés **par script** au runtime, pas placés dans la scène.
+
+### Terrains (sol + ground)
+
+| Prefab | Contenu |
+|---|---|
+| `Terrain.prefab` | Sol, BoxCollider, mesh décor (herbe, terre...) |
+| `TerrainNight.prefab` | Variante nuit du terrain |
+
+### Environnements (décor background)
+
+| Prefab | Contenu |
+|---|---|
+| `Env1Sun.prefab` | Décor jour — version 1 |
+| `Env1Night.prefab` | Décor nuit — version 1 |
+| `Env2Sun.prefab` | Décor jour — version 2 |
+| `Env2Night.prefab` | Décor nuit — version 2 |
+| `Env3Sun.prefab` | Décor jour — version 3 |
+| `Env3Night.prefab` | Décor nuit — version 3 |
+
+Un **script d'environnement** (`Demolition_EnvironmentSpawner.cs` ou directement dans le GameManager) pioche aléatoirement un Terrain + un Env et les instancie au `Start()`.
+
+## Ce que doit contenir la GameScene (setup minimal)
 
 ```
 GameScene_Demolition.unity
@@ -49,9 +73,11 @@ GameScene_Demolition.unity
 │   │   └── Demolition_ObstacleAnchor (isFantomeAnchor=true, fantomePrefab)
 │   └── Anchor_Obstacles_N
 │       └── Demolition_ObstacleAnchor (obstaclePrefabs[], spawnRadius, minCount, maxCount)
-├── Terrain (prefab: Terrain.prefab / TerrainNight.prefab)
-└── Env (prefab: Env1Sun.prefab / Env1Night.prefab / ...)
+├── EnvSpawner (empty)            ← instancie Terrain + Env aléatoires au Start()
+└── StructuresParent (empty)      ← parent des obstacles spawnés
 ```
+
+**Terrains et Envs ne sont PAS dans la scène.** Ils sont instanciés au runtime par EnvSpawner.
 
 ### GameManager — champs à remplir
 
@@ -68,7 +94,7 @@ GameScene_Demolition.unity
 | `gameOverSound` | AudioClip | Sons/gameover.wav |
 | `currentScrollSpeed` | float | 2 (non utilisé en 3D) |
 | `structuresParent` | Transform | Empty parent pour les structures |
-| `sceneNames[]` | string[] | Liste de toutes les GameScene (ex: GameScene_Demolition) |
+| `sceneNames[]` | string[] | Liste de toutes les GameScene (ex: GameScene_Demolition, GameScene_Demolition_2...) |
 
 ### ObstacleAnchor — configuration
 
