@@ -37,6 +37,10 @@ namespace Demolition
         public AudioClip gameOverSound;
         private AudioSource audioSource;
 
+        [Header("Scrolling")]
+        public float currentScrollSpeed = 2f;
+        public Transform structuresParent;
+
         [Header("Scènes")]
         public string[] sceneNames;
 
@@ -247,6 +251,58 @@ namespace Demolition
                 SceneManager.LoadScene(Demolition_GeneralVariables.Instance?.scoreScene ?? "Score_Demolition");
             else if (MenuSelectionButton.Instance != null)
                 MenuSelectionButton.Instance.gameObject.SetActive(true);
+        }
+
+        public void PlaySfx(AudioClip clip, float pitch, float volume)
+        {
+            if (clip != null && audioSource != null)
+            {
+                float origPitch = audioSource.pitch;
+                float origVolume = audioSource.volume;
+                audioSource.pitch = pitch;
+                audioSource.volume = volume;
+                audioSource.PlayOneShot(clip);
+                audioSource.pitch = origPitch;
+                audioSource.volume = origVolume;
+            }
+        }
+
+        public void AddScore(int points, Vector3 pos, Color popupColor, float popupScale, string prefix)
+        {
+            score += points;
+            sceneScore += points;
+            UpdateUI();
+
+            // Popup flottant
+            GameObject popupGO = new GameObject("ScorePopup");
+            popupGO.transform.position = pos;
+            var popup = popupGO.AddComponent<Demolition_PopupText>();
+            popup.SetText(prefix + points.ToString(), popupColor, popupScale);
+        }
+
+        public void TriggerImpactFeel(Vector3 pos, int hitCount)
+        {
+            // Petit effet de punch au ralenti sur les impacts
+            StartCoroutine(ImpactSlowMo());
+        }
+
+        private IEnumerator ImpactSlowMo()
+        {
+            Time.timeScale = 0.3f;
+            yield return new WaitForSecondsRealtime(0.06f);
+            Time.timeScale = 1f;
+        }
+
+        public IEnumerator CollapseSlowMo()
+        {
+            Time.timeScale = 0.15f;
+            yield return new WaitForSecondsRealtime(0.3f);
+            Time.timeScale = 1f;
+        }
+
+        public void TriggerPigDestroyed(int starValue)
+        {
+            Demolition_DebrisSpawner.SpawnStarBurst(Vector3.zero, 5 + starValue * 3);
         }
 
         private void UpdateUI()
