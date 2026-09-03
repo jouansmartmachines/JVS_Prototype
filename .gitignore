@@ -1,4 +1,6 @@
+# ==========================================
 # Unity standard
+# ==========================================
 /[Ll]ibrary/
 /[Tt]emp/
 /[Oo]bj/
@@ -11,7 +13,9 @@
 /.vs/
 /.idea/
 
-# Visual Studio
+# ==========================================
+# Visual Studio / IDES
+# ==========================================
 /*.csproj
 /*.unityproj
 /*.sln
@@ -24,10 +28,44 @@
 /*.pdb
 /*.opendb
 /*.VC.db
-
-# OS
-.DS_Store
-Thumbs.db
-# JVS specific
 /*.slnx
 JVS_Prototype.slnx
+
+# ==========================================
+# OS
+# ==========================================
+.DS_Store
+Thumbs.db
+
+# ==========================================
+# Assets volumineux (remplace Git LFS)
+# ==========================================
+# Textures & Images
+*.tga
+*.psd
+*.png
+*.jpg
+*.jpeg
+*.tif
+*.tiff
+*.exr
+*.hdr
+
+# Modèles 3D
+*.fbx
+*.obj
+*.blend
+*.max
+*.c4d
+
+# Audio & Vidéo
+*.mp3
+*.wav
+*.ogg
+*.mp4
+*.mov
+
+# Archives & Builds
+*.zip
+*.rar
+*.7z
