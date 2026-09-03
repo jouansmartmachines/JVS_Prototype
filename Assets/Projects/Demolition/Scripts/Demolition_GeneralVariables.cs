@@ -23,6 +23,9 @@ namespace Demolition
         public const string GameTimeKey = "Demolition_GameTime";
         public const string ScrollSpeedKey = "Demolition_ScrollSpeed";
 
+        public const string SceneTimeKey = "Demolition_SceneTime";
+        public const string GlobalTimeKey = "Demolition_GlobalTime";
+
         public override void ReceiveName(string name)
         {
             float score = PlayerPrefs.GetFloat(HighScoreKey);
