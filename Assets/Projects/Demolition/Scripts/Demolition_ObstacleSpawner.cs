@@ -116,6 +116,12 @@ namespace Demolition
                 if (pushable == null)
                     pushable = obj.AddComponent<Demolition_Pushable>();
 
+                // Initialiser l'Event (nécessaire car il est privé)
+                var eventField = typeof(Universal_Button).GetField("_event",
+                    System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                if (eventField != null && eventField.GetValue(btn) == null)
+                    eventField.SetValue(btn, new UnityEngine.Events.UnityEvent());
+
                 btn.Event.AddListener(pushable.OnPushed);
             }
         }
