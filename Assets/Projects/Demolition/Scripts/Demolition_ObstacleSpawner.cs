@@ -41,11 +41,6 @@ namespace Demolition
             set => currentDifficulty = Mathf.Clamp(value, 0, difficultyLevels.Length - 1);
         }
 
-        void Start()
-        {
-            SpawnForDifficulty(currentDifficulty);
-        }
-
         public void SpawnForDifficulty(int level)
         {
             CurrentDifficulty = level;

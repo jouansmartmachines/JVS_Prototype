@@ -10,6 +10,12 @@ namespace Demolition
     /// </summary>
     public class Demolition_EnvironmentSpawner : MonoBehaviour
     {
+        /// <summary>
+        /// Alterne jour/nuit à chaque reload de scène.
+        /// La scène name sert pour la première détection, ensuite toggle.
+        /// </summary>
+        private static bool _toggleNight = false;
+
         [Header("Skybox")]
         public Material daySkybox;
         public Material nightSkybox;
@@ -28,10 +34,22 @@ namespace Demolition
 
         void Start()
         {
+            // Au premier lancement on utilise le nom de la scène, ensuite on alterne
             bool isNight = IsNightScene();
+            if (_toggleNight)
+                isNight = !isNight;
+
             SetSkybox(isNight);
             SpawnSettings(isNight);
             SpawnEnv(isNight);
+
+            // Alternance pour le prochain reload
+            _toggleNight = true;
+
+            // Déclencher le spawn des obstacles après que les env soient dans la scène
+            var spawner = FindObjectOfType<Demolition_ObstacleSpawner>();
+            if (spawner != null)
+                spawner.SpawnForDifficulty(spawner.CurrentDifficulty);
         }
 
         private static bool IsNightScene()
