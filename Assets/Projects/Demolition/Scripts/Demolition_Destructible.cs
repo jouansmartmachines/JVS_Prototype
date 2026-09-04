@@ -57,19 +57,6 @@ namespace Demolition
             }
         }
 
-        /// <summary>
-        /// Applique des dégâts programmatiquement (appelé par GameManager).
-        /// </summary>
-        public void ApplyDamage(int damage)
-        {
-            if (isDestroyed) return;
-            hp -= damage;
-            if (rend != null)
-                StartCoroutine(FlashRoutine());
-            if (hp <= 0)
-                DestroySelf();
-        }
-
         private void DestroySelf()
         {
             if (isDestroyed) return;
