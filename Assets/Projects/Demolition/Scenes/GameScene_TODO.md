@@ -73,69 +73,64 @@
 
 ## ⚡ Comment Universal_Button est intégré (CRITIQUE)
 
-**C'est la partie la plus importante.** Voici exactement comment ça marche :
+### Tu ajoutes TOUS les composants manuellement sur les prefabs
 
-### Les obstacles (caisses, barils, fantôme) reçoivent Universal_Button AUTOMATIQUEMENT
+Pas d'auto-setup — tu mets toi-même chaque composant dans chaque prefab obstacle.
 
-Dans `Demolition_ObstacleSpawner.SetupInteractable()` — appelé pour chaque obstacle spawné :
+**Pour chaque obstacle (caisse, baril) :**
+
+Sur `Caisse.prefab` et `Baril.prefab`, ajoute ces 4 composants :
+
+| Composant | Type | Rôle |
+|---|---|---|
+| `BoxCollider` | Collider 3D | Détection physique |
+| `Rigidbody` | Rigidbody 3D | Gravité + collisions physiques |
+| `Universal_Button` | **Universal_Button** (pas Collider2DButton, pas Mask) | Détection toucher OSC |
+| `Demolition_Pushable` | Script C# | Force d'impulsion au toucher |
+
+**Pour le fantôme (`Fantome.prefab`) :**
+
+| Composant | Type | Rôle |
+|---|---|---|
+| `BoxCollider` | Collider 3D | Collision physique (pas Universal_Button) |
+| `Rigidbody` | Rigidbody 3D | Physique (chocs) |
+| `Demolition_Fantome` | Script C# | HP, dégâts par force de choc, mort |
+
+→ **Pas de Universal_Button** sur le fantôme — il reçoit les dégâts via `OnCollisionEnter` (force de choc), pas par impact direct.
+
+**Pour les obstacles décoratifs / non interactifs :**
+
+Juste Mesh + éventuellement Collider si besoin de collision physique.
+
+### Quel type de Universal_Button selon le contexte
+
+| Type de rendu | Composant à ajouter |
+|---|---|
+| **3D** (MeshRenderer, Collider 3D) → caisses, barils | `Universal_Button` (détection Physics.Raycast) |
+| **2D** (SpriteRenderer, Collider2D) | `Universal_Collider2DButton` |
+| **Canvas UI** (RectTransform) | `Universal_Button` (détection Rect) |
+| **Bouton Play Accueil** | `Universal_PlayButton` |
+
+→ **Pour Demolition 3D, c'est `Universal_Button` standard** (pas Collider2DButton, pas Mask).
+
+### Binding du Event
+
+Ensuite, dans le script `Demolition_ObstacleSpawner`, le `SetupInteractable()` ne fait **plus que le binding** (puisque les composants sont déjà là) :
 
 ```csharp
 private void SetupInteractable(GameObject obj)
 {
-    // 1. Ajoute un Collider 3D si manquant
-    if (obj.GetComponent<Collider>() == null)
-        obj.AddComponent<BoxCollider>();
+    var btn = obj.GetComponent<Universal_Button>();
+    if (btn == null) return;
 
-    // 2. Ajoute un Rigidbody 3D si manquant
-    if (obj.GetComponent<Rigidbody>() == null)
-        obj.AddComponent<Rigidbody>();
+    var pushable = obj.GetComponent<Demolition_Pushable>();
+    if (pushable == null) return;
 
-    // 3. Ajoute Universal_Button (type 3D → Universal_Button standard)
-    if (obj.GetComponent<Universal_Button>() == null)
-    {
-        var btn = obj.AddComponent<Universal_Button>();
-
-        // 4. Ajoute Demolition_Pushable (script métier)
-        var pushable = obj.GetComponent<Demolition_Pushable>();
-        if (pushable == null)
-            pushable = obj.AddComponent<Demolition_Pushable>();
-
-        // 5. Binding automatique : Event.AddListener(pushable.OnPushed)
-        btn.Event.AddListener(pushable.OnPushed);
-    }
+    btn.Event.AddListener(pushable.OnPushed);
 }
 ```
 
-### Ce que ça donne dans Unity
-
-**Pour chaque obstacle (caisse, baril, fantôme), les composants suivants sont automatiquement ajoutés au runtime :**
-
-| Composant | Type | Rôle |
-|---|---|---|
-| `BoxCollider` | Collider 3D | Détection physique et OSC |
-| `Rigidbody` | Rigidbody 3D | Physique (gravité, collisions) |
-| `Universal_Button` | Universal_Button **3D** | Détection du toucher OSC |
-| `Demolition_Pushable` | Script C# | Force d'impulsion au toucher |
-
-### Quel type de Universal_Button utiliser
-
-| Type de rendu | Universal_Button à utiliser |
-|---|---|
-| **3D** (MeshRenderer, Collider 3D) → caisses, barils, fantôme | `Universal_Button` (détection par Physics.Raycast) |
-| **2D** (SpriteRenderer, Collider2D) | `Universal_Collider2DButton` |
-| **Canvas UI** (RectTransform) | `Universal_Button` (détection Rect) |
-
-→ **Pour Demolition 3D, c'est `Universal_Button` standard** (pas Collider2DButton, pas Mask).
-
-### Donc dans Unity tu n'as RIEN à assigner pour Universal_Button
-
-Les prefabs obstacles (`Caisse.prefab`, `Baril.prefab`, `Fantome.prefab`) n'ont PAS besoin d'avoir Universal_Button dans leur prefab — `SetupInteractable()` l'ajoute au moment du spawn.
-
-**Ce que tu dois juste vérifier :** que tes prefabs obstacles ont bien :
-- Un **Mesh** visible
-- **Pas** de Collider déjà présent (le `SetupInteractable` en ajoute un — si déjà présent, pas de problème)
-- **Pas** de Rigidbody déjà présent (pareil, ajouté que si absent)
-- Le script `Demolition_Pushable.cs` ou `Demolition_Destructible.cs` ou `Demolition_Fantome.cs` selon le type
+**Donc :** tu ajoutes les 4 composants à la main → l'ObstacleSpawner bind juste l'Event. OK ?
 
 ---
 
