@@ -9,12 +9,8 @@ namespace Demolition
     /// </summary>
     public class Demolition_EnvironmentSpawner : MonoBehaviour
     {
-        [Header("Terrains")]
-        public GameObject[] dayTerrainPrefabs;
-        public GameObject[] nightTerrainPrefabs;
-
-        [Header("Environnements (décor background)")]
-        public GameObject[] dayEnvPrefabs;
+        [Header("Environnements (contiennent décor + ObstacleAnchors)")]
+            public GameObject[] dayEnvPrefabs;
         public GameObject[] nightEnvPrefabs;
 
         [Header("Paramètres")]
@@ -23,7 +19,6 @@ namespace Demolition
         void Start()
         {
             bool isNight = IsNightScene();
-            SpawnTerrain(isNight);
             SpawnEnv(isNight);
         }
 
@@ -36,16 +31,6 @@ namespace Demolition
                     return true;
             }
             return false;
-        }
-
-        private void SpawnTerrain(bool isNight)
-        {
-            GameObject[] pool = isNight ? nightTerrainPrefabs : dayTerrainPrefabs;
-            if (pool == null || pool.Length == 0) return;
-
-            GameObject prefab = pool[Random.Range(0, pool.Length)];
-            if (prefab != null)
-                Instantiate(prefab, Vector3.zero, Quaternion.identity);
         }
 
         private void SpawnEnv(bool isNight)

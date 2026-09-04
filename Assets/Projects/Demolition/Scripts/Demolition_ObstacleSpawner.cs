@@ -98,32 +98,17 @@ namespace Demolition
 
         private void SetupInteractable(GameObject obj)
         {
-            if (obj.GetComponent<Collider>() == null)
-                obj.AddComponent<BoxCollider>();
+            var btn = obj.GetComponent<Universal_Button>();
+            if (btn == null) return;
 
-            if (obj.GetComponent<Rigidbody>() == null)
+            var pushable = obj.GetComponent<Demolition_Pushable>();
+            if (pushable == null)
             {
-                var rb = obj.AddComponent<Rigidbody>();
-                rb.mass = 2f;
-                rb.drag = 0.5f;
-                rb.angularDrag = 0.5f;
+                Debug.LogWarning($"Demolition_ObstacleSpawner: {obj.name} a Universal_Button mais pas Demolition_Pushable — ajoute-le manuellement sur le prefab.");
+                return;
             }
 
-            if (obj.GetComponent<Universal_Button>() == null)
-            {
-                var btn = obj.AddComponent<Universal_Button>();
-                var pushable = obj.GetComponent<Demolition_Pushable>();
-                if (pushable == null)
-                    pushable = obj.AddComponent<Demolition_Pushable>();
-
-                // Initialiser l'Event (nécessaire car il est privé)
-                var eventField = typeof(Universal_Button).GetField("_event",
-                    System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-                if (eventField != null && eventField.GetValue(btn) == null)
-                    eventField.SetValue(btn, new UnityEngine.Events.UnityEvent());
-
-                btn.Event.AddListener(pushable.OnPushed);
-            }
+            btn.Event.AddListener(pushable.OnPushed);
         }
     }
 }
