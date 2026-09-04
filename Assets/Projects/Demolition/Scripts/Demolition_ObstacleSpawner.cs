@@ -5,8 +5,8 @@ namespace Demolition
 {
     /// <summary>
     /// Configure les obstacles à spawner + les 3 niveaux de difficulté.
-    /// Tous les prefabs sont référencés ICI, pas dans les ObstacleAnchors.
-    /// Les ObstacleAnchors ne sont que des positions (Transforms) dans la scène.
+    /// Les ObstacleAnchors fournissent les Transform positions de spawn.
+    /// Les obstacles spawnent exactement à la position de l'ObstacleAnchor.
     /// </summary>
     public class Demolition_ObstacleSpawner : MonoBehaviour
     {
@@ -27,9 +27,6 @@ namespace Demolition
 
         [Header("3 niveaux de difficulté")]
         public DifficultyLevel[] difficultyLevels = new DifficultyLevel[3];
-
-        [Header("Anti-overlap")]
-        public float minDistanceBetweenObstacles = 0.8f;
 
         [Header("Parent dans la hiérarchie")]
         public Transform obstaclesParent;
@@ -54,8 +51,6 @@ namespace Demolition
                 return;
             }
 
-            List<Vector3> usedPositions = new List<Vector3>();
-
             foreach (var anchor in anchors)
             {
                 if (anchor.isFantomeAnchor)
@@ -65,11 +60,11 @@ namespace Demolition
                     continue;
                 }
 
-                SpawnObstaclesInZone(anchor, config, usedPositions);
+                SpawnObstaclesInZone(anchor, config);
             }
         }
 
-        private void SpawnObstaclesInZone(Demolition_ObstacleAnchor anchor, DifficultyLevel config, List<Vector3> usedPositions)
+        private void SpawnObstaclesInZone(Demolition_ObstacleAnchor anchor, DifficultyLevel config)
         {
             if (config.availablePrefabs == null || config.availablePrefabs.Length == 0)
             {
@@ -81,16 +76,12 @@ namespace Demolition
 
             for (int i = 0; i < count; i++)
             {
-                Vector3 pos = GetRandomPositionInRadius(anchor.transform.position, anchor.spawnRadius, usedPositions);
-                if (pos == Vector3.zero) continue;
-
                 GameObject prefab = config.availablePrefabs[Random.Range(0, config.availablePrefabs.Length)];
                 if (prefab == null) continue;
 
-                GameObject obj = Instantiate(prefab, pos, Random.rotation, obstaclesParent);
+                GameObject obj = Instantiate(prefab, anchor.transform.position, Random.rotation, obstaclesParent);
 
                 SetupInteractable(obj);
-                usedPositions.Add(pos);
             }
         }
 
@@ -109,30 +100,6 @@ namespace Demolition
             if (barilPrefab != null) defaults.Add(barilPrefab);
             if (defaults.Count == 0) return;
             config.availablePrefabs = defaults.ToArray();
-        }
-
-        private Vector3 GetRandomPositionInRadius(Vector3 center, float radius, List<Vector3> used)
-        {
-            for (int attempt = 0; attempt < 20; attempt++)
-            {
-                Vector2 circle = Random.insideUnitCircle * radius;
-                Vector3 candidate = new Vector3(center.x + circle.x, center.y + circle.y, center.z);
-
-                bool overlap = false;
-                foreach (var usedPos in used)
-                {
-                    if (Vector3.Distance(candidate, usedPos) < minDistanceBetweenObstacles)
-                    {
-                        overlap = true;
-                        break;
-                    }
-                }
-
-                if (!overlap && Physics.CheckSphere(candidate, minDistanceBetweenObstacles * 0.4f) == false)
-                    return candidate;
-            }
-
-            return Vector3.zero;
         }
 
         private void SetupInteractable(GameObject obj)
