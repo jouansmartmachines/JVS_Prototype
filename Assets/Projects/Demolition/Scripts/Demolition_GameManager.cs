@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using MenuSelection;
 
@@ -41,12 +40,8 @@ namespace Demolition
         public float currentScrollSpeed = 2f;
         public Transform structuresParent;
 
-        [Header("Scènes")]
-        public string[] sceneNames;
-
         private bool isRunning = false;
         private bool isGameOver = false;
-        private string sceneToLoadNext;
 
         private void Awake()
         {
@@ -77,9 +72,6 @@ namespace Demolition
         {
             sceneDuration = Demolition_GeneralVariables.GetSceneDurationFromPrefs();
             globalTimer = Demolition_GeneralVariables.GetGlobalTimeFromPrefs();
-
-            if (sceneNames == null || sceneNames.Length == 0)
-                sceneNames = new string[] { "GameScene_Demolition" };
         }
 
         private void EnsureSceneElements()
@@ -156,8 +148,7 @@ namespace Demolition
             if (sceneClearSound != null)
                 audioSource.PlayOneShot(sceneClearSound);
 
-            PickNextScene();
-            StartCoroutine(FadeOutAndLoad());
+            StartCoroutine(FadeOutAndReload());
         }
 
         private void EndGame()
@@ -181,24 +172,6 @@ namespace Demolition
             StartCoroutine(TransitionToScore());
         }
 
-        private void PickNextScene()
-        {
-            if (sceneNames == null || sceneNames.Length == 0)
-            {
-                sceneToLoadNext = Demolition_GeneralVariables.Instance?.gameScene ?? "GameScene_Demolition";
-                return;
-            }
-
-            string currentScene = SceneManager.GetActiveScene().name;
-            List<string> candidates = new List<string>(sceneNames);
-            candidates.Remove(currentScene);
-
-            if (candidates.Count == 0)
-                candidates.Add(currentScene);
-
-            sceneToLoadNext = candidates[Random.Range(0, candidates.Count)];
-        }
-
         private IEnumerator FadeIn()
         {
             if (fadeCanvasGroup == null) yield break;
@@ -213,7 +186,7 @@ namespace Demolition
             fadeCanvasGroup.alpha = 0f;
         }
 
-        private IEnumerator FadeOutAndLoad()
+        private IEnumerator FadeOutAndReload()
         {
             yield return new WaitForSeconds(1f);
 
@@ -229,10 +202,8 @@ namespace Demolition
                 fadeCanvasGroup.alpha = 1f;
             }
 
-            if (!string.IsNullOrEmpty(sceneToLoadNext))
-                SceneManager.LoadScene(sceneToLoadNext);
-            else
-                EndGame();
+            // Recharger la même scène (reset)
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
 
         private IEnumerator TransitionToScore()

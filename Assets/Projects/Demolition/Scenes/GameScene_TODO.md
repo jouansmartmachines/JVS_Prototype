@@ -2,10 +2,10 @@
 
 ## Concept
 
-- **Terrain** = pas un prefab, ce sont des **éléments** (mesh, collider) que tu utilises en jeu pour construire un environnement visuel
-- **ObstacleAnchors** → directement DANS les environnements (Env_Jour.prefab / Env_Nuit.prefab)
-- **ObstacleSpawner** → 3 niveaux de difficulté (structures d'obstacles de plus en plus complexes)
-- **Universal_Button** → point critique, tout le binding est automatique via `SetupInteractable()` dans ObstacleSpawner
+- **Pas de Terrain** — juste des environnements (Env_Jour.prefab / Env_Nuit.prefab) qui contiennent décor + sol + ObstacleAnchors
+- **ObstacleAnchors** → directement DANS les environnements
+- **ObstacleSpawner** → 3 niveaux de difficulté avec `FindObjectsOfType` sur les anchors
+- **Universal_Button** → ajouté à la main sur chaque prefab obstacle, puis bindé via `SetupInteractable()`
 
 ---
 
@@ -35,17 +35,14 @@
 
 ### 3. DemolitionManager (déjà présent)
 
-- [ ] **sceneNames[]** : `GameScene_Demolition_1`, `GameScene_Demolition_Night_1`...
 - [ ] **Audio clips** : `sceneClearSound`, `gameOverSound`
 
 ### 4. EnvSpawner (unique empty dans la scène)
 
 - [ ] Créer un empty `EnvSpawner` avec `Demolition_EnvironmentSpawner.cs`
 - [ ] Remplir les tableaux :
-  - `dayEnvPrefabs[]` → `Env_Jour_1`, `Env_Jour_2`... (contiennent ObstacleAnchors + décor)
+  - `dayEnvPrefabs[]` → `Env_Jour_1`, `Env_Jour_2`... (contiennent ObstacleAnchors + décor + sol)
   - `nightEnvPrefabs[]` → `Env_Nuit_1`, `Env_Nuit_2`...
-  - `dayTerrainElements[]` → éléments de terrain jour (mesh sol, mesh décor)
-  - `nightTerrainElements[]` → éléments de terrain nuit
 
 **ObstacleAnchors sont DANS les prefabs Env_Jour / Env_Nuit**, pas dans la scène.
 
@@ -148,7 +145,7 @@ private void SetupInteractable(GameObject obj)
 Chaque Env prefab contient dans sa hiérarchie :
 ```
 Env_Jour_1.prefab
-├── Sol (mesh décoratif + BoxCollider — ou pas, le sol peut être séparé)
+├── Sol (mesh décoratif + BoxCollider)
 ├── Décor (mesh visuel)
 ├── ObstacleAnchors (empty)
 │   ├── Anchor_N1_Obstacles (Demolition_ObstacleAnchor, prefabs[] N1, radius=2, min=1, max=2)
@@ -156,30 +153,23 @@ Env_Jour_1.prefab
 │   └── Anchor_Fantome (Demolition_ObstacleAnchor, isFantomeAnchor=true, fantomePrefab)
 ```
 
-**ObstacleSpawner** est un empty séparé dans la scène (pas dans les Env) — c'est lui qui parcourt tous les ObstacleAnchors trouvés avec `FindObjectsOfType`.
+**ObstacleSpawner** est un empty séparé dans la scène (pas dans les Env) — c'est lui qui parcourt tous les ObstacleAnchors avec `FindObjectsOfType` et spawn les obstacles selon le niveau courant.
 
 ### Obstacles (instanciés par ObstacleSpawner)
 
-| Prefab | Composants essentiels |
+| Prefab | Composants à ajouter à la main |
 |---|---|
-| `Caisse.prefab` | Mesh + **aucun composant requis** (SetupInteractable ajoute Collider+Rigidbody+Universal_Button+Pushable) |
-| `Baril.prefab` | Mesh + **idem** |
-| `Fantome.prefab` | Mesh + **Collider + Rigidbody** (nécessaires pour OnCollisionEnter) + `Demolition_Fantome.cs` |
+| `Caisse.prefab` | Mesh + `BoxCollider` + `Rigidbody` + `Universal_Button` + `Demolition_Pushable` |
+| `Baril.prefab` | Mesh + `BoxCollider` + `Rigidbody` + `Universal_Button` + `Demolition_Pushable` |
+| `Fantome.prefab` | Mesh + `BoxCollider` + `Rigidbody` + `Demolition_Fantome` (pas de Universal_Button) |
 
-Le Fantôme : il a déjà `Demolition_Fantome.cs` dans le prefab → `ObstacleSpawner.SpawnFantome()` ne lui ajoute pas de Universal_Button (c'est un obstacle à choc, pas à impact direct). Il utilise `OnCollisionEnter` avec `collision.impulse.magnitude` pour les dégâts.
+Le Fantôme utilise `OnCollisionEnter` avec `collision.impulse.magnitude` pour les dégâts — pas d'impact direct OSC.
 
-### Éléments de terrain (pas des prefabs complets)
+### Impact
 
-Ce sont des **éléments** que l'EnvSpawner combine au runtime :
-
-| Élément | Type | Usage |
-|---|---|---|
-| `Sol_Jour` | Mesh + BoxCollider | Sol de base jour |
-| `Sol_Nuit` | Mesh + BoxCollider | Sol de base nuit |
-| `Decor_Arbre_1` | Mesh | Décor planté sur le sol |
-| `Decor_Rocher_1` | Mesh | Décor |
-
-L'EnvSpawner instancie `Sol_Jour` + pioche 1-2 décors aléatoires pour construire l'environnement.
+| Prefab | Composants |
+|---|---|
+| `ImpactExplosion.prefab` | Particle System + audio (existe déjà) |
 
 ---
 
@@ -187,7 +177,7 @@ L'EnvSpawner instancie `Sol_Jour` + pioche 1-2 décors aléatoires pour construi
 
 - [ ] `Build Settings` → toutes les scènes Demolition ajoutées
 - [ ] `GameScoreBoard.Demolition` existe dans `ScoreBoardManager.cs`
-- [ ] Les **Mesh 3D** dans `Mesh/` sont assignés sur les éléments de terrain / obstacles
+- [ ] Les **Mesh 3D** dans `Mesh/` sont assignés sur les environnements / obstacles
 - [ ] `Canvas.m_RenderMode = 1` (Screen Space Camera)
 - [ ] L'éclairage (Directional Light) réglé jour ou nuit selon le nom de la scène
 
@@ -198,6 +188,6 @@ L'EnvSpawner instancie `Sol_Jour` + pioche 1-2 décors aléatoires pour construi
 - **Ne pas éditer le YAML .unity**
 - **Ne pas assigner manuellement** ce que les scripts trouvent via `GameObject.Find()`
 - **Police du Menu** → ne pas toucher
-- **Universal_Button 3D** est ajouté automatiquement par `ObstacleSpawner.SetupInteractable()` — pas besoin de le mettre dans les prefabs obstacles
+- **Universal_Button** → ajouté à la main sur chaque prefab (`BoxCollider` + `Rigidbody` + `Universal_Button` + `Demolition_Pushable`), puis `SetupInteractable()` bind l'Event
 - **Fantôme** n'a PAS de Universal_Button — il utilise `OnCollisionEnter`
 - Les **ObstacleAnchors** sont dans les prefabs `Env_Jour` / `Env_Nuit`, pas dans la scène
