@@ -137,7 +137,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &101
 Transform:
   m_ObjectHideFlags: 0
@@ -488,7 +488,7 @@ GameObject:
   - component: {fileID: 680095160}
   - component: {fileID: 680095159}
   m_Layer: 0
-  m_Name: utilis
+  m_Name: Score
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -625,12 +625,12 @@ GameObject:
   - component: {fileID: 785611916}
   - component: {fileID: 785611915}
   m_Layer: 0
-  m_Name: utilis
+  m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &785611914
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1040,25 +1040,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 813e5a086c1927d77cdafb99f04aceb0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Demolition.Demolition_GameManager
-  launchMode: 0
-  oiseauPrefab: {fileID: 4778636932907053998, guid: 98670adc6e21c644abbaa8412104767b, type: 3}
-  impactEffectPrefab: {fileID: 8637732324076961834, guid: b374cb26f89bd3f4ba74c2513bc08f04, type: 3}
-  popupTextPrefab: {fileID: 0}
-  structuresParent: {fileID: 1173445717}
-  groundY: -4
-  baseScrollSpeed: 2
-  currentScrollSpeed: 0
-  gameDuration: 60
-  currentTime: 0
-  minTimeBetweenShots: 0.12
-  impactSound: {fileID: 8300000, guid: 13169ca93ce7e2949accf68b7acbd0ed, type: 3}
-  destructionSound: {fileID: 8300000, guid: 073f1d85bc5ebca4fa565df58852ba46, type: 3}
-  gameOverSound: {fileID: 8300000, guid: 34806e543b1d56b419fd641a6822f494, type: 3}
-  pigHitSound: {fileID: 0}
+  sceneDuration: 60
+  sceneTimer: 0
+  globalTimer: 300
+  useGlobalTimer: 1
+  sceneScore: 0
   scoreText: {fileID: 0}
   timerText: {fileID: 0}
-  starText: {fileID: 0}
-  currentStars: 1
+  sceneText: {fileID: 0}
+  globalTimerText: {fileID: 0}
+  fadeCanvasGroup: {fileID: 0}
+  fadeInDuration: 0.5
+  fadeOutDuration: 1
+  sceneClearSound: {fileID: 0}
+  gameOverSound: {fileID: 8300000, guid: 34806e543b1d56b419fd641a6822f494, type: 3}
+  currentScrollSpeed: 0
+  structuresParent: {fileID: 1173445717}
+  sceneNames: []
 --- !u!4 &1450344021
 Transform:
   m_ObjectHideFlags: 0
@@ -1086,7 +1084,7 @@ GameObject:
   - component: {fileID: 1562551323}
   - component: {fileID: 1562551322}
   m_Layer: 0
-  m_Name: utilis
+  m_Name: Level
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1356,7 +1354,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1859528090
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1444,63 +1442,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
---- !u!1001 &1913702744
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 4945247784738895748, guid: 88608f90592e2f345a8fec88b36149e6, type: 3}
-      propertyPath: m_Name
-      value: TerrainNight
-      objectReference: {fileID: 0}
-    - target: {fileID: 9047998520072647943, guid: 88608f90592e2f345a8fec88b36149e6, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 35171.195
-      objectReference: {fileID: 0}
-    - target: {fileID: 9047998520072647943, guid: 88608f90592e2f345a8fec88b36149e6, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9047998520072647943, guid: 88608f90592e2f345a8fec88b36149e6, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -18159.498
-      objectReference: {fileID: 0}
-    - target: {fileID: 9047998520072647943, guid: 88608f90592e2f345a8fec88b36149e6, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 9047998520072647943, guid: 88608f90592e2f345a8fec88b36149e6, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9047998520072647943, guid: 88608f90592e2f345a8fec88b36149e6, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9047998520072647943, guid: 88608f90592e2f345a8fec88b36149e6, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9047998520072647943, guid: 88608f90592e2f345a8fec88b36149e6, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9047998520072647943, guid: 88608f90592e2f345a8fec88b36149e6, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9047998520072647943, guid: 88608f90592e2f345a8fec88b36149e6, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 88608f90592e2f345a8fec88b36149e6, type: 3}
 --- !u!1 &2082745519
 GameObject:
   m_ObjectHideFlags: 0
@@ -1513,7 +1454,7 @@ GameObject:
   - component: {fileID: 2082745522}
   - component: {fileID: 2082745521}
   m_Layer: 0
-  m_Name: utilis
+  m_Name: Timer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1651,4 +1592,3 @@ SceneRoots:
   - {fileID: 1859528093}
   - {fileID: 385827813}
   - {fileID: 1214886546}
-  - {fileID: 1913702744}

@@ -105,8 +105,8 @@ namespace Demolition
             {
                 var rb = obj.AddComponent<Rigidbody>();
                 rb.mass = 2f;
-                rb.drag = 0.5f;
-                rb.angularDrag = 0.5f;
+                rb.linearDamping = 0.5f;
+                rb.angularDamping = 0.5f;
             }
 
             if (obj.GetComponent<Universal_Button>() == null)
