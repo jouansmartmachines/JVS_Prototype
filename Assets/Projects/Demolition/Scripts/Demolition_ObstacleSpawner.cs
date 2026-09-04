@@ -3,11 +3,6 @@ using System.Collections.Generic;
 
 namespace Demolition
 {
-    /// <summary>
-    /// Configure les obstacles à spawner + les 3 niveaux de difficulté.
-    /// Les ObstacleAnchors fournissent les Transform positions de spawn.
-    /// Les obstacles spawnent exactement à la position de l'ObstacleAnchor.
-    /// </summary>
     public class Demolition_ObstacleSpawner : MonoBehaviour
     {
         [Header("Prefabs obstacles")]
@@ -66,20 +61,36 @@ namespace Demolition
 
         private void SpawnObstaclesInZone(Demolition_ObstacleAnchor anchor, DifficultyLevel config)
         {
-            if (config.availablePrefabs == null || config.availablePrefabs.Length == 0)
+            GameObject[] prefabsToSpawn = config.availablePrefabs;
+
+            if (prefabsToSpawn == null || prefabsToSpawn.Length == 0)
             {
                 FillDefaultPrefabs(config);
-                if (config.availablePrefabs.Length == 0) return;
+                prefabsToSpawn = config.availablePrefabs;
+                if (prefabsToSpawn.Length == 0) return;
             }
 
             int count = Random.Range(config.minCount, config.maxCount + 1);
 
             for (int i = 0; i < count; i++)
             {
-                GameObject prefab = config.availablePrefabs[Random.Range(0, config.availablePrefabs.Length)];
+                GameObject prefab = prefabsToSpawn[Random.Range(0, prefabsToSpawn.Length)];
                 if (prefab == null) continue;
 
-                GameObject obj = Instantiate(prefab, anchor.transform.position, Random.rotation, obstaclesParent);
+                Transform targetParent = obstaclesParent != null ? obstaclesParent : anchor.transform;
+                Vector3 spawnPosition = anchor.transform.position;
+
+                if (anchor.obstaclePrefabs != null && anchor.obstaclePrefabs.Length > 0)
+                {
+                    GameObject parentObj = anchor.obstaclePrefabs[Random.Range(0, anchor.obstaclePrefabs.Length)];
+                    if (parentObj != null && parentObj.scene.IsValid())
+                    {
+                        targetParent = parentObj.transform;
+                        spawnPosition = targetParent.position;
+                    }
+                }
+
+                GameObject obj = Instantiate(prefab, spawnPosition, Random.rotation, targetParent);
 
                 SetupInteractable(obj);
             }
@@ -87,7 +98,10 @@ namespace Demolition
 
         private void SpawnFantome(Demolition_ObstacleAnchor anchor)
         {
-            GameObject fantome = Instantiate(fantomePrefab, anchor.transform.position, Quaternion.identity, obstaclesParent);
+            Vector3 spawnPos = obstaclesParent != null ? obstaclesParent.position : anchor.transform.position;
+            Transform parentT = obstaclesParent != null ? obstaclesParent : anchor.transform;
+
+            GameObject fantome = Instantiate(fantomePrefab, spawnPos, Quaternion.identity, parentT);
 
             if (fantome.GetComponent<Demolition_Fantome>() == null)
                 fantome.AddComponent<Demolition_Fantome>();

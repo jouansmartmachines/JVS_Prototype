@@ -27,53 +27,30 @@ namespace Demolition
         public TextMeshProUGUI sceneText;
         public TextMeshProUGUI globalTimerText;
 
-<<<<<<< Updated upstream
-        [Header("Destructibles (IndieKit)")]
-        /// <summary>
-        /// Applique des dégâts à un DestructibleObject IndieKit.
-        /// </summary>
-        public void ApplyDamageToDestructible(Component target, int damage)
-=======
-        [Header("Destructibles")]
-        public void ApplyDamageToDestructible(DestructibleObject target, int damage)
->>>>>>> Stashed changes
+        public void ApplyDamageToDestructible(IndieKit.IDamageable target, float damage, Vector3 hitPoint)
         {
-            if (target == null) return;
-            var dest = target.GetComponent("DestructibleObject");
-            if (dest != null)
-                dest.SendMessage("ApplyDamage", damage, SendMessageOptions.DontRequireReceiver);
+            if (target != null)
+                target.ApplyDamage(damage, hitPoint);
         }
 
-        /// <summary>
-        /// Explosion de zone : tous les DestructibleObject dans le radius prennent damage.
-        /// </summary>
-        public void ApplyDamageToAllInRadius(Vector3 center, float radius, int damage)
+        public void ApplyDamageToAllInRadius(Vector3 center, float radius, float damage)
         {
             Collider[] hits = Physics.OverlapSphere(center, radius);
             foreach (var hit in hits)
             {
-<<<<<<< Updated upstream
-                var dest = hit.GetComponent("DestructibleObject");
-=======
-                var dest = hit.GetComponent<DestructibleObject>();
->>>>>>> Stashed changes
-                if (dest != null)
-                    dest.SendMessage("ApplyDamage", damage, SendMessageOptions.DontRequireReceiver);
+                // On cherche l'interface commune IDamageable au lieu d'un script spécifique
+                if (hit.TryGetComponent<IndieKit.IDamageable>(out var damageable))
+                {
+                    damageable.ApplyDamage(damage, center);
+                }
             }
         }
 
-        /// <summary>
-        /// Vérifie s'il y a des DestructibleObject dans une zone.
-        /// </summary>
         public bool HasDestructiblesInRadius(Vector3 center, float radius)
         {
             Collider[] hits = Physics.OverlapSphere(center, radius);
             foreach (var hit in hits)
-<<<<<<< Updated upstream
-                if (hit.GetComponent("DestructibleObject") != null)
-=======
-                if (hit.GetComponent<DestructibleObject>() != null)
->>>>>>> Stashed changes
+                if (hit.GetComponent<Demolition_Destructible>() != null)
                     return true;
             return false;
         }
@@ -313,11 +290,6 @@ namespace Demolition
             Time.timeScale = 0.15f;
             yield return new WaitForSecondsRealtime(0.3f);
             Time.timeScale = 1f;
-        }
-
-        public void TriggerPigDestroyed(int starValue)
-        {
-            Demolition_DebrisSpawner.SpawnStarBurst(Vector3.zero, 5 + starValue * 3);
         }
 
         private void UpdateUI()

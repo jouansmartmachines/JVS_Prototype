@@ -789,16 +789,7 @@ public class JVS_SetupEditor : EditorWindow
         }
     }
 
-    private static void CreateBloc(string prefabDir, string name, Sprite sprite, Demolition_Block.MaterialType mat, int hp, int pts, Sprite f1, Sprite f2)
-    {
-        var go = new GameObject(name, typeof(SpriteRenderer), typeof(BoxCollider2D), typeof(Rigidbody2D), typeof(AudioSource), typeof(Demolition_Block));
-        var sr = go.GetComponent<SpriteRenderer>(); sr.sprite = sprite; sr.sortingOrder = 3;
-        var blk = go.GetComponent<Demolition_Block>();
-        blk.hp = hp; blk.points = pts; blk.materialType = mat; blk.spriteRenderer = sr;
-        blk.damageSprites = new Sprite[] { f1, f2 };
-        PrefabUtility.SaveAsPrefabAsset(go, prefabDir + "/" + name + ".prefab");
-        Object.DestroyImmediate(go);
-    }
+
 
     private static void CreateDebris(string prefabDir, string name, Sprite sprite)
     {
@@ -808,49 +799,10 @@ public class JVS_SetupEditor : EditorWindow
         Object.DestroyImmediate(go);
     }
 
-    private static void CreateOiseau(string prefabDir, Sprite oiSprite, Sprite imSprite)
-    {
-        var imp = new GameObject("ImpactExplosion", typeof(SpriteRenderer));
-        imp.GetComponent<SpriteRenderer>().sprite = imSprite;
-        imp.GetComponent<SpriteRenderer>().sortingOrder = 5;
-        PrefabUtility.SaveAsPrefabAsset(imp, prefabDir + "/ImpactExplosion.prefab");
-        Object.DestroyImmediate(imp);
 
-        var go = new GameObject("Oiseau", typeof(SpriteRenderer), typeof(Demolition_Projectile));
-        go.GetComponent<SpriteRenderer>().sprite = oiSprite;
-        go.GetComponent<SpriteRenderer>().sortingOrder = 8;
-        var p = go.GetComponent<Demolition_Projectile>();
-        p.flightDuration = 0.14f;
-        p.scaleStart = 1.4f;
-        p.scaleEnd = 0.55f;
-        p.hitRadius = 0.35f;
-        p.pushForce = 2.2f;
-        p.directDamage = 1;
-        PrefabUtility.SaveAsPrefabAsset(go, prefabDir + "/Oiseau.prefab");
-        Object.DestroyImmediate(go);
-    }
 
-    private static void CreateCochonPrefabs()
-    {
-        var t_cochon = LoadSprite(_demoTex, "cochon");
-        if (t_cochon == null) { Debug.LogWarning("cochon.png pas trouvé"); return; }
-        CreateCochonBloc("Cochon", t_cochon, 3, 500, 1);
-        var t_cv = LoadSprite(_demoTex, "cochon_vert");
-        if (t_cv != null) CreateCochonBloc("Cochon_Vert", t_cv, 4, 1000, 2);
-        var t_cb = LoadSprite(_demoTex, "cochon_bleu");
-        if (t_cb != null) CreateCochonBloc("Cochon_Bleu", t_cb, 6, 2000, 3);
-    }
 
-    private static void CreateCochonBloc(string name, Sprite sprite, int hp, int pts, int starVal)
-    {
-        var go = new GameObject(name, typeof(SpriteRenderer), typeof(BoxCollider2D), typeof(Rigidbody2D), typeof(AudioSource), typeof(Demolition_Block), typeof(Demolition_PigBehavior));
-        var sr = go.GetComponent<SpriteRenderer>(); sr.sprite = sprite; sr.sortingOrder = 3;
-        var blk = go.GetComponent<Demolition_Block>();
-        blk.hp = hp; blk.points = pts; blk.materialType = Demolition_Block.MaterialType.Cochon; blk.spriteRenderer = sr;
-        blk.isTarget = true; blk.starValue = starVal;
-        PrefabUtility.SaveAsPrefabAsset(go, _demoPrefab + "/" + name + ".prefab");
-        Object.DestroyImmediate(go);
-    }
+
 
     private static void CreatePopupTextPrefab()
     {
