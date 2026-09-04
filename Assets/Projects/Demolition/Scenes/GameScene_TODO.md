@@ -183,6 +183,41 @@ Le Fantôme utilise `OnCollisionEnter` avec `collision.impulse.magnitude` pour l
 
 ---
 
+## 🔧 Changements récents (sept. 2026)
+
+### ObstacleAnchor — nouveau setup
+
+Chaque `Demolition_ObstacleAnchor` a maintenant 2 nouveaux champs :
+
+| Champ | Type | Usage |
+|---|---|---|
+| `obstaclePrefabs[]` | GameObject[] | Prefabs spécifiques à CET anchor (remplace la config globale du Spawner) |
+| `anchorCamera` | Camera | Caméra dédiée pour la vue — utilisée par les obstacles spawnés ici |
+
+**À faire dans Unity :**
+- [ ] Sur chaque ObstacleAnchor, remplir `obstaclePrefabs[]` avec les prefabs à spawner (caisses, barils...)
+- [ ] Assigner `anchorCamera` : la Main Camera de la scène (ou une caméra dédiée)
+- [ ] Les anchors gardent `spawnRadius`, `minCount`, `maxCount`, `isFantomeAnchor` inchangés
+
+### GameManager — casser les caisses programmatiquement
+
+Le GameManager expose 3 nouvelles méthodes publiques :
+
+```csharp
+// Cibler un objet destructible précis
+Demolition_GameManager.Instance.ApplyDamageToDestructible(target, damage);
+
+// Explosion de zone — tous les Demolition_Destructible dans le radius
+Demolition_GameManager.Instance.ApplyDamageToAllInRadius(center, radius, damage);
+
+// Vérifier s'il y a des destructibles dans une zone
+Demolition_GameManager.Instance.HasDestructiblesInRadius(center, radius);
+```
+
+**Utilisation typique :** quand un impact ou une explosion touche une zone, appelle `ApplyDamageToAllInRadius` pour casser les caisses/barils à proximité.
+
+**Caisse = `Demolition_Destructible`** (HP, flash rouge, destruction + score + son). Le script n'a pas été modifié — `ApplyDamage()` reste dans `Demolition_Destructible`, le GameManager y accède via les wrappers ci-dessus.
+
 ## 📝 Rappel des règles
 
 - **Ne pas éditer le YAML .unity**
@@ -191,3 +226,4 @@ Le Fantôme utilise `OnCollisionEnter` avec `collision.impulse.magnitude` pour l
 - **Universal_Button** → ajouté à la main sur chaque prefab (`BoxCollider` + `Rigidbody` + `Universal_Button` + `Demolition_Pushable`), puis `SetupInteractable()` bind l'Event
 - **Fantôme** n'a PAS de Universal_Button — il utilise `OnCollisionEnter`
 - Les **ObstacleAnchors** sont dans les prefabs `Env_Jour` / `Env_Nuit`, pas dans la scène
+- **Demolition_Destructible.cs** intact — seul `ApplyDamage()` a été ajouté (méthode publique, pas de modification du comportement existant)
