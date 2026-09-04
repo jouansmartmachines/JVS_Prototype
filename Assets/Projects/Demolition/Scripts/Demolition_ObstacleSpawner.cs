@@ -31,6 +31,9 @@ namespace Demolition
         [Header("Anti-overlap")]
         public float minDistanceBetweenObstacles = 0.8f;
 
+        [Header("Parent dans la hiérarchie")]
+        public Transform obstaclesParent;
+
         private int currentDifficulty = 0;
         public int CurrentDifficulty
         {
@@ -89,8 +92,7 @@ namespace Demolition
                 GameObject prefab = config.availablePrefabs[Random.Range(0, config.availablePrefabs.Length)];
                 if (prefab == null) continue;
 
-                GameObject obj = Instantiate(prefab, pos, Random.rotation);
-                obj.transform.SetParent(anchor.transform);
+                GameObject obj = Instantiate(prefab, pos, Random.rotation, obstaclesParent);
 
                 SetupInteractable(obj);
                 usedPositions.Add(pos);
@@ -99,8 +101,7 @@ namespace Demolition
 
         private void SpawnFantome(Demolition_ObstacleAnchor anchor)
         {
-            GameObject fantome = Instantiate(fantomePrefab, anchor.transform.position, Quaternion.identity);
-            fantome.transform.SetParent(anchor.transform);
+            GameObject fantome = Instantiate(fantomePrefab, anchor.transform.position, Quaternion.identity, obstaclesParent);
 
             if (fantome.GetComponent<Demolition_Fantome>() == null)
                 fantome.AddComponent<Demolition_Fantome>();

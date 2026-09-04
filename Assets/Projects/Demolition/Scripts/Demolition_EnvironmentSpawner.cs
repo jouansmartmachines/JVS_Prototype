@@ -22,6 +22,10 @@ namespace Demolition
         public GameObject[] dayEnvPrefabs;
         public GameObject[] nightEnvPrefabs;
 
+        [Header("Parents dans la hiérarchie")]
+        public Transform settingsParent;
+        public Transform envParent;
+
         void Start()
         {
             bool isNight = IsNightScene();
@@ -47,7 +51,7 @@ namespace Demolition
             if (pool == null || pool.Length == 0) return;
             GameObject prefab = pool[Random.Range(0, pool.Length)];
             if (prefab != null)
-                Instantiate(prefab, Vector3.zero, Quaternion.identity);
+                Instantiate(prefab, Vector3.zero, Quaternion.identity, settingsParent);
         }
 
         private void SpawnEnv(bool isNight)
@@ -56,7 +60,7 @@ namespace Demolition
             if (pool == null || pool.Length == 0) return;
             GameObject prefab = pool[Random.Range(0, pool.Length)];
             if (prefab != null)
-                Instantiate(prefab, Vector3.zero, Quaternion.identity);
+                Instantiate(prefab, Vector3.zero, Quaternion.identity, envParent);
         }
     }
 }
