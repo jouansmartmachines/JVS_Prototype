@@ -26,6 +26,33 @@ namespace Demolition
         public TextMeshProUGUI sceneText;
         public TextMeshProUGUI globalTimerText;
 
+        [Header("Destructibles")]
+        public void ApplyDamageToDestructible(Demolition_Destructible target, int damage)
+        {
+            if (target != null)
+                target.ApplyDamage(damage);
+        }
+
+        public void ApplyDamageToAllInRadius(Vector3 center, float radius, int damage)
+        {
+            Collider[] hits = Physics.OverlapSphere(center, radius);
+            foreach (var hit in hits)
+            {
+                var dest = hit.GetComponent<Demolition_Destructible>();
+                if (dest != null)
+                    dest.ApplyDamage(damage);
+            }
+        }
+
+        public bool HasDestructiblesInRadius(Vector3 center, float radius)
+        {
+            Collider[] hits = Physics.OverlapSphere(center, radius);
+            foreach (var hit in hits)
+                if (hit.GetComponent<Demolition_Destructible>() != null)
+                    return true;
+            return false;
+        }
+
         [Header("Fondu")]
         public CanvasGroup fadeCanvasGroup;
         public float fadeInDuration = 0.5f;
