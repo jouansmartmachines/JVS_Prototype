@@ -3,6 +3,7 @@ using UnityEngine.SceneManagement;
 using System.Collections;
 using TMPro;
 using MenuSelection;
+using IndieKit;
 
 namespace Demolition
 {
@@ -26,11 +27,16 @@ namespace Demolition
         public TextMeshProUGUI sceneText;
         public TextMeshProUGUI globalTimerText;
 
+<<<<<<< Updated upstream
         [Header("Destructibles (IndieKit)")]
         /// <summary>
         /// Applique des dégâts à un DestructibleObject IndieKit.
         /// </summary>
         public void ApplyDamageToDestructible(Component target, int damage)
+=======
+        [Header("Destructibles")]
+        public void ApplyDamageToDestructible(DestructibleObject target, int damage)
+>>>>>>> Stashed changes
         {
             if (target == null) return;
             var dest = target.GetComponent("DestructibleObject");
@@ -46,7 +52,11 @@ namespace Demolition
             Collider[] hits = Physics.OverlapSphere(center, radius);
             foreach (var hit in hits)
             {
+<<<<<<< Updated upstream
                 var dest = hit.GetComponent("DestructibleObject");
+=======
+                var dest = hit.GetComponent<DestructibleObject>();
+>>>>>>> Stashed changes
                 if (dest != null)
                     dest.SendMessage("ApplyDamage", damage, SendMessageOptions.DontRequireReceiver);
             }
@@ -59,7 +69,11 @@ namespace Demolition
         {
             Collider[] hits = Physics.OverlapSphere(center, radius);
             foreach (var hit in hits)
+<<<<<<< Updated upstream
                 if (hit.GetComponent("DestructibleObject") != null)
+=======
+                if (hit.GetComponent<DestructibleObject>() != null)
+>>>>>>> Stashed changes
                     return true;
             return false;
         }
