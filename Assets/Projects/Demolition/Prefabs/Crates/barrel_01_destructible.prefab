@@ -65,6 +65,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 8297713493923082310, guid: c9812f496a4576447b4789a9cbac420a, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1572056852743235735}
+    - targetCorrespondingSourceObject: {fileID: 8297713493923082310, guid: c9812f496a4576447b4789a9cbac420a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8602065686301216383}
   m_SourcePrefab: {fileID: 100100000, guid: c9812f496a4576447b4789a9cbac420a, type: 3}
 --- !u!1 &4160661253462383299 stripped
 GameObject:
@@ -126,3 +129,18 @@ MonoBehaviour:
   IsActive: 1
   hits: []
   rayCastAll: 0
+--- !u!114 &8602065686301216383
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4160661253462383299}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b3d90053bb8562e4ebd2519f6f24f19e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Demolition.Demolition_Pushable
+  pushForce: 8
+  uplift: 4
+  radiusVariation: 0.5

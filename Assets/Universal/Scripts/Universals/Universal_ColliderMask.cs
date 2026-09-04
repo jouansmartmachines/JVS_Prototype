@@ -76,7 +76,7 @@ public class Universal_ColliderMask : Universal_Button
             }
 
             bool isInside = col3D.Raycast(ray, out RaycastHit rayHit, Mathf.Infinity);
-            Debug.Log($"[ColliderMask] Collider3D Hit: {isInside} | IsActive: {IsActive}");
+            //Debug.Log($"[ColliderMask] Collider3D Hit: {isInside} | IsActive: {IsActive}");
 
             if (isInside && IsActive)
             {

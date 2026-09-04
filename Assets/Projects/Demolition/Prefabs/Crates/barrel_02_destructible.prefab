@@ -62,6 +62,15 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 8091562023395317160, guid: a1c6fcc429226d442b76d514a5e62193, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8997501445746444140}
+    - targetCorrespondingSourceObject: {fileID: 8091562023395317160, guid: a1c6fcc429226d442b76d514a5e62193, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6848106567177531833}
+    - targetCorrespondingSourceObject: {fileID: 8091562023395317160, guid: a1c6fcc429226d442b76d514a5e62193, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1199368143922420096}
+    - targetCorrespondingSourceObject: {fileID: 8091562023395317160, guid: a1c6fcc429226d442b76d514a5e62193, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1881820788019330866}
   m_SourcePrefab: {fileID: 100100000, guid: a1c6fcc429226d442b76d514a5e62193, type: 3}
 --- !u!1 &3981453300096807182 stripped
 GameObject:
@@ -105,3 +114,68 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   health: 1
   DebrisPrefab: {fileID: 6629971194052481647, guid: 0e4190f32e0237548bf63b0d29eb9ef9, type: 3}
+--- !u!54 &6848106567177531833
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3981453300096807182}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!114 &1199368143922420096
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3981453300096807182}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 320278daab0ee04418f9afea74cfc2d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Universal_ColliderMask
+  _event:
+    m_PersistentCalls:
+      m_Calls: []
+  IsActive: 1
+  hits: []
+  rayCastAll: 0
+  usePriority: 0
+  priority: 0
+  interactableParentName: ParentInteractable
+  useCollider2DMask: 0
+  useCollider3DMask: 1
+--- !u!114 &1881820788019330866
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3981453300096807182}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b3d90053bb8562e4ebd2519f6f24f19e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Demolition.Demolition_Pushable
+  pushForce: 8
+  uplift: 4
+  radiusVariation: 0.5

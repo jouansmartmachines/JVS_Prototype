@@ -2,16 +2,16 @@ using UnityEngine;
 
 namespace Demolition
 {
-    /// <summary>
-    /// Applique une force d'impulsion 3D sur l'objet quand il est touché via Universal_Button.
-    /// Bindé dans ObstacleSpawner via button.Event.AddListener(pushable.OnPushed).
-    /// </summary>
     public class Demolition_Pushable : MonoBehaviour
     {
         [Header("Force")]
         public float pushForce = 8f;
         public float uplift = 4f;
         public float radiusVariation = 0.5f;
+
+        [Header("Bonus de Hauteur (Multi-coups)")]
+        public float upliftBonusPerHit = 2f;
+        private int pushCount = 0;
 
         private Rigidbody rb;
 
@@ -22,20 +22,49 @@ namespace Demolition
                 rb = gameObject.AddComponent<Rigidbody>();
         }
 
-        /// <summary>
-        /// Appelé par Universal_Button.Event quand le joueur touche l'objet.
-        /// </summary>
         public void OnPushed()
         {
+            pushCount++;
+            Debug.Log($"Demolition_Pushable: {gameObject.name} touché {pushCount} fois !");
             if (rb == null) return;
 
-            Vector3 camPos = Camera.main != null ? Camera.main.transform.position : Vector3.zero;
-            Vector3 dir = (transform.position - camPos).normalized;
-            Vector3 randomOffset = Random.insideUnitSphere * radiusVariation;
+            Camera cam = Camera.main;
+            Vector3 camForward = cam != null ? cam.transform.forward : Vector3.forward;
 
+            // 1. Direction latérale (projection sur le plan de la caméra, SANS profondeur)
+            Vector3 baseDir = cam != null ? (transform.position - cam.transform.position) : transform.forward;
+            Vector3 lateralDir = Vector3.ProjectOnPlane(baseDir, camForward).normalized;
+            if (lateralDir == Vector3.zero && cam != null)
+            {
+                lateralDir = cam.transform.right;
+            }
+
+            // 2. Variation aléatoire (uniquement sur le plan de l'écran)
+            Vector3 randomOffset = Vector3.zero;
+            if (cam != null)
+            {
+                Vector2 random2D = Random.insideUnitCircle * radiusVariation;
+                randomOffset = (cam.transform.right * random2D.x) + (cam.transform.up * random2D.y);
+            }
+            else
+            {
+                randomOffset = Random.insideUnitSphere * radiusVariation;
+                randomOffset.z = 0f;
+            }
+
+            // 3. Calcul de la hauteur dynamique (augmente avec le nombre de coups)
+            float dynamicUplift = uplift + ((pushCount - 1) * upliftBonusPerHit);
+
+            // 4. CONSTRUCTION DE LA FORCE AVEC PRIORITÉ AU HAUT
+            // On applique la force latérale, mais on NE projette PAS la force finale sur le plan de la caméra.
+            // Au lieu de cela, on ajoute la force "uplift" directement après, pour garantir l'envol vertical.
+            Vector3 finalForce = (lateralDir * pushForce) + randomOffset;
+            finalForce += Vector3.up * dynamicUplift;
+
+            // Application de l'impulsion physique
             rb.AddForceAtPosition(
-                dir * pushForce + Vector3.up * uplift + randomOffset,
-                transform.position + Random.insideUnitSphere * 0.3f,
+                finalForce,
+                transform.position + (Random.insideUnitSphere * 0.3f),
                 ForceMode.Impulse);
         }
     }

@@ -64,7 +64,13 @@ PrefabInstance:
       addedObject: {fileID: 3513562719491690848}
     - targetCorrespondingSourceObject: {fileID: 3515362071201072596, guid: 6b5e5466a670b4a459797592aea4c1d9, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 8955948199117390937}
+      addedObject: {fileID: -5989328885341053683}
+    - targetCorrespondingSourceObject: {fileID: 3515362071201072596, guid: 6b5e5466a670b4a459797592aea4c1d9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2683701211849786135}
+    - targetCorrespondingSourceObject: {fileID: 3515362071201072596, guid: 6b5e5466a670b4a459797592aea4c1d9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7840109575538381570}
   m_SourcePrefab: {fileID: 100100000, guid: 6b5e5466a670b4a459797592aea4c1d9, type: 3}
 --- !u!1 &2184992753038776018 stripped
 GameObject:
@@ -106,7 +112,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   health: 1
   DebrisPrefab: {fileID: 2732566085063128815, guid: ba38c29459097cf4caa71688f424c0e9, type: 3}
---- !u!114 &8955948199117390937
+--- !u!114 &-5989328885341053683
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -115,12 +121,59 @@ MonoBehaviour:
   m_GameObject: {fileID: 2184992753038776018}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe0e4dd3d097f8247b02e87a239e7dc5, type: 3}
+  m_Script: {fileID: 11500000, guid: b3d90053bb8562e4ebd2519f6f24f19e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Universal_Button
+  m_EditorClassIdentifier: Assembly-CSharp::Demolition.Demolition_Pushable
+  pushForce: 8
+  uplift: 4
+  radiusVariation: 0.5
+--- !u!54 &2683701211849786135
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2184992753038776018}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!114 &7840109575538381570
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2184992753038776018}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 320278daab0ee04418f9afea74cfc2d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Universal_ColliderMask
   _event:
     m_PersistentCalls:
       m_Calls: []
   IsActive: 1
   hits: []
   rayCastAll: 0
+  usePriority: 0
+  priority: 0
+  interactableParentName: ParentInteractable
+  useCollider2DMask: 0
+  useCollider3DMask: 1

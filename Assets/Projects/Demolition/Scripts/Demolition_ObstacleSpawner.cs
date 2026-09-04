@@ -5,26 +5,26 @@ namespace Demolition
 {
     public class Demolition_ObstacleSpawner : MonoBehaviour
     {
-        [Header("Prefabs obstacles")]
-        public GameObject caissePrefab;
-        public GameObject barilPrefab;
+        [Header("Prefabs de structures (Angry Birds)")]
+        [Tooltip("Glisse ici tes prefabs de structures complètes.")]
+        public GameObject[] structurePrefabs;
+
+        [Header("Prefab Fantôme")]
+        [Tooltip("Glisse ici ton prefab de fantôme (cochon) à spawner.")]
         public GameObject fantomePrefab;
 
         [System.Serializable]
         public class DifficultyLevel
         {
             public string name = "Niveau 1";
-            public GameObject[] availablePrefabs;
-            public int minCount = 1;
-            public int maxCount = 3;
-            public bool includeFantome = false;
+            [Tooltip("Nombre de structures à spawner pour ce niveau.")]
+            public int numberOfStructures = 2;
+            [Tooltip("Nombre de fantômes à spawner pour ce niveau.")]
+            public int numberOfFantomes = 1;
         }
 
-        [Header("3 niveaux de difficulté")]
+        [Header("Niveaux de difficulté")]
         public DifficultyLevel[] difficultyLevels = new DifficultyLevel[3];
-
-        [Header("Parent dans la hiérarchie")]
-        public Transform obstaclesParent;
 
         private int currentDifficulty = 0;
         public int CurrentDifficulty
@@ -37,98 +37,76 @@ namespace Demolition
         {
             CurrentDifficulty = level;
             DifficultyLevel config = difficultyLevels[currentDifficulty];
-            if (config == null) return;
 
             Demolition_ObstacleAnchor[] anchors = FindObjectsOfType<Demolition_ObstacleAnchor>();
-            if (anchors.Length == 0)
-            {
-                Debug.LogWarning("Demolition_ObstacleSpawner: aucun ObstacleAnchor trouvé dans la scène.");
-                return;
-            }
+            if (anchors.Length == 0) return;
 
-            foreach (var anchor in anchors)
+            List<Demolition_ObstacleAnchor> availableAnchors = new List<Demolition_ObstacleAnchor>(anchors);
+            ShuffleList(availableAnchors);
+
+            int anchorIndex = 0;
+
+            // 1. SPAWN DES STRUCTURES
+            anchorIndex = SpawnBatch(structurePrefabs, config.numberOfStructures, availableAnchors, anchorIndex, true);
+
+            // 2. SPAWN DES FANTÔMES
+            SpawnBatch(new GameObject[] { fantomePrefab }, config.numberOfFantomes, availableAnchors, anchorIndex, false);
+        }
+
+        private int SpawnBatch(GameObject[] prefabs, int count, List<Demolition_ObstacleAnchor> anchors, int startIndex, bool isStructure)
+        {
+            if (prefabs.Length == 0) return startIndex;
+
+            int toSpawn = Mathf.Min(count, anchors.Count - startIndex);
+            for (int i = 0; i < toSpawn; i++)
             {
-                if (anchor.isFantomeAnchor)
+                var anchor = anchors[startIndex++];
+                SpawnObjectOnAnchor(anchor, prefabs[Random.Range(0, prefabs.Length)], isStructure);
+            }
+            return startIndex;
+        }
+
+        private void SpawnObjectOnAnchor(Demolition_ObstacleAnchor anchor, GameObject prefabToSpawn, bool isStructure)
+        {
+            Transform targetParent = anchor.transform;
+            Vector3 spawnPosition = anchor.transform.position;
+
+            if (anchor.obstaclePrefabs.Length > 0)
+            {
+                GameObject parentObj = anchor.obstaclePrefabs[Random.Range(0, anchor.obstaclePrefabs.Length)];
+                if (parentObj.scene.IsValid())
                 {
-                    if (config.includeFantome && fantomePrefab != null)
-                        SpawnFantome(anchor);
-                    continue;
+                    targetParent = parentObj.transform;
+                    spawnPosition = targetParent.position;
                 }
-
-                SpawnObstaclesInZone(anchor, config);
-            }
-        }
-
-        private void SpawnObstaclesInZone(Demolition_ObstacleAnchor anchor, DifficultyLevel config)
-        {
-            GameObject[] prefabsToSpawn = config.availablePrefabs;
-
-            if (prefabsToSpawn == null || prefabsToSpawn.Length == 0)
-            {
-                FillDefaultPrefabs(config);
-                prefabsToSpawn = config.availablePrefabs;
-                if (prefabsToSpawn.Length == 0) return;
             }
 
-            int count = Random.Range(config.minCount, config.maxCount + 1);
+            GameObject spawnedObj = Instantiate(prefabToSpawn, spawnPosition, anchor.transform.rotation, targetParent);
 
-            for (int i = 0; i < count; i++)
+            if (isStructure)
             {
-                GameObject prefab = prefabsToSpawn[Random.Range(0, prefabsToSpawn.Length)];
-                if (prefab == null) continue;
-
-                Transform targetParent = obstaclesParent != null ? obstaclesParent : anchor.transform;
-                Vector3 spawnPosition = anchor.transform.position;
-
-                if (anchor.obstaclePrefabs != null && anchor.obstaclePrefabs.Length > 0)
+                foreach (var pushable in spawnedObj.GetComponentsInChildren<Demolition_Pushable>())
                 {
-                    GameObject parentObj = anchor.obstaclePrefabs[Random.Range(0, anchor.obstaclePrefabs.Length)];
-                    if (parentObj != null && parentObj.scene.IsValid())
-                    {
-                        targetParent = parentObj.transform;
-                        spawnPosition = targetParent.position;
-                    }
+                    var btn = pushable.GetComponent<Universal_Button>();
+                    if (btn) btn.Event.AddListener(pushable.OnPushed);
                 }
-
-                GameObject obj = Instantiate(prefab, spawnPosition, Random.rotation, targetParent);
-
-                SetupInteractable(obj);
             }
-        }
-
-        private void SpawnFantome(Demolition_ObstacleAnchor anchor)
-        {
-            Vector3 spawnPos = obstaclesParent != null ? obstaclesParent.position : anchor.transform.position;
-            Transform parentT = obstaclesParent != null ? obstaclesParent : anchor.transform;
-
-            GameObject fantome = Instantiate(fantomePrefab, spawnPos, Quaternion.identity, parentT);
-
-            if (fantome.GetComponent<Demolition_Fantome>() == null)
-                fantome.AddComponent<Demolition_Fantome>();
-        }
-
-        private void FillDefaultPrefabs(DifficultyLevel config)
-        {
-            var defaults = new List<GameObject>();
-            if (caissePrefab != null) defaults.Add(caissePrefab);
-            if (barilPrefab != null) defaults.Add(barilPrefab);
-            if (defaults.Count == 0) return;
-            config.availablePrefabs = defaults.ToArray();
-        }
-
-        private void SetupInteractable(GameObject obj)
-        {
-            var btn = obj.GetComponent<Universal_Button>();
-            if (btn == null) return;
-
-            var pushable = obj.GetComponent<Demolition_Pushable>();
-            if (pushable == null)
+            else
             {
-                Debug.LogWarning($"Demolition_ObstacleSpawner: {obj.name} a Universal_Button mais pas Demolition_Pushable.");
-                return;
+                if (!spawnedObj.GetComponent<Demolition_Fantome>())
+                    spawnedObj.AddComponent<Demolition_Fantome>();
             }
+        }
 
-            btn.Event.AddListener(pushable.OnPushed);
+        private void ShuffleList<T>(List<T> list)
+        {
+            for (int i = 0; i < list.Count; i++)
+            {
+                int randomIndex = Random.Range(i, list.Count);
+                T temp = list[i];
+                list[i] = list[randomIndex];
+                list[randomIndex] = temp;
+            }
         }
     }
 }
