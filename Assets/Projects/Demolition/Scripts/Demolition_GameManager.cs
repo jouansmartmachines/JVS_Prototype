@@ -26,29 +26,40 @@ namespace Demolition
         public TextMeshProUGUI sceneText;
         public TextMeshProUGUI globalTimerText;
 
-        [Header("Destructibles")]
-        public void ApplyDamageToDestructible(Demolition_Destructible target, int damage)
+        [Header("Destructibles (IndieKit)")]
+        /// <summary>
+        /// Applique des dégâts à un DestructibleObject IndieKit.
+        /// </summary>
+        public void ApplyDamageToDestructible(Component target, int damage)
         {
-            if (target != null)
-                target.ApplyDamage(damage);
+            if (target == null) return;
+            var dest = target.GetComponent("DestructibleObject");
+            if (dest != null)
+                dest.SendMessage("ApplyDamage", damage, SendMessageOptions.DontRequireReceiver);
         }
 
+        /// <summary>
+        /// Explosion de zone : tous les DestructibleObject dans le radius prennent damage.
+        /// </summary>
         public void ApplyDamageToAllInRadius(Vector3 center, float radius, int damage)
         {
             Collider[] hits = Physics.OverlapSphere(center, radius);
             foreach (var hit in hits)
             {
-                var dest = hit.GetComponent<Demolition_Destructible>();
+                var dest = hit.GetComponent("DestructibleObject");
                 if (dest != null)
-                    dest.ApplyDamage(damage);
+                    dest.SendMessage("ApplyDamage", damage, SendMessageOptions.DontRequireReceiver);
             }
         }
 
+        /// <summary>
+        /// Vérifie s'il y a des DestructibleObject dans une zone.
+        /// </summary>
         public bool HasDestructiblesInRadius(Vector3 center, float radius)
         {
             Collider[] hits = Physics.OverlapSphere(center, radius);
             foreach (var hit in hits)
-                if (hit.GetComponent<Demolition_Destructible>() != null)
+                if (hit.GetComponent("DestructibleObject") != null)
                     return true;
             return false;
         }

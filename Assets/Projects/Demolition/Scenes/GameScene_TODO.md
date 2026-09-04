@@ -199,24 +199,24 @@ Chaque `Demolition_ObstacleAnchor` a maintenant 2 nouveaux champs :
 - [ ] Assigner `anchorCamera` : la Main Camera de la scène (ou une caméra dédiée)
 - [ ] Les anchors gardent `spawnRadius`, `minCount`, `maxCount`, `isFantomeAnchor` inchangés
 
-### GameManager — casser les caisses programmatiquement
+### GameManager — casser les caisses (IndieKit DestructibleObject)
 
-Le GameManager expose 3 nouvelles méthodes publiques :
+Le GameManager expose 3 nouvelles méthodes. Elles ciblent **`DestructibleObject`** d'IndieKit via `GetComponent("DestructibleObject")` + `SendMessage("ApplyDamage")` — aucun import direct, le script IndieKit reste intact.
 
 ```csharp
 // Cibler un objet destructible précis
-Demolition_GameManager.Instance.ApplyDamageToDestructible(target, damage);
+Demolition_GameManager.Instance.ApplyDamageToDestructible(targetComponent, damage);
 
-// Explosion de zone — tous les Demolition_Destructible dans le radius
+// Explosion de zone — tous les DestructibleObject dans le radius
 Demolition_GameManager.Instance.ApplyDamageToAllInRadius(center, radius, damage);
 
 // Vérifier s'il y a des destructibles dans une zone
 Demolition_GameManager.Instance.HasDestructiblesInRadius(center, radius);
 ```
 
-**Utilisation typique :** quand un impact ou une explosion touche une zone, appelle `ApplyDamageToAllInRadius` pour casser les caisses/barils à proximité.
+**Utilisation typique :** impact ou explosion → `ApplyDamageToAllInRadius(position, 2f, 1)` pour casser caisses/barils à proximité.
 
-**Caisse = `Demolition_Destructible`** (HP, flash rouge, destruction + score + son). Le script n'a pas été modifié — `ApplyDamage()` reste dans `Demolition_Destructible`, le GameManager y accède via les wrappers ci-dessus.
+**Ne pas toucher au script IndieKit `DestructibleObject`** — il a sa propre méthode `ApplyDamage(int)`. Le GameManager l'appelle par reflection douce (SendMessage).
 
 ## 📝 Rappel des règles
 
