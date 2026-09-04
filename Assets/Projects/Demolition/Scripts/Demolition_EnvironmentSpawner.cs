@@ -4,8 +4,9 @@ using UnityEngine.SceneManagement;
 namespace Demolition
 {
     /// <summary>
-    /// Gère l'environnement visuel : skybox + settings prefabs (reflection probes, éclairage).
-    /// Ne spawn PAS de terrain ni d'obstacles — juste le décor ambiant.
+    /// Gère l'environnement visuel : settings prefabs (reflection, éclairage)
+    /// + env prefabs (décor/terrain). Pas de keywords — la détection jour/nuit
+    /// est hardcodée sur le nom de la scène.
     /// </summary>
     public class Demolition_EnvironmentSpawner : MonoBehaviour
     {
@@ -13,26 +14,26 @@ namespace Demolition
         public Material daySkybox;
         public Material nightSkybox;
 
-        [Header("Settings Prefabs (reflection probes, lighting tweaks, etc.)")]
+        [Header("Settings Prefabs (reflection probes, lighting tweaks)")]
         public GameObject[] daySettingsPrefabs;
         public GameObject[] nightSettingsPrefabs;
 
-        [Header("Paramètres")]
-        public string[] nightSceneKeywords = new string[] { "Night", "Nuit" };
+        [Header("Env Prefabs (décor, terrain, obstacles)")]
+        public GameObject[] dayEnvPrefabs;
+        public GameObject[] nightEnvPrefabs;
 
         void Start()
         {
             bool isNight = IsNightScene();
             SetSkybox(isNight);
             SpawnSettings(isNight);
+            SpawnEnv(isNight);
         }
 
-        private bool IsNightScene()
+        private static bool IsNightScene()
         {
-            string sceneName = SceneManager.GetActiveScene().name;
-            foreach (string kw in nightSceneKeywords)
-                if (sceneName.Contains(kw)) return true;
-            return false;
+            string name = SceneManager.GetActiveScene().name;
+            return name.Contains("Night") || name.Contains("Nuit");
         }
 
         private void SetSkybox(bool isNight)
@@ -44,7 +45,15 @@ namespace Demolition
         {
             GameObject[] pool = isNight ? nightSettingsPrefabs : daySettingsPrefabs;
             if (pool == null || pool.Length == 0) return;
+            GameObject prefab = pool[Random.Range(0, pool.Length)];
+            if (prefab != null)
+                Instantiate(prefab, Vector3.zero, Quaternion.identity);
+        }
 
+        private void SpawnEnv(bool isNight)
+        {
+            GameObject[] pool = isNight ? nightEnvPrefabs : dayEnvPrefabs;
+            if (pool == null || pool.Length == 0) return;
             GameObject prefab = pool[Random.Range(0, pool.Length)];
             if (prefab != null)
                 Instantiate(prefab, Vector3.zero, Quaternion.identity);
