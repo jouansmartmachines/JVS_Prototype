@@ -5,108 +5,134 @@ namespace Demolition
 {
     public class Demolition_ObstacleSpawner : MonoBehaviour
     {
-        [Header("Prefabs de structures (Angry Birds)")]
-        [Tooltip("Glisse ici tes prefabs de structures complètes.")]
-        public GameObject[] structurePrefabs;
-
-        [Header("Prefab Fantôme")]
-        [Tooltip("Glisse ici ton prefab de fantôme (cochon) à spawner.")]
-        public GameObject fantomePrefab;
-
         [System.Serializable]
-        public class DifficultyLevel
+        public struct BlockConfig
         {
-            public string name = "Niveau 1";
-            [Tooltip("Nombre de structures à spawner pour ce niveau.")]
-            public int numberOfStructures = 2;
-            [Tooltip("Nombre de fantômes à spawner pour ce niveau.")]
-            public int numberOfFantomes = 1;
+            public Vector2Int size;
+            public GameObject[] prefab;
         }
 
-        [Header("Niveaux de difficulté")]
-        public DifficultyLevel[] difficultyLevels = new DifficultyLevel[3];
+        [Header("Configuration de la Grille")]
+        public int gridWidth = 6;
+        public int gridHeight = 7;
+        public float cellSize = 1f;
 
-        private int currentDifficulty = 0;
+        [Header("Subdivision Interne (Précision x2)")]
+        [Range(1, 4)] public int gridSubdivision = 2;
+
+        [Header("Ressources")]
+        public List<BlockConfig> availableBlocks = new List<BlockConfig>();
+        public GameObject fantomePrefab;
+
+        private int currentDifficulty = 1;
         public int CurrentDifficulty
         {
             get => currentDifficulty;
-            set => currentDifficulty = Mathf.Clamp(value, 0, difficultyLevels.Length - 1);
+            set => currentDifficulty = Mathf.Max(1, value);
         }
 
         public void SpawnForDifficulty(int level)
         {
             CurrentDifficulty = level;
-            DifficultyLevel config = difficultyLevels[currentDifficulty];
-
-            Demolition_ObstacleAnchor[] anchors = FindObjectsOfType<Demolition_ObstacleAnchor>();
-            if (anchors.Length == 0) return;
-
-            List<Demolition_ObstacleAnchor> availableAnchors = new List<Demolition_ObstacleAnchor>(anchors);
-            ShuffleList(availableAnchors);
-
-            int anchorIndex = 0;
-
-            // 1. SPAWN DES STRUCTURES
-            anchorIndex = SpawnBatch(structurePrefabs, config.numberOfStructures, availableAnchors, anchorIndex, true);
-
-            // 2. SPAWN DES FANTÔMES
-            SpawnBatch(new GameObject[] { fantomePrefab }, config.numberOfFantomes, availableAnchors, anchorIndex, false);
+            SpawnWithGrid(CurrentDifficulty);
         }
 
-        private int SpawnBatch(GameObject[] prefabs, int count, List<Demolition_ObstacleAnchor> anchors, int startIndex, bool isStructure)
+        private void SpawnWithGrid(int level)
         {
-            if (prefabs.Length == 0) return startIndex;
-
-            int toSpawn = Mathf.Min(count, anchors.Count - startIndex);
-            for (int i = 0; i < toSpawn; i++)
+            var anchors = FindObjectsOfType<Demolition_ObstacleAnchor>();
+            if (anchors == null || anchors.Length == 0)
             {
-                var anchor = anchors[startIndex++];
-                SpawnObjectOnAnchor(anchor, prefabs[Random.Range(0, prefabs.Length)], isStructure);
+                Debug.LogWarning("[ObstacleSpawner] Aucun Demolition_ObstacleAnchor trouvé.");
+                return;
             }
-            return startIndex;
-        }
 
-        private void SpawnObjectOnAnchor(Demolition_ObstacleAnchor anchor, GameObject prefabToSpawn, bool isStructure)
-        {
-            Transform targetParent = anchor.transform;
-            Vector3 spawnPosition = anchor.transform.position;
+            // Toujours utiliser la liste complète des formes disponibles (poutres, piliers, caisses...)
+            var blocksToUse = (availableBlocks != null && availableBlocks.Count > 0)
+                ? availableBlocks
+                : GetDefaultBlockConfigs();
 
-            if (anchor.obstaclePrefabs.Length > 0)
+            // Nettoyage préalable sous toutes les ancres et leurs points de spawn (obstaclePrefabs)
+            foreach (var anchor in anchors)
             {
-                GameObject parentObj = anchor.obstaclePrefabs[Random.Range(0, anchor.obstaclePrefabs.Length)];
-                if (parentObj.scene.IsValid())
+                CleanOldObstacles(anchor.transform);
+                if (anchor.obstaclePrefabs != null)
                 {
-                    targetParent = parentObj.transform;
-                    spawnPosition = targetParent.position;
+                    foreach (var spawnPoint in anchor.obstaclePrefabs)
+                    {
+                        if (spawnPoint != null)
+                            CleanOldObstacles(spawnPoint.transform);
+                    }
                 }
             }
 
-            GameObject spawnedObj = Instantiate(prefabToSpawn, spawnPosition, anchor.transform.rotation, targetParent);
-
-            if (isStructure)
+            // Récupération des points de spawn cibles (priorité aux transforms référencés dans obstaclePrefabs)
+            var spawnTargets = new List<Transform>();
+            foreach (var anchor in anchors)
             {
-                foreach (var pushable in spawnedObj.GetComponentsInChildren<Demolition_Pushable>())
+                if (anchor.obstaclePrefabs != null && anchor.obstaclePrefabs.Length > 0)
                 {
-                    var btn = pushable.GetComponent<Universal_Button>();
-                    if (btn) btn.Event.AddListener(pushable.OnPushed);
+                    foreach (var p in anchor.obstaclePrefabs)
+                    {
+                        if (p != null)
+                        {
+                            spawnTargets.Add(p.transform);
+                        }
+                    }
+                }
+                else
+                {
+                    spawnTargets.Add(anchor.transform);
                 }
             }
-            else
+
+            if (spawnTargets.Count == 0)
             {
-                if (!spawnedObj.GetComponent<Demolition_Fantome>())
-                    spawnedObj.AddComponent<Demolition_Fantome>();
+                Debug.LogWarning("[ObstacleSpawner] Aucun point de spawn valide trouvé.");
+                return;
+            }
+
+            // Nombre de points de spawn à utiliser selon le niveau
+            int targetsToUse = 1;
+            if (level >= 5) targetsToUse = spawnTargets.Count;
+            else if (level >= 3) targetsToUse = Mathf.Min(2, spawnTargets.Count);
+
+            for (int i = 0; i < targetsToUse; i++)
+            {
+                Transform targetParent = spawnTargets[i];
+                Debug.Log("[ObstacleSpawner] Spawning obstacles for level " + level + " at " + targetParent.name);
+
+                Demolition_GridGenerator.GenerateProceduralStructure(
+                    targetParent,
+                    blocksToUse,
+                    fantomePrefab,
+                    gridWidth,
+                    gridHeight,
+                    cellSize,
+                    gridSubdivision,
+                    level + i
+                );
             }
         }
 
-        private void ShuffleList<T>(List<T> list)
+        private void CleanOldObstacles(Transform parent)
         {
-            for (int i = 0; i < list.Count; i++)
+            if (parent == null) return;
+
+            for (int i = parent.childCount - 1; i >= 0; i--)
             {
-                int randomIndex = Random.Range(i, list.Count);
-                T temp = list[i];
-                list[i] = list[randomIndex];
-                list[randomIndex] = temp;
+                var child = parent.GetChild(i);
+                if (child.GetComponent<Demolition_Pushable>() != null || 
+                    child.GetComponent<Demolition_Fantome>() != null || 
+                    child.name.Contains("(Clone)"))
+                {
+                    Destroy(child.gameObject);
+                }
             }
+        }
+
+        private List<BlockConfig> GetDefaultBlockConfigs()
+        {
+            return new List<BlockConfig>();
         }
     }
 }

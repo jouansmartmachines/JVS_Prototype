@@ -3,17 +3,8 @@ using UnityEngine.SceneManagement;
 
 namespace Demolition
 {
-    /// <summary>
-    /// Gère l'environnement visuel : settings prefabs (reflection, éclairage)
-    /// + env prefabs (décor/terrain). Pas de keywords — la détection jour/nuit
-    /// est hardcodée sur le nom de la scène.
-    /// </summary>
     public class Demolition_EnvironmentSpawner : MonoBehaviour
     {
-        /// <summary>
-        /// Alterne jour/nuit à chaque reload de scène.
-        /// La scène name sert pour la première détection, ensuite toggle.
-        /// </summary>
         private static bool _toggleNight = false;
 
         [Header("Skybox")]
@@ -34,7 +25,6 @@ namespace Demolition
 
         void Start()
         {
-            // Au premier lancement on utilise le nom de la scène, ensuite on alterne
             bool isNight = IsNightScene();
             if (_toggleNight)
                 isNight = !isNight;
@@ -43,13 +33,11 @@ namespace Demolition
             SpawnSettings(isNight);
             SpawnEnv(isNight);
 
-            // Alternance pour le prochain reload
             _toggleNight = true;
 
-            // Déclencher le spawn des obstacles après que les env soient dans la scène
             var spawner = FindObjectOfType<Demolition_ObstacleSpawner>();
-            if (spawner != null)
-                spawner.SpawnForDifficulty(spawner.CurrentDifficulty);
+            if (spawner)
+                spawner.SpawnForDifficulty(Demolition_GameManager.currentLevel);
         }
 
         private static bool IsNightScene()
@@ -60,25 +48,32 @@ namespace Demolition
 
         private void SetSkybox(bool isNight)
         {
-            RenderSettings.skybox = isNight ? nightSkybox : daySkybox;
+            Material targetSkybox = isNight ? nightSkybox : daySkybox;
+            if (targetSkybox)
+                RenderSettings.skybox = targetSkybox;
         }
 
         private void SpawnSettings(bool isNight)
         {
             GameObject[] pool = isNight ? nightSettingsPrefabs : daySettingsPrefabs;
-            if (pool == null || pool.Length == 0) return;
-            GameObject prefab = pool[Random.Range(0, pool.Length)];
-            if (prefab != null)
-                Instantiate(prefab, Vector3.zero, Quaternion.identity, settingsParent);
+            SpawnRandomPrefab(pool, settingsParent, "Settings");
         }
 
         private void SpawnEnv(bool isNight)
         {
             GameObject[] pool = isNight ? nightEnvPrefabs : dayEnvPrefabs;
+            SpawnRandomPrefab(pool, envParent, "Env");
+        }
+
+        private void SpawnRandomPrefab(GameObject[] pool, Transform parentTransform, string categoryName)
+        {
             if (pool == null || pool.Length == 0) return;
+
             GameObject prefab = pool[Random.Range(0, pool.Length)];
-            if (prefab != null)
-                Instantiate(prefab, Vector3.zero, Quaternion.identity, envParent);
+            if (!prefab) return;
+
+            Transform targetParent = parentTransform ? parentTransform : transform;
+            Instantiate(prefab, Vector3.zero, Quaternion.identity, targetParent);
         }
     }
 }

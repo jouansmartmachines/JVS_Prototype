@@ -13,6 +13,18 @@ PrefabInstance:
       value: crate_01_destructible
       objectReference: {fileID: 0}
     - target: {fileID: 7912417174230425900, guid: 474b836f8361a7843a7a9a3707baf5ba, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.54
+      objectReference: {fileID: 0}
+    - target: {fileID: 7912417174230425900, guid: 474b836f8361a7843a7a9a3707baf5ba, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.54
+      objectReference: {fileID: 0}
+    - target: {fileID: 7912417174230425900, guid: 474b836f8361a7843a7a9a3707baf5ba, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.54
+      objectReference: {fileID: 0}
+    - target: {fileID: 7912417174230425900, guid: 474b836f8361a7843a7a9a3707baf5ba, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
@@ -52,6 +64,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7912417174230425900, guid: 474b836f8361a7843a7a9a3707baf5ba, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -62,6 +78,15 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 7387413924892916630, guid: 474b836f8361a7843a7a9a3707baf5ba, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2526292257857465008}
+    - targetCorrespondingSourceObject: {fileID: 7387413924892916630, guid: 474b836f8361a7843a7a9a3707baf5ba, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2603737315367664970}
+    - targetCorrespondingSourceObject: {fileID: 7387413924892916630, guid: 474b836f8361a7843a7a9a3707baf5ba, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1845607956528444284}
+    - targetCorrespondingSourceObject: {fileID: 7387413924892916630, guid: 474b836f8361a7843a7a9a3707baf5ba, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 643437090168756721}
   m_SourcePrefab: {fileID: 100100000, guid: 474b836f8361a7843a7a9a3707baf5ba, type: 3}
 --- !u!1 &8169353957686536075 stripped
 GameObject:
@@ -103,3 +128,70 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   health: 1
   DebrisPrefab: {fileID: 4214787666867792323, guid: 04f5ebbb33af3ea40b5350d0f6c68366, type: 3}
+--- !u!114 &2603737315367664970
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8169353957686536075}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 320278daab0ee04418f9afea74cfc2d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Universal_ColliderMask
+  _event:
+    m_PersistentCalls:
+      m_Calls: []
+  IsActive: 1
+  hits: []
+  rayCastAll: 0
+  usePriority: 0
+  priority: 0
+  interactableParentName: ParentInteractable
+  useCollider2DMask: 0
+  useCollider3DMask: 1
+--- !u!114 &1845607956528444284
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8169353957686536075}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b3d90053bb8562e4ebd2519f6f24f19e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Demolition.Demolition_Pushable
+  pushForce: 20
+  uplift: 50
+  radiusVariation: 0.5
+  upliftBonusPerHit: 2
+  spawnRotationOffset: {x: 0, y: 90, z: 0}
+--- !u!54 &643437090168756721
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8169353957686536075}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0

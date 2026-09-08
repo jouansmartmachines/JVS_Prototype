@@ -81,6 +81,7 @@ public class Universal_ColliderMask : Universal_Button
             if (isInside && IsActive)
             {
                 pos = rayHit.point;
+                
                 //Debug.Log($"<color=yellow>[Success]</color> {gameObject.name} touché (Collider3D) ! Point: {pos} Analyse de la priorité...");
                 HandlePriority(pos, hit);
             }

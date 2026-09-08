@@ -11,6 +11,11 @@ namespace Demolition
     {
         public static Demolition_GameManager Instance { get; private set; }
 
+        // Données persistantes de session
+        public static int currentLevel = 1;
+        public static int sessionScore = 0;
+        public static float sessionGlobalTimer = -1f;
+
         [Header("Timers")]
         public float sceneDuration = 60f;
         public float sceneTimer;
@@ -26,34 +31,6 @@ namespace Demolition
         public TextMeshProUGUI timerText;
         public TextMeshProUGUI sceneText;
         public TextMeshProUGUI globalTimerText;
-
-        public void ApplyDamageToDestructible(IndieKit.IDamageable target, float damage, Vector3 hitPoint)
-        {
-            if (target != null)
-                target.ApplyDamage(damage, hitPoint);
-        }
-
-        public void ApplyDamageToAllInRadius(Vector3 center, float radius, float damage)
-        {
-            Collider[] hits = Physics.OverlapSphere(center, radius);
-            foreach (var hit in hits)
-            {
-                // On cherche l'interface commune IDamageable au lieu d'un script spécifique
-                if (hit.TryGetComponent<IndieKit.IDamageable>(out var damageable))
-                {
-                    damageable.ApplyDamage(damage, center);
-                }
-            }
-        }
-
-        public bool HasDestructiblesInRadius(Vector3 center, float radius)
-        {
-            Collider[] hits = Physics.OverlapSphere(center, radius);
-            foreach (var hit in hits)
-                if (hit.GetComponent<Demolition_Destructible>() != null)
-                    return true;
-            return false;
-        }
 
         [Header("Fondu")]
         public CanvasGroup fadeCanvasGroup;
@@ -72,6 +49,33 @@ namespace Demolition
         private bool isRunning = false;
         private bool isGameOver = false;
 
+        public void ApplyDamageToDestructible(IndieKit.IDamageable target, float damage, Vector3 hitPoint)
+        {
+            if (target != null)
+                target.ApplyDamage(damage, hitPoint);
+        }
+
+        public void ApplyDamageToAllInRadius(Vector3 center, float radius, float damage)
+        {
+            Collider[] hits = Physics.OverlapSphere(center, radius);
+            foreach (var hit in hits)
+            {
+                if (hit.TryGetComponent<IndieKit.IDamageable>(out var damageable))
+                {
+                    damageable.ApplyDamage(damage, center);
+                }
+            }
+        }
+
+        public bool HasDestructiblesInRadius(Vector3 center, float radius)
+        {
+            Collider[] hits = Physics.OverlapSphere(center, radius);
+            foreach (var hit in hits)
+                if (hit.GetComponent<Demolition_Destructible>() != null)
+                    return true;
+            return false;
+        }
+
         private void Awake()
         {
             if (Instance == null) Instance = this;
@@ -88,8 +92,14 @@ namespace Demolition
             EnsureSceneElements();
             LoadPreferences();
 
-            sceneTimer = sceneDuration;
+            // Restaure le score et le timer de session s'ils existent
+            score = sessionScore;
             sceneScore = 0;
+
+            if (sessionGlobalTimer > 0f)
+                globalTimer = sessionGlobalTimer;
+
+            sceneTimer = sceneDuration;
             isRunning = true;
             isGameOver = false;
 
@@ -100,7 +110,8 @@ namespace Demolition
         private void LoadPreferences()
         {
             sceneDuration = Demolition_GeneralVariables.GetSceneDurationFromPrefs();
-            globalTimer = Demolition_GeneralVariables.GetGlobalTimeFromPrefs();
+            if (sessionGlobalTimer <= 0f)
+                globalTimer = Demolition_GeneralVariables.GetGlobalTimeFromPrefs();
         }
 
         private void EnsureSceneElements()
@@ -136,6 +147,8 @@ namespace Demolition
             if (useGlobalTimer)
             {
                 globalTimer -= Time.deltaTime;
+                sessionGlobalTimer = globalTimer;
+
                 if (globalTimer <= 0)
                 {
                     globalTimer = 0;
@@ -149,14 +162,50 @@ namespace Demolition
         public void OnFantomeKilled()
         {
             if (!isRunning || isGameOver) return;
-            EndScene("Fantôme vaincu !");
+
+            // Vérifie s'il reste d'autres fantômes vivants dans la scène
+            StartCoroutine(CheckRemainingFantomesRoutine());
+        }
+
+        private IEnumerator CheckRemainingFantomesRoutine()
+        {
+            yield return new WaitForSeconds(0.5f);
+
+            var fantomes = FindObjectsOfType<Demolition_Fantome>();
+            int aliveCount = 0;
+            foreach (var f in fantomes)
+            {
+                if (f != null && f.GetHealthRatio() > 0)
+                    aliveCount++;
+            }
+
+            if (aliveCount == 0)
+            {
+                currentLevel++;
+                sessionScore = score;
+                EndScene("Tous les fantômes éliminés !");
+            }
         }
 
         public void AddScore(int points, Vector3 pos)
         {
             score += points;
             sceneScore += points;
+            sessionScore = score;
             UpdateUI();
+        }
+
+        public void AddScore(int points, Vector3 pos, Color popupColor, float popupScale, string prefix)
+        {
+            score += points;
+            sceneScore += points;
+            sessionScore = score;
+            UpdateUI();
+
+            GameObject popupGO = new GameObject("ScorePopup");
+            popupGO.transform.position = pos;
+            var popup = popupGO.AddComponent<Demolition_PopupText>();
+            popup.SetText(prefix + points.ToString(), popupColor, popupScale);
         }
 
         public void PlaySfx(AudioClip clip)
@@ -165,12 +214,26 @@ namespace Demolition
                 audioSource.PlayOneShot(clip);
         }
 
+        public void PlaySfx(AudioClip clip, float pitch, float volume)
+        {
+            if (clip != null && audioSource != null)
+            {
+                float origPitch = audioSource.pitch;
+                float origVolume = audioSource.volume;
+                audioSource.pitch = pitch;
+                audioSource.volume = volume;
+                audioSource.PlayOneShot(clip);
+                audioSource.pitch = origPitch;
+                audioSource.volume = origVolume;
+            }
+        }
+
         private void EndScene(string reason)
         {
             if (isGameOver) return;
             isRunning = false;
 
-            Debug.Log($"Demolition: Scene terminée - {reason}");
+            Debug.Log($"Demolition: Scene terminée - {reason} (Passage au Niveau {currentLevel})");
 
             PlayerPrefs.SetInt("Demolition_SceneScore", sceneScore);
 
@@ -194,6 +257,11 @@ namespace Demolition
 
             PlayerPrefs.SetInt("Demolition_FinalScore", score);
             PlayerPrefs.Save();
+
+            // Réinitialisation de session pour une prochaine partie
+            currentLevel = 1;
+            sessionScore = 0;
+            sessionGlobalTimer = -1f;
 
             if (gameOverSound != null)
                 audioSource.PlayOneShot(gameOverSound);
@@ -231,7 +299,6 @@ namespace Demolition
                 fadeCanvasGroup.alpha = 1f;
             }
 
-            // Recharger la même scène (reset)
             SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
 
@@ -245,36 +312,8 @@ namespace Demolition
                 MenuSelectionButton.Instance.gameObject.SetActive(true);
         }
 
-        public void PlaySfx(AudioClip clip, float pitch, float volume)
-        {
-            if (clip != null && audioSource != null)
-            {
-                float origPitch = audioSource.pitch;
-                float origVolume = audioSource.volume;
-                audioSource.pitch = pitch;
-                audioSource.volume = volume;
-                audioSource.PlayOneShot(clip);
-                audioSource.pitch = origPitch;
-                audioSource.volume = origVolume;
-            }
-        }
-
-        public void AddScore(int points, Vector3 pos, Color popupColor, float popupScale, string prefix)
-        {
-            score += points;
-            sceneScore += points;
-            UpdateUI();
-
-            // Popup flottant
-            GameObject popupGO = new GameObject("ScorePopup");
-            popupGO.transform.position = pos;
-            var popup = popupGO.AddComponent<Demolition_PopupText>();
-            popup.SetText(prefix + points.ToString(), popupColor, popupScale);
-        }
-
         public void TriggerImpactFeel(Vector3 pos, int hitCount)
         {
-            // Petit effet de punch au ralenti sur les impacts
             StartCoroutine(ImpactSlowMo());
         }
 
@@ -301,7 +340,7 @@ namespace Demolition
                 timerText.text = Mathf.CeilToInt(sceneTimer).ToString();
 
             if (sceneText != null)
-                sceneText.text = $"Niveau en cours";
+                sceneText.text = $"Niveau {currentLevel}";
 
             if (globalTimerText != null && useGlobalTimer)
             {

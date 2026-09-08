@@ -353,20 +353,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 427ceae3aed1421458726eea455df361, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Demolition.Demolition_ObstacleSpawner
-  structurePrefabs:
-  - {fileID: 3981453300096807182, guid: 045f2920b7c30d74ca45847b543cee82, type: 3}
-  - {fileID: 2184992753038776018, guid: f54bbd85bdb20e94abeee875eab8a7b3, type: 3}
+  gridWidth: 10
+  gridHeight: 10
+  cellSize: 1
+  gridSubdivision: 2
+  availableBlocks:
+  - size: {x: 1, y: 1}
+    prefab:
+    - {fileID: 236178164653354411, guid: fb8f072672b81fb4299ef73259391c89, type: 3}
+  - size: {x: 1, y: 2}
+    prefab: []
+  - size: {x: 2, y: 1}
+    prefab:
+    - {fileID: 9104992119841098205, guid: 951abd779739b25418ca2a2113e7a1ca, type: 3}
+    - {fileID: 8169353957686536075, guid: 7fd1114c059891f4ba94b28b70a61b4f, type: 3}
+  - size: {x: 3, y: 1}
+    prefab: []
+  - size: {x: 1, y: 3}
+    prefab:
+    - {fileID: 8382478847385736378, guid: 029c1ea4f9628634c8e945f9d658ffc6, type: 3}
+  - size: {x: 2, y: 2}
+    prefab:
+    - {fileID: 2184992753038776018, guid: f54bbd85bdb20e94abeee875eab8a7b3, type: 3}
+    - {fileID: 8207307112882083821, guid: e768280c0dd34c04298b08ba6febb971, type: 3}
+    - {fileID: 7008483182764174368, guid: a99373a61774b91448ac7e7b5586224e, type: 3}
+    - {fileID: 4160661253462383299, guid: 70a111350e1ab07469a8a27a6267a21b, type: 3}
+    - {fileID: 3981453300096807182, guid: 045f2920b7c30d74ca45847b543cee82, type: 3}
   fantomePrefab: {fileID: 8334493386568013090, guid: 29d3bdba5eae95b4ca6cb002bf1cd6fb, type: 3}
-  difficultyLevels:
-  - name: Niveau 1
-    numberOfStructures: 5
-    numberOfFantomes: 1
-  - name: Niveau 1
-    numberOfStructures: 2
-    numberOfFantomes: 1
-  - name: Niveau 1
-    numberOfStructures: 2
-    numberOfFantomes: 1
 --- !u!4 &292877123
 Transform:
   m_ObjectHideFlags: 0
@@ -780,7 +793,7 @@ MonoBehaviour:
   nightSettingsPrefabs:
   - {fileID: 6286395678348113043, guid: 118da35df690cba4889f470258fb041b, type: 3}
   dayEnvPrefabs:
-  - {fileID: 2262415064059282411, guid: c44afa11a824f284c830c389f649b387, type: 3}
+  - {fileID: 2178550315987440869, guid: c7f5c5516119c2846b2adf84b0a423fb, type: 3}
   nightEnvPrefabs:
   - {fileID: 1432095997803376272, guid: d5f2a7cc6499af04285de3a696dcca37, type: 3}
   - {fileID: 4023218510596498314, guid: 5a5afd38760f28f449f12f66ea61fb41, type: 3}
@@ -853,7 +866,8 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 3215339897384421364, guid: ad832d45d87680347ac358a210be98d2, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -997,7 +1011,7 @@ MonoBehaviour:
   fadeCanvasGroup: {fileID: 1053466763}
   fadeInDuration: 0.5
   fadeOutDuration: 1
-  sceneClearSound: {fileID: 0}
+  sceneClearSound: {fileID: 8300000, guid: 3cfd51234ac3e4c439ee3f898c055400, type: 3}
   gameOverSound: {fileID: 8300000, guid: 34806e543b1d56b419fd641a6822f494, type: 3}
   currentScrollSpeed: 0
   structuresParent: {fileID: 1173445717}

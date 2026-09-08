@@ -13,6 +13,18 @@ PrefabInstance:
       value: crate_02_destructible
       objectReference: {fileID: 0}
     - target: {fileID: 4288204754772959086, guid: 6b5e5466a670b4a459797592aea4c1d9, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 4288204754772959086, guid: 6b5e5466a670b4a459797592aea4c1d9, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 4288204754772959086, guid: 6b5e5466a670b4a459797592aea4c1d9, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 4288204754772959086, guid: 6b5e5466a670b4a459797592aea4c1d9, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
@@ -51,6 +63,10 @@ PrefabInstance:
     - target: {fileID: 4288204754772959086, guid: 6b5e5466a670b4a459797592aea4c1d9, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4288204754772959086, guid: 6b5e5466a670b4a459797592aea4c1d9, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -110,7 +126,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 877537cda7c83dd4989872ab33cea55f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  health: 1
+  health: 5
   DebrisPrefab: {fileID: 2732566085063128815, guid: ba38c29459097cf4caa71688f424c0e9, type: 3}
 --- !u!114 &-5989328885341053683
 MonoBehaviour:
@@ -125,8 +141,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Demolition.Demolition_Pushable
   pushForce: 8
-  uplift: 4
+  uplift: 15
   radiusVariation: 0.5
+  upliftBonusPerHit: 2
+  spawnRotationOffset: {x: 0, y: 0, z: 0}
 --- !u!54 &2683701211849786135
 Rigidbody:
   m_ObjectHideFlags: 0
