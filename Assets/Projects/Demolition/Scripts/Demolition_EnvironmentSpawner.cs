@@ -1,79 +1,100 @@
+using System.Collections;
 using UnityEngine;
-using UnityEngine.SceneManagement;
+using UnityEngine.Rendering;
 
 namespace Demolition
 {
+    [System.Serializable]
+    public struct EnvironmentData
+    {
+        public string environmentName;
+        public Material skyboxMaterial;
+        
+        [Header("Lighting & Shadows")]
+        [ColorUsage(true, true)] public Color realtimeShadowColor;
+
+        [Header("Environment Lighting (Gradient)")]
+        [ColorUsage(true, true)] public Color ambientSkyColor;
+        [ColorUsage(true, true)] public Color ambientEquatorColor;
+        [ColorUsage(true, true)] public Color ambientGroundColor;
+
+        [Header("Environment Reflections")]
+        [Range(1, 5)] public int reflectionBounces;
+        public float reflectionIntensityMultiplier;
+
+        [Header("Fog Settings")]
+        public bool fogEnabled;
+        public Color fogColor;
+        public float fogStartDistance;
+        public float fogEndDistance;
+
+        [Header("Prefabs associés")]
+        public GameObject[] envPrefabs;
+        public GameObject[] settingsPrefabs;
+    }
+
     public class Demolition_EnvironmentSpawner : MonoBehaviour
     {
-        private static bool _toggleNight = false;
-
-        [Header("Skybox")]
-        public Material daySkybox;
-        public Material nightSkybox;
-
-        [Header("Settings Prefabs (reflection probes, lighting tweaks)")]
-        public GameObject[] daySettingsPrefabs;
-        public GameObject[] nightSettingsPrefabs;
-
-        [Header("Env Prefabs (décor, terrain, obstacles)")]
-        public GameObject[] dayEnvPrefabs;
-        public GameObject[] nightEnvPrefabs;
+        [Header("Configurations Jour / Nuit")]
+        public EnvironmentData dayEnvironment;
+        public EnvironmentData nightEnvironment;
 
         [Header("Parents dans la hiérarchie")]
         public Transform settingsParent;
         public Transform envParent;
 
-        void Start()
+        private GameObject currentSettingsInstance;
+        public GameObject currentEnvInstance;
+
+
+
+
+        public void ApplyEnvironment(EnvironmentData data)
         {
-            bool isNight = IsNightScene();
-            if (_toggleNight)
-                isNight = !isNight;
+            // 1. Skybox
+            RenderSettings.skybox = data.skyboxMaterial;
 
-            SetSkybox(isNight);
-            SpawnSettings(isNight);
-            SpawnEnv(isNight);
+            // 2. Realtime Shadow Color
+            RenderSettings.subtractiveShadowColor = data.realtimeShadowColor;
 
-            _toggleNight = true;
+            // 3. Éclairage Ambiant (Trilight)
+            RenderSettings.ambientMode = AmbientMode.Trilight;
+            RenderSettings.ambientSkyColor = data.ambientSkyColor;
+            RenderSettings.ambientEquatorColor = data.ambientEquatorColor;
+            RenderSettings.ambientGroundColor = data.ambientGroundColor;
 
-            var spawner = FindObjectOfType<Demolition_ObstacleSpawner>();
-            if (spawner)
-                spawner.SpawnForDifficulty(Demolition_GameManager.currentLevel);
+            // 4. Réflexions
+            RenderSettings.reflectionBounces = data.reflectionBounces;
+            RenderSettings.reflectionIntensity = data.reflectionIntensityMultiplier;
+
+            // 5. Brouillard (Fog)
+            RenderSettings.fog = data.fogEnabled;
+            RenderSettings.fogColor = data.fogColor;
+            RenderSettings.fogMode = FogMode.Linear;
+            RenderSettings.fogStartDistance = data.fogStartDistance;
+            RenderSettings.fogEndDistance = data.fogEndDistance;
+
+            // 6. Nettoyage des anciens prefabs (chunks et réglages précédents)
+            if (currentSettingsInstance != null) Destroy(currentSettingsInstance);
+            if (currentEnvInstance != null) Destroy(currentEnvInstance);
+
+            // 7. Instanciation des nouveaux prefabs correspondants
+            currentSettingsInstance = SpawnRandomPrefab(data.settingsPrefabs, settingsParent);
+            currentEnvInstance = SpawnRandomPrefab(data.envPrefabs, envParent);
+
+            // Met à jour l'illumination globale en temps réel
+            DynamicGI.UpdateEnvironment();
         }
 
-        private static bool IsNightScene()
+        private GameObject SpawnRandomPrefab(GameObject[] pool, Transform parentTransform)
         {
-            string name = SceneManager.GetActiveScene().name;
-            return name.Contains("Night") || name.Contains("Nuit");
-        }
-
-        private void SetSkybox(bool isNight)
-        {
-            Material targetSkybox = isNight ? nightSkybox : daySkybox;
-            if (targetSkybox)
-                RenderSettings.skybox = targetSkybox;
-        }
-
-        private void SpawnSettings(bool isNight)
-        {
-            GameObject[] pool = isNight ? nightSettingsPrefabs : daySettingsPrefabs;
-            SpawnRandomPrefab(pool, settingsParent, "Settings");
-        }
-
-        private void SpawnEnv(bool isNight)
-        {
-            GameObject[] pool = isNight ? nightEnvPrefabs : dayEnvPrefabs;
-            SpawnRandomPrefab(pool, envParent, "Env");
-        }
-
-        private void SpawnRandomPrefab(GameObject[] pool, Transform parentTransform, string categoryName)
-        {
-            if (pool == null || pool.Length == 0) return;
+            if (pool == null || pool.Length == 0) return null;
 
             GameObject prefab = pool[Random.Range(0, pool.Length)];
-            if (!prefab) return;
+            if (!prefab) return null;
 
             Transform targetParent = parentTransform ? parentTransform : transform;
-            Instantiate(prefab, Vector3.zero, Quaternion.identity, targetParent);
+            return Instantiate(prefab, Vector3.zero, Quaternion.identity, targetParent);
         }
     }
 }

@@ -31,20 +31,19 @@ namespace Demolition
             set => currentDifficulty = Mathf.Max(1, value);
         }
 
-        public void SpawnForDifficulty(int level)
+
+
+        public void SpawnForDifficulty(int level,Demolition_ObstacleAnchor anchor )
         {
             CurrentDifficulty = level;
-            SpawnWithGrid(CurrentDifficulty);
+            SpawnWithGrid(CurrentDifficulty, anchor);
         }
 
-        private void SpawnWithGrid(int level)
+        private void SpawnWithGrid(int level,Demolition_ObstacleAnchor anchor )
         {
-            var anchors = FindObjectsOfType<Demolition_ObstacleAnchor>();
-            if (anchors == null || anchors.Length == 0)
-            {
-                Debug.LogWarning("[ObstacleSpawner] Aucun Demolition_ObstacleAnchor trouvé.");
-                return;
-            }
+
+            Debug.Log($"[ObstacleSpawner] Spawning obstacles for level {level} at anchor {anchor.name}");
+
 
             // Toujours utiliser la liste complète des formes disponibles (poutres, piliers, caisses...)
             var blocksToUse = (availableBlocks != null && availableBlocks.Count > 0)
@@ -52,38 +51,36 @@ namespace Demolition
                 : GetDefaultBlockConfigs();
 
             // Nettoyage préalable sous toutes les ancres et leurs points de spawn (obstaclePrefabs)
-            foreach (var anchor in anchors)
+
+            CleanOldObstacles(anchor.transform);
+            if (anchor.obstaclePrefabs != null)
             {
-                CleanOldObstacles(anchor.transform);
-                if (anchor.obstaclePrefabs != null)
+                foreach (var spawnPoint in anchor.obstaclePrefabs)
                 {
-                    foreach (var spawnPoint in anchor.obstaclePrefabs)
-                    {
-                        if (spawnPoint != null)
-                            CleanOldObstacles(spawnPoint.transform);
-                    }
+                    if (spawnPoint != null)
+                        CleanOldObstacles(spawnPoint.transform);
                 }
             }
+            
 
             // Récupération des points de spawn cibles (priorité aux transforms référencés dans obstaclePrefabs)
             var spawnTargets = new List<Transform>();
-            foreach (var anchor in anchors)
+
+            if (anchor.obstaclePrefabs != null && anchor.obstaclePrefabs.Length > 0)
             {
-                if (anchor.obstaclePrefabs != null && anchor.obstaclePrefabs.Length > 0)
+                foreach (var p in anchor.obstaclePrefabs)
                 {
-                    foreach (var p in anchor.obstaclePrefabs)
+                    if (p != null)
                     {
-                        if (p != null)
-                        {
-                            spawnTargets.Add(p.transform);
-                        }
+                        spawnTargets.Add(p.transform);
                     }
                 }
-                else
-                {
-                    spawnTargets.Add(anchor.transform);
-                }
             }
+            else
+            {
+                spawnTargets.Add(anchor.transform);
+            }
+            
 
             if (spawnTargets.Count == 0)
             {

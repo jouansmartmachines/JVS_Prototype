@@ -14,6 +14,8 @@ namespace Demolition
         // Données persistantes de session
         public static int currentLevel = 1;
         public static int sessionScore = 0;
+
+        public static bool isDaytime = false;
         public static float sessionGlobalTimer = -1f;
 
         [Header("Timers")]
@@ -47,7 +49,12 @@ namespace Demolition
         public Transform structuresParent;
 
         private bool isRunning = false;
+
+        private bool iSNight = true;
         private bool isGameOver = false;
+
+        [SerializeField] private Demolition_EnvironmentSpawner envSpawner;
+        [SerializeField] private Demolition_ObstacleSpawner obstacleSpawner;
 
         public void ApplyDamageToDestructible(IndieKit.IDamageable target, float damage, Vector3 hitPoint)
         {
@@ -87,6 +94,8 @@ namespace Demolition
             audioSource.playOnAwake = false;
         }
 
+
+
         void Start()
         {
             EnsureSceneElements();
@@ -105,6 +114,24 @@ namespace Demolition
 
             StartCoroutine(FadeIn());
             UpdateUI();
+            SetupLevelEnvironment();
+            obstacleSpawner.SpawnForDifficulty(currentLevel, envSpawner.currentEnvInstance.GetComponent<Demolition_ObstacleAnchor>());
+        }
+        private void SetupLevelEnvironment()
+        {
+            if (envSpawner == null) return;
+
+            isDaytime = !isDaytime;
+            if (isDaytime)
+            {
+                envSpawner.ApplyEnvironment(envSpawner.dayEnvironment);
+                Debug.Log($"Demolition: Environnement JOUR appliqué pour le niveau {currentLevel}");
+            }
+            else
+            {
+                envSpawner.ApplyEnvironment(envSpawner.nightEnvironment);
+                Debug.Log($"Demolition: Environnement NUIT appliqué pour le niveau {currentLevel}");
+            }
         }
 
         private void LoadPreferences()

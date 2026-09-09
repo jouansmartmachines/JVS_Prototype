@@ -19,9 +19,8 @@ namespace Demolition
         [SerializeField] Color _winnerColor;
 
         public const string HighScoreKey = "Demolition_HighScore";
-        public const string ModeOiseauKey = "Demolition_ModeOiseau";
+
         public const string GameTimeKey = "Demolition_GameTime";
-        public const string ScrollSpeedKey = "Demolition_ScrollSpeed";
 
         public const string SceneTimeKey = "Demolition_SceneTime";
         public const string GlobalTimeKey = "Demolition_GlobalTime";
@@ -32,15 +31,15 @@ namespace Demolition
             return index switch
             {
                 0 => 30f,
-                1 => 15f,
+                1 => 300f,
                 2 => 90f,
-                _ => 15f
+                _ => 300f
             };
         }
 
         public static float GetGlobalTimeFromPrefs()
         {
-            return PlayerPrefs.GetFloat(GlobalTimeKey, 300f);
+            return PlayerPrefs.GetFloat(GlobalTimeKey, 15000f);
         }
 
         public override void ReceiveName(string name)

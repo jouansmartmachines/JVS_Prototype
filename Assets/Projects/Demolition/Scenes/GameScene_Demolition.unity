@@ -93,7 +93,7 @@ LightmapSettings:
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
-  m_LightingDataAsset: {fileID: 20201, guid: 0000000000000000f000000000000000, type: 0}
+  m_LightingDataAsset: {fileID: 0}
   m_LightingSettings: {fileID: 0}
 --- !u!196 &4
 NavMeshSettings:
@@ -786,19 +786,45 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f9f1ecf10e687854783cec45ad23b5f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Demolition.Demolition_EnvironmentSpawner
-  daySkybox: {fileID: 2100000, guid: 30438304e2efa6e4f96c0459a9a111d8, type: 2}
-  nightSkybox: {fileID: 2100000, guid: 7b6d5af899483db4384b008fa951f847, type: 2}
-  daySettingsPrefabs:
-  - {fileID: 5426458053580748137, guid: 253d75e4406eac842a12bc005d4a43d0, type: 3}
-  nightSettingsPrefabs:
-  - {fileID: 6286395678348113043, guid: 118da35df690cba4889f470258fb041b, type: 3}
-  dayEnvPrefabs:
-  - {fileID: 2178550315987440869, guid: c7f5c5516119c2846b2adf84b0a423fb, type: 3}
-  nightEnvPrefabs:
-  - {fileID: 1432095997803376272, guid: d5f2a7cc6499af04285de3a696dcca37, type: 3}
-  - {fileID: 4023218510596498314, guid: 5a5afd38760f28f449f12f66ea61fb41, type: 3}
+  dayEnvironment:
+    environmentName: 
+    skyboxMaterial: {fileID: 2100000, guid: 30438304e2efa6e4f96c0459a9a111d8, type: 2}
+    realtimeShadowColor: {r: 0.1470273, g: 0.19120172, b: 0.3515327, a: 0}
+    ambientSkyColor: {r: 1, g: 1, b: 1, a: 0}
+    ambientEquatorColor: {r: 0.730461, g: 0.76052475, b: 0.78353804, a: 0}
+    ambientGroundColor: {r: 0.52711535, g: 0.52711535, b: 0.52711535, a: 0}
+    reflectionBounces: 1
+    reflectionIntensityMultiplier: 1
+    fogEnabled: 1
+    fogColor: {r: 0.21176472, g: 0.6666667, b: 1, a: 0}
+    fogStartDistance: 80
+    fogEndDistance: 480
+    envPrefabs:
+    - {fileID: 2262415064059282411, guid: c44afa11a824f284c830c389f649b387, type: 3}
+    - {fileID: 2178550315987440869, guid: c7f5c5516119c2846b2adf84b0a423fb, type: 3}
+    settingsPrefabs:
+    - {fileID: 5426458053580748137, guid: 253d75e4406eac842a12bc005d4a43d0, type: 3}
+  nightEnvironment:
+    environmentName: 
+    skyboxMaterial: {fileID: 2100000, guid: 7b6d5af899483db4384b008fa951f847, type: 2}
+    realtimeShadowColor: {r: 0.1470273, g: 0.19120172, b: 0.3515327, a: 0}
+    ambientSkyColor: {r: 0.637597, g: 0.730461, b: 1, a: 0}
+    ambientEquatorColor: {r: 0, g: 0.33716366, b: 0.9646866, a: 0}
+    ambientGroundColor: {r: 0.41788515, g: 0.27467737, b: 0.822786, a: 0}
+    reflectionBounces: 1
+    reflectionIntensityMultiplier: 1
+    fogEnabled: 1
+    fogColor: {r: 0, g: 0.3019608, b: 0.6039216, a: 0}
+    fogStartDistance: 32
+    fogEndDistance: 280
+    envPrefabs:
+    - {fileID: 1432095997803376272, guid: d5f2a7cc6499af04285de3a696dcca37, type: 3}
+    - {fileID: 4023218510596498314, guid: 5a5afd38760f28f449f12f66ea61fb41, type: 3}
+    settingsPrefabs:
+    - {fileID: 6286395678348113043, guid: 118da35df690cba4889f470258fb041b, type: 3}
   settingsParent: {fileID: 1537042551}
   envParent: {fileID: 845488287}
+  currentEnvInstance: {fileID: 0}
 --- !u!4 &1265095617
 Transform:
   m_ObjectHideFlags: 0
@@ -999,9 +1025,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 813e5a086c1927d77cdafb99f04aceb0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Demolition.Demolition_GameManager
-  sceneDuration: 15
+  sceneDuration: 300
   sceneTimer: 0
-  globalTimer: 300
+  globalTimer: 12000
   useGlobalTimer: 1
   sceneScore: 0
   scoreText: {fileID: 680095159}
@@ -1015,6 +1041,8 @@ MonoBehaviour:
   gameOverSound: {fileID: 8300000, guid: 34806e543b1d56b419fd641a6822f494, type: 3}
   currentScrollSpeed: 0
   structuresParent: {fileID: 1173445717}
+  envSpawner: {fileID: 1265095616}
+  obstacleSpawner: {fileID: 292877122}
 --- !u!4 &1450344021
 Transform:
   m_ObjectHideFlags: 0
