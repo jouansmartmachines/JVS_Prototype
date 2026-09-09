@@ -116,7 +116,9 @@ namespace Demolition
             UpdateUI();
             SetupLevelEnvironment();
             obstacleSpawner.SpawnForDifficulty(currentLevel, envSpawner.currentEnvInstance.GetComponent<Demolition_ObstacleAnchor>());
+            SpawnGuards();
         }
+
         private void SetupLevelEnvironment()
         {
             if (envSpawner == null) return;
@@ -358,7 +360,47 @@ namespace Demolition
             Time.timeScale = 1f;
         }
 
-        private void UpdateUI()
+public void TriggerPigDestroyed(int starValue)
+        {
+            Demolition_DebrisSpawner.SpawnStarBurst(Vector3.zero, 5 + starValue * 3);
+        }
+
+        private void SpawnGuards()
+        {
+            var fantome = FindObjectOfType<Demolition_Fantome>();
+            if (fantome == null) return;
+
+            GameObject guardPrefab = Resources.Load<GameObject>("Prefabs/Garde");
+            if (guardPrefab == null)
+            {
+                Debug.LogWarning("Demolition: prefab Garde introuvable dans Resources/Prefabs/");
+                return;
+            }
+
+            int guardCount = 3;
+            float angleStep = 360f / guardCount;
+
+            for (int i = 0; i < guardCount; i++)
+            {
+                Vector3 pos = fantome.transform.position + new Vector3(
+                    Mathf.Cos(i * angleStep * Mathf.Deg2Rad) * 1.5f,
+                    Mathf.Sin(i * angleStep * Mathf.Deg2Rad) * 1.5f * 0.7f,
+                    0
+                );
+
+                GameObject guardGO = Instantiate(guardPrefab, pos, Quaternion.identity);
+                var guard = guardGO.GetComponent<Demolition_Guard>();
+                if (guard != null)
+                    guard.Initialize(fantome.transform, i * angleStep);
+
+                // Binding Universal_Button → Demolition_Guard.OnTouched
+                var btn = guardGO.GetComponent<Universal_Button>();
+                if (btn != null && guard != null)
+                    btn.Event.AddListener(guard.OnTouched);
+            }
+        }
+
+private void UpdateUI()
         {
             if (scoreText != null)
                 scoreText.text = $"Score: {score}";
