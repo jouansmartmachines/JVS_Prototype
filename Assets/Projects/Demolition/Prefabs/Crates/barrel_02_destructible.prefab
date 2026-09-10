@@ -12,6 +12,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: barrel_02_destructible
       objectReference: {fileID: 0}
+    - target: {fileID: 8091562023395317160, guid: a1c6fcc429226d442b76d514a5e62193, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8863313205455523602, guid: a1c6fcc429226d442b76d514a5e62193, type: 3}
       propertyPath: m_LocalScale.x
       value: 1.36
@@ -189,7 +193,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3

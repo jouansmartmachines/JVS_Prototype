@@ -12,6 +12,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: crate_01_destructible
       objectReference: {fileID: 0}
+    - target: {fileID: 7387413924892916630, guid: 474b836f8361a7843a7a9a3707baf5ba, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7912417174230425900, guid: 474b836f8361a7843a7a9a3707baf5ba, type: 3}
       propertyPath: m_LocalScale.x
       value: 1.54
@@ -108,7 +112,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3

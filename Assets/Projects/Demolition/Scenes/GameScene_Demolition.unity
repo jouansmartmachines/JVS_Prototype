@@ -395,6 +395,54 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &665913281
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 665913283}
+  - component: {fileID: 665913282}
+  m_Layer: 0
+  m_Name: GuardSpawner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &665913282
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 665913281}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3acd401b1f1551d46a3a0daacda83fd5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Demolition.Demolition_GuardSpawner
+  guardPrefab: {fileID: 2904187909706243493, guid: 7c61ef66c7b5c794fac50dff9b3c02a5, type: 3}
+  maxGuardsToSpawn: 4
+  spawnSpacing: 2
+  respawnDelay: 2
+--- !u!4 &665913283
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 665913281}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 353.26932, y: 0.00002, z: -95.76093}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &680095157
 GameObject:
   m_ObjectHideFlags: 0
@@ -801,7 +849,6 @@ MonoBehaviour:
     fogEndDistance: 480
     envPrefabs:
     - {fileID: 2262415064059282411, guid: c44afa11a824f284c830c389f649b387, type: 3}
-    - {fileID: 2178550315987440869, guid: c7f5c5516119c2846b2adf84b0a423fb, type: 3}
     settingsPrefabs:
     - {fileID: 5426458053580748137, guid: 253d75e4406eac842a12bc005d4a43d0, type: 3}
   nightEnvironment:
@@ -818,7 +865,6 @@ MonoBehaviour:
     fogStartDistance: 32
     fogEndDistance: 280
     envPrefabs:
-    - {fileID: 1432095997803376272, guid: d5f2a7cc6499af04285de3a696dcca37, type: 3}
     - {fileID: 4023218510596498314, guid: 5a5afd38760f28f449f12f66ea61fb41, type: 3}
     settingsPrefabs:
     - {fileID: 6286395678348113043, guid: 118da35df690cba4889f470258fb041b, type: 3}
@@ -1025,6 +1071,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 813e5a086c1927d77cdafb99f04aceb0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Demolition.Demolition_GameManager
+  isDaytime: 1
   sceneDuration: 300
   sceneTimer: 0
   globalTimer: 12000
@@ -1043,6 +1090,7 @@ MonoBehaviour:
   structuresParent: {fileID: 1173445717}
   envSpawner: {fileID: 1265095616}
   obstacleSpawner: {fileID: 292877122}
+  guardSpawner: {fileID: 665913282}
 --- !u!4 &1450344021
 Transform:
   m_ObjectHideFlags: 0
@@ -1484,3 +1532,4 @@ SceneRoots:
   - {fileID: 292877123}
   - {fileID: 845488287}
   - {fileID: 1537042551}
+  - {fileID: 665913283}

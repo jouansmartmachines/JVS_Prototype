@@ -31,7 +31,7 @@ namespace Demolition
             return index switch
             {
                 0 => 30f,
-                1 => 300f,
+                1 => 150f,
                 2 => 90f,
                 _ => 300f
             };

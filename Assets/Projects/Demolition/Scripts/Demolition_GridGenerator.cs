@@ -314,6 +314,7 @@ namespace Demolition
             int totalGridW, float cellSize,
             bool[,] occupiedGrid, CellDebugInfo[,] debugGrid, List<PlacedBlockDebugInfo> debugBlocks, List<Rigidbody> rbs)
         {
+            return;
             FillArea(occupiedGrid, rx, ry, internalSize, true);
 
             for (int x = 0; x < internalSize.x; x++)

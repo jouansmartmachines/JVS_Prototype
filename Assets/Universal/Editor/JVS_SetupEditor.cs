@@ -633,7 +633,6 @@ public class JVS_SetupEditor : EditorWindow
             trt.anchoredPosition = new Vector2(548, -12.5f);
             trt.sizeDelta = new Vector2(125, 125);
             var toggle = toggleGO.AddComponent<Toggle>();
-            toggle.isOn = PlayerPrefs.GetInt(Demolition_GeneralVariables.ModeOiseauKey, 1) == 1;
             toggleGO.AddComponent<CanvasRenderer>();
             var bgImg = toggleGO.AddComponent<Image>();
             bgImg.color = new Color(0.96f, 0.64f, 0);
@@ -713,7 +712,6 @@ public class JVS_SetupEditor : EditorWindow
             slider.targetGraphic = handle.GetComponent<Image>();
 
             slider.minValue = 1; slider.maxValue = 5; slider.wholeNumbers = true;
-            slider.value = PlayerPrefs.GetFloat(Demolition_GeneralVariables.ScrollSpeedKey, 2f);
 
             var bg = new GameObject("Background", typeof(RectTransform));
             bg.transform.SetParent(sliderGO.transform);
