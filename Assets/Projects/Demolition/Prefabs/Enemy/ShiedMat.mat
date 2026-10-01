@@ -1,0 +1,102 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-2532204742386343278
+MonoBehaviour:
+  m_ObjectHideFlags: 11
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Editor::UnityEditor.Rendering.Universal.AssetVersion
+  version: 10
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: ShiedMat
+  m_Shader: {fileID: -6465566751694194690, guid: c7165187d9296b341866e570ab937a6c, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords:
+  - _ALPHAPREMULTIPLY_ON
+  - _SURFACE_TYPE_TRANSPARENT
+  m_InvalidKeywords:
+  - USE_COLLISION_RIPPLES
+  m_LightmapFlags: 2
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap:
+    RenderType: Transparent
+  disabledShaderPasses:
+  - MOTIONVECTORS
+  - DepthOnly
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _MainTexture:
+        m_Texture: {fileID: 2800000, guid: 7b0fd7e43cd06e24d8421d2456efdc4e, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_Lightmaps:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_LightmapsInd:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_ShadowMasks:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - USE_COLLISION_RIPPLES: 1
+    - _AlphaClip: 0
+    - _AlphaToMask: 0
+    - _AspectRatio: 0.5
+    - _Blend: 0
+    - _BlendModePreserveSpecular: 1
+    - _CastShadows: 1
+    - _Cull: 0
+    - _DstBlend: 10
+    - _DstBlendAlpha: 10
+    - _FresnelPower: 6.38
+    - _Impact: 1
+    - _QueueControl: 0
+    - _QueueOffset: 0
+    - _ReceiveShadows: 1
+    - _RippleSpeed: 0.61
+    - _RippleThickness: 0.05
+    - _RippleThickness_1: 1.39
+    - _RippleTime: 0.44
+    - _SphereHardness: 0.99
+    - _SphereMask: 0
+    - _SphereRadius: 0
+    - _SrcBlend: 1
+    - _SrcBlendAlpha: 1
+    - _Surface: 1
+    - _VertexFrequency: 1.02
+    - _WorkflowMode: 1
+    - _ZTest: 4
+    - _ZWrite: 0
+    - _ZWriteControl: 0
+    - _alpha: 0.59
+    m_Colors:
+    - _BackColor: {r: 1, g: 0.044800427, b: 0, a: 0.72156864}
+    - _FresnelColor: {r: 10.432951, g: 2.1302881, b: 8.536863, a: 0.7529412}
+    - _FrontColor: {r: 4.536354, g: 1.7332298, b: 1.7332298, a: 0.043137256}
+    - _RippleOrigin: {r: 0.64, g: 0.43, b: 0, a: 0}
+    - _Sphere_Center: {r: 0, g: 0, b: 0, a: 0}
+    - _VertexAmount: {r: 0.1, g: 0.1, b: 0.1, a: 0}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1

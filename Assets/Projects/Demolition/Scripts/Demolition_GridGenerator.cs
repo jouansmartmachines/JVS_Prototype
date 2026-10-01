@@ -27,7 +27,6 @@ namespace Demolition
         public static void GenerateProceduralStructure(
             Transform targetParent, 
             List<Demolition_ObstacleSpawner.BlockConfig> availableBlocks, 
-            GameObject fantomePrefab,
             int gridW, int gridH, float cellSize, int subdivision,
             int levelIndex)
         {
@@ -39,7 +38,6 @@ namespace Demolition
 
             var rbs = new List<Rigidbody>();
             var debugBlocks = new List<PlacedBlockDebugInfo>();
-            var debugFantomes = new List<FantomeDebugInfo>();
             var debugGrid = new CellDebugInfo[internalW, internalH];
             bool[,] occupiedGrid = new bool[internalW, internalH];
 
@@ -67,39 +65,39 @@ namespace Demolition
             switch (puzzleType)
             {
                 case 0:
-                    BuildDolmenPuzzle(targetParent, pillarConfig, beamConfig, squareConfig, fantomePrefab,
+                    BuildDolmenPuzzle(targetParent, pillarConfig, beamConfig, squareConfig,
                         internalW, internalH, internalCellSize, subdivision, fSize,
-                        occupiedGrid, debugGrid, debugBlocks, debugFantomes, rbs);
+                        occupiedGrid, debugGrid, debugBlocks, rbs);
                     break;
 
                 case 1:
-                    BuildKeystoneBunkerPuzzle(targetParent, pillarConfig, beamConfig, squareConfig, fantomePrefab,
+                    BuildKeystoneBunkerPuzzle(targetParent, pillarConfig, beamConfig, squareConfig,
                         internalW, internalH, internalCellSize, subdivision, fSize,
-                        occupiedGrid, debugGrid, debugBlocks, debugFantomes, rbs);
+                        occupiedGrid, debugGrid, debugBlocks, rbs);
                     break;
 
                 case 2:
-                    BuildTwoTierTowerPuzzle(targetParent, pillarConfig, beamConfig, squareConfig, fantomePrefab,
+                    BuildTwoTierTowerPuzzle(targetParent, pillarConfig, beamConfig, squareConfig,
                         internalW, internalH, internalCellSize, subdivision, fSize,
-                        occupiedGrid, debugGrid, debugBlocks, debugFantomes, rbs);
+                        occupiedGrid, debugGrid, debugBlocks, rbs);
                     break;
 
                 case 3:
-                    BuildCantileverPuzzle(targetParent, pillarConfig, beamConfig, squareConfig, fantomePrefab,
+                    BuildCantileverPuzzle(targetParent, pillarConfig, beamConfig, squareConfig,
                         internalW, internalH, internalCellSize, subdivision, fSize,
-                        occupiedGrid, debugGrid, debugBlocks, debugFantomes, rbs);
+                        occupiedGrid, debugGrid, debugBlocks, rbs);
                     break;
 
                 default:
-                    BuildGrandCitadelPuzzle(targetParent, pillarConfig, beamConfig, squareConfig, fantomePrefab,
+                    BuildGrandCitadelPuzzle(targetParent, pillarConfig, beamConfig, squareConfig,
                         internalW, internalH, internalCellSize, subdivision, fSize,
-                        occupiedGrid, debugGrid, debugBlocks, debugFantomes, rbs);
+                        occupiedGrid, debugGrid, debugBlocks, rbs);
                     break;
             }
 
             var host = targetParent.gameObject.GetComponent<StructureHost>();
             if (host == null) host = targetParent.gameObject.AddComponent<StructureHost>();
-            host.Init(rbs, debugGrid, debugBlocks, debugFantomes, internalW, internalH, internalCellSize);
+            host.Init(rbs, debugGrid, debugBlocks, internalW, internalH, internalCellSize);
         }
 
         // =========================================================================================
@@ -107,9 +105,8 @@ namespace Demolition
         // =========================================================================================
 
         private static void BuildDolmenPuzzle(
-            Transform parent, Demolition_ObstacleSpawner.BlockConfig pillar, Demolition_ObstacleSpawner.BlockConfig beam, Demolition_ObstacleSpawner.BlockConfig square,
-            GameObject fantome, int w, int h, float cSize, int sub, Vector2Int fSize,
-            bool[,] occ, CellDebugInfo[,] dGrid, List<PlacedBlockDebugInfo> dBlocks, List<FantomeDebugInfo> dFantomes, List<Rigidbody> rbs)
+            Transform parent, Demolition_ObstacleSpawner.BlockConfig pillar, Demolition_ObstacleSpawner.BlockConfig beam, Demolition_ObstacleSpawner.BlockConfig square, int w, int h, float cSize, int sub, Vector2Int fSize,
+            bool[,] occ, CellDebugInfo[,] dGrid, List<PlacedBlockDebugInfo> dBlocks, List<Rigidbody> rbs)
         {
             Vector2Int pSize = pillar.size * sub;
             Vector2Int bSize = beam.size * sub;
@@ -130,8 +127,6 @@ namespace Demolition
 
             // Fantôme au centre au sol
             int fX = startX + (span - fSize.x) / 2;
-            if (fantome != null && CanPlace(occ, fX, 0, fSize.x, fSize.y))
-                PlaceFantomeInstance(parent, fantome, fX, 0, fSize, w, cSize, occ, dGrid, dFantomes, rbs);
 
             // Toiture
             int roofY = pSize.y;
@@ -151,8 +146,8 @@ namespace Demolition
 
         private static void BuildKeystoneBunkerPuzzle(
             Transform parent, Demolition_ObstacleSpawner.BlockConfig pillar, Demolition_ObstacleSpawner.BlockConfig beam, Demolition_ObstacleSpawner.BlockConfig square,
-            GameObject fantome, int w, int h, float cSize, int sub, Vector2Int fSize,
-            bool[,] occ, CellDebugInfo[,] dGrid, List<PlacedBlockDebugInfo> dBlocks, List<FantomeDebugInfo> dFantomes, List<Rigidbody> rbs)
+            int w, int h, float cSize, int sub, Vector2Int fSize,
+            bool[,] occ, CellDebugInfo[,] dGrid, List<PlacedBlockDebugInfo> dBlocks,  List<Rigidbody> rbs)
         {
             Vector2Int pSize = pillar.size * sub;
             Vector2Int bSize = beam.size * sub;
@@ -170,10 +165,6 @@ namespace Demolition
             if (rightX > midX + sqSize.x)
                 PlaceBlockInstance(parent, pillar, rightX, 0, pSize, w, cSize, occ, dGrid, dBlocks, rbs);
 
-            // Fantôme dans la chambre droite
-            int fX = midX + sqSize.x + 1;
-            if (fantome != null && CanPlace(occ, fX, 0, fSize.x, fSize.y))
-                PlaceFantomeInstance(parent, fantome, fX, 0, fSize, w, cSize, occ, dGrid, dFantomes, rbs);
 
             // Toiture
             int roofY = Mathf.Max(pSize.y, sqSize.y);
@@ -187,8 +178,8 @@ namespace Demolition
 
         private static void BuildTwoTierTowerPuzzle(
             Transform parent, Demolition_ObstacleSpawner.BlockConfig pillar, Demolition_ObstacleSpawner.BlockConfig beam, Demolition_ObstacleSpawner.BlockConfig square,
-            GameObject fantome, int w, int h, float cSize, int sub, Vector2Int fSize,
-            bool[,] occ, CellDebugInfo[,] dGrid, List<PlacedBlockDebugInfo> dBlocks, List<FantomeDebugInfo> dFantomes, List<Rigidbody> rbs)
+             int w, int h, float cSize, int sub, Vector2Int fSize,
+            bool[,] occ, CellDebugInfo[,] dGrid, List<PlacedBlockDebugInfo> dBlocks,  List<Rigidbody> rbs)
         {
             Vector2Int pSize = pillar.size * sub;
             Vector2Int bSize = beam.size * sub;
@@ -202,11 +193,6 @@ namespace Demolition
             int rightX = startX + span - pSize.x;
             if (rightX > startX + pSize.x)
                 PlaceBlockInstance(parent, pillar, rightX, 0, pSize, w, cSize, occ, dGrid, dBlocks, rbs);
-
-            // Fantôme 1 en bas
-            int fX1 = startX + (span - fSize.x) / 2;
-            if (fantome != null && CanPlace(occ, fX1, 0, fSize.x, fSize.y))
-                PlaceFantomeInstance(parent, fantome, fX1, 0, fSize, w, cSize, occ, dGrid, dFantomes, rbs);
 
             // Toit Étage 1
             int tier1Y = pSize.y;
@@ -226,18 +212,14 @@ namespace Demolition
                 int tier2RoofY = tier2PillarY + pSize.y;
                 PlaceBlockInstance(parent, beam, startX, tier2RoofY, bSize, w, cSize, occ, dGrid, dBlocks, rbs);
 
-                // Fantôme 2 perché au sommet
-                int fX2 = startX + (span - fSize.x) / 2;
-                int fY2 = tier2RoofY + bSize.y;
-                if (fantome != null && fY2 + fSize.y <= h && CanPlace(occ, fX2, fY2, fSize.x, fSize.y))
-                    PlaceFantomeInstance(parent, fantome, fX2, fY2, fSize, w, cSize, occ, dGrid, dFantomes, rbs);
+            
             }
         }
 
         private static void BuildCantileverPuzzle(
             Transform parent, Demolition_ObstacleSpawner.BlockConfig pillar, Demolition_ObstacleSpawner.BlockConfig beam, Demolition_ObstacleSpawner.BlockConfig square,
-            GameObject fantome, int w, int h, float cSize, int sub, Vector2Int fSize,
-            bool[,] occ, CellDebugInfo[,] dGrid, List<PlacedBlockDebugInfo> dBlocks, List<FantomeDebugInfo> dFantomes, List<Rigidbody> rbs)
+             int w, int h, float cSize, int sub, Vector2Int fSize,
+            bool[,] occ, CellDebugInfo[,] dGrid, List<PlacedBlockDebugInfo> dBlocks, List<Rigidbody> rbs)
         {
             Vector2Int pSize = pillar.size * sub;
             Vector2Int bSize = beam.size * sub;
@@ -262,16 +244,12 @@ namespace Demolition
                 PlaceBlockInstance(parent, square, startX, weightY, sqSize, w, cSize, occ, dGrid, dBlocks, rbs);
             }
 
-            // Fantôme sous la partie suspendue à droite
-            int fX = startX + span - fSize.x;
-            if (fantome != null && CanPlace(occ, fX, 0, fSize.x, fSize.y))
-                PlaceFantomeInstance(parent, fantome, fX, 0, fSize, w, cSize, occ, dGrid, dFantomes, rbs);
         }
 
         private static void BuildGrandCitadelPuzzle(
             Transform parent, Demolition_ObstacleSpawner.BlockConfig pillar, Demolition_ObstacleSpawner.BlockConfig beam, Demolition_ObstacleSpawner.BlockConfig square,
-            GameObject fantome, int w, int h, float cSize, int sub, Vector2Int fSize,
-            bool[,] occ, CellDebugInfo[,] dGrid, List<PlacedBlockDebugInfo> dBlocks, List<FantomeDebugInfo> dFantomes, List<Rigidbody> rbs)
+            int w, int h, float cSize, int sub, Vector2Int fSize,
+            bool[,] occ, CellDebugInfo[,] dGrid, List<PlacedBlockDebugInfo> dBlocks,  List<Rigidbody> rbs)
         {
             Vector2Int pSize = pillar.size * sub;
             Vector2Int bSize = beam.size * sub;
@@ -287,15 +265,6 @@ namespace Demolition
             PlaceBlockInstance(parent, pillar, p2, 0, pSize, w, cSize, occ, dGrid, dBlocks, rbs);
             if (p3 > p2 + pSize.x)
                 PlaceBlockInstance(parent, pillar, p3, 0, pSize, w, cSize, occ, dGrid, dBlocks, rbs);
-
-            // Fantômes dans chaque chambre
-            int fX1 = p1 + (p2 - p1 - fSize.x) / 2;
-            if (fantome != null && CanPlace(occ, fX1, 0, fSize.x, fSize.y))
-                PlaceFantomeInstance(parent, fantome, fX1, 0, fSize, w, cSize, occ, dGrid, dFantomes, rbs);
-
-            int fX2 = p2 + pSize.x + 1;
-            if (fantome != null && CanPlace(occ, fX2, 0, fSize.x, fSize.y))
-                PlaceFantomeInstance(parent, fantome, fX2, 0, fSize, w, cSize, occ, dGrid, dFantomes, rbs);
 
             // Toiture
             int roofY = pSize.y;
@@ -335,34 +304,9 @@ namespace Demolition
                     spawned.transform.localRotation = Quaternion.Euler(pushable.spawnRotationOffset);
                 else
                     spawned.transform.localRotation = Quaternion.identity;
-
-
             }
         }
 
-        private static void PlaceFantomeInstance(
-            Transform parent, GameObject fantomePrefab,
-            int rx, int ry, Vector2Int internalSize,
-            int totalGridW, float cellSize,
-            bool[,] occupiedGrid, CellDebugInfo[,] debugGrid, List<FantomeDebugInfo> debugFantomes, List<Rigidbody> rbs)
-        {
-            FillArea(occupiedGrid, rx, ry, internalSize, true);
-
-            for (int x = 0; x < internalSize.x; x++)
-                for (int y = 0; y < internalSize.y; y++)
-                    debugGrid[rx + x, ry + y] = new CellDebugInfo { isFilled = true, isFantome = true };
-
-            debugFantomes.Add(new FantomeDebugInfo { position = new Vector2Int(rx, ry), size = internalSize });
-
-            Vector3 localPos = new Vector3((rx + internalSize.x * 0.5f - totalGridW * 0.5f) * cellSize, ry * cellSize, 0f);
-            GameObject spawned = Object.Instantiate(fantomePrefab, parent);
-            spawned.transform.localPosition = localPos;
-            spawned.transform.localRotation = fantomePrefab.transform.rotation;
-
-            if (!spawned.GetComponent<Demolition_Fantome>())
-                spawned.AddComponent<Demolition_Fantome>();
-
-        }
 
         public static bool CanPlace(bool[,] grid, int startX, int startY, int sizeX, int sizeY)
         {
@@ -395,12 +339,11 @@ namespace Demolition
             private int w, h;
             private float cSize;
 
-            public void Init(List<Rigidbody> rbs, CellDebugInfo[,] grid, List<PlacedBlockDebugInfo> blocks, List<FantomeDebugInfo> fantomes, int w, int h, float size)
+            public void Init(List<Rigidbody> rbs, CellDebugInfo[,] grid, List<PlacedBlockDebugInfo> blocks, int w, int h, float size)
             {
                 this.rbs = rbs; 
                 this.dGrid = grid; 
                 this.blocks = blocks; 
-                this.fantomes = fantomes;
                 this.w = w; 
                 this.h = h; 
                 this.cSize = size;

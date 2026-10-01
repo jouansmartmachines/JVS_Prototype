@@ -5,6 +5,7 @@ namespace Demolition
 {
     public class Demolition_ObstacleSpawner : MonoBehaviour
     {
+        
         [System.Serializable]
         public struct BlockConfig
         {
@@ -23,6 +24,8 @@ namespace Demolition
         [Header("Ressources")]
         public List<BlockConfig> availableBlocks = new List<BlockConfig>();
         public GameObject fantomePrefab;
+        
+
 
         private int currentDifficulty = 1;
         public int CurrentDifficulty
@@ -31,27 +34,22 @@ namespace Demolition
             set => currentDifficulty = Mathf.Max(1, value);
         }
 
-
-
-        public void SpawnForDifficulty(int level,Demolition_ObstacleAnchor anchor )
+        public void SpawnForDifficulty(int level, Demolition_ObstacleAnchor anchor)
         {
             CurrentDifficulty = level;
             SpawnWithGrid(CurrentDifficulty, anchor);
         }
 
-        private void SpawnWithGrid(int level,Demolition_ObstacleAnchor anchor )
+        private void SpawnWithGrid(int level, Demolition_ObstacleAnchor anchor)
         {
-
             Debug.Log($"[ObstacleSpawner] Spawning obstacles for level {level} at anchor {anchor.name}");
 
-
-            // Toujours utiliser la liste complète des formes disponibles (poutres, piliers, caisses...)
+            // Toujours utiliser la liste complète des formes disponibles
             var blocksToUse = (availableBlocks != null && availableBlocks.Count > 0)
                 ? availableBlocks
                 : GetDefaultBlockConfigs();
 
-            // Nettoyage préalable sous toutes les ancres et leurs points de spawn (obstaclePrefabs)
-
+            // 1. Nettoyage préalable sous toutes les ancres et leurs points de spawn
             CleanOldObstacles(anchor.transform);
             if (anchor.obstaclePrefabs != null)
             {
@@ -61,9 +59,24 @@ namespace Demolition
                         CleanOldObstacles(spawnPoint.transform);
                 }
             }
-            
 
-            // Récupération des points de spawn cibles (priorité aux transforms référencés dans obstaclePrefabs)
+            // 2. Gestion et Instanciation du Fantôme via le Transform dédié dans l'Anchor
+            if (anchor.fantomeSpawnPoint != null)
+            {
+                // Nettoyage de l'ancien fantôme spécifique sur ce point
+                CleanOldObstacles(anchor.fantomeSpawnPoint);
+
+                if (fantomePrefab != null)
+                {
+                    Instantiate(fantomePrefab, anchor.fantomeSpawnPoint.position, anchor.fantomeSpawnPoint.rotation, anchor.fantomeSpawnPoint);
+                }
+                else
+                {
+                    Debug.LogWarning("[ObstacleSpawner] anchor.fantomeSpawnPoint existe mais fantomePrefab est nul sur le Spawner.");
+                }
+            }
+
+            // 3. Récupération des points de spawn cibles pour la grille d'obstacles
             var spawnTargets = new List<Transform>();
 
             if (anchor.obstaclePrefabs != null && anchor.obstaclePrefabs.Length > 0)
@@ -80,7 +93,6 @@ namespace Demolition
             {
                 spawnTargets.Add(anchor.transform);
             }
-            
 
             if (spawnTargets.Count == 0)
             {
@@ -93,6 +105,7 @@ namespace Demolition
             if (level >= 5) targetsToUse = spawnTargets.Count;
             else if (level >= 3) targetsToUse = Mathf.Min(2, spawnTargets.Count);
 
+            // 4. Génération procédurale des structures d'obstacles uniquement
             for (int i = 0; i < targetsToUse; i++)
             {
                 Transform targetParent = spawnTargets[i];
@@ -101,7 +114,6 @@ namespace Demolition
                 Demolition_GridGenerator.GenerateProceduralStructure(
                     targetParent,
                     blocksToUse,
-                    fantomePrefab,
                     gridWidth,
                     gridHeight,
                     cellSize,

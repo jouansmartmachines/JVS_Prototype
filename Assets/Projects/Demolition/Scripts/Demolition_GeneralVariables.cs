@@ -30,8 +30,8 @@ namespace Demolition
             int index = PlayerPrefs.GetInt(SceneTimeKey, 1);
             return index switch
             {
-                0 => 30f,
-                1 => 150f,
+                0 => 60f,
+                1 => 60f,
                 2 => 90f,
                 _ => 300f
             };

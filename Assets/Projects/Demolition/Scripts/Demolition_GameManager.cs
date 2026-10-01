@@ -4,9 +4,11 @@ using System.Collections;
 using TMPro;
 using MenuSelection;
 using IndieKit;
+using System.Collections.Generic;
 
 namespace Demolition
-{
+{   
+
     public class Demolition_GameManager : MonoBehaviour
     {
         public static Demolition_GameManager Instance { get; private set; }
@@ -15,8 +17,24 @@ namespace Demolition
         public static int currentLevel = 1;
         public static int sessionScore = 0;
 
-        public  bool isDaytime = false;
+        public static bool isDaytime = false;
         public static float sessionGlobalTimer = -1f;
+
+        [Header("Jour / Nuit Debug")]
+        public bool overrideDaytime = false;
+        public bool debugIsDaytime = true;
+
+        [Header("Progression de Difficulté")]
+        [Tooltip("Nombre de scènes avant de passer à la difficulté suivante")]
+        [Min(1)]
+        public int scenesPerDifficulty = 2;
+
+        public static int CurrentDifficulty { get; private set; }
+
+        public bool overrideDifficulty = false;
+
+        [Range(1, 3)]
+        public int debugDifficulty = 1;
 
         [Header("Timers")]
         public float sceneDuration = 60f;
@@ -51,10 +69,21 @@ namespace Demolition
         private bool isRunning = false;
         private bool isGameOver = false;
 
+        
+
         [SerializeField] private Demolition_EnvironmentSpawner envSpawner;
         [SerializeField] private Demolition_ObstacleSpawner obstacleSpawner;
         [SerializeField] private Demolition_GuardSpawner guardSpawner;
 
+        private readonly List<Demolition_Fantome> activeFantomes = new List<Demolition_Fantome>();
+
+        public int GetDifficultyForLevel(int level)
+        {
+            if (overrideDifficulty)
+                return debugDifficulty;
+
+            return ((level - 1) / scenesPerDifficulty) + 1;
+        }
         public void ApplyDamageToDestructible(IndieKit.IDamageable target, float damage, Vector3 hitPoint)
         {
             if (target != null)
@@ -100,7 +129,7 @@ namespace Demolition
             EnsureSceneElements();
             LoadPreferences();
 
-            // Restaure le score et le timer de session s'ils existent
+            // Restauration de session
             score = sessionScore;
             sceneScore = 0;
 
@@ -112,27 +141,53 @@ namespace Demolition
             isGameOver = false;
 
             StartCoroutine(FadeIn());
-            UpdateUI();
-            SetupLevelEnvironment();
-            obstacleSpawner.SpawnForDifficulty(currentLevel, envSpawner.currentEnvInstance.GetComponent<Demolition_ObstacleAnchor>());
-            guardSpawner?.SpawnGuards(envSpawner.currentEnvInstance.GetComponent<Demolition_ObstacleAnchor>());
-        }
 
-        private void SetupLevelEnvironment()
-        {
-            if (envSpawner == null) return;
+            // 1. Calcul du Type de niveau
+            // Mise à jour de la variable statique
+            CurrentDifficulty = GetDifficultyForLevel(currentLevel);
 
-            isDaytime = !isDaytime;
-            if (isDaytime)
+            // 2. Alternance Jour / Nuit (pense bien à mettre "public static bool isDaytime" en haut de ta classe !)
+            if (overrideDaytime)
             {
-                envSpawner.ApplyEnvironment(envSpawner.dayEnvironment);
-                Debug.Log($"Demolition: Environnement JOUR appliqué pour le niveau {currentLevel}");
+                isDaytime = debugIsDaytime;
             }
             else
             {
-                envSpawner.ApplyEnvironment(envSpawner.nightEnvironment);
-                Debug.Log($"Demolition: Environnement NUIT appliqué pour le niveau {currentLevel}");
+                isDaytime = !isDaytime;
             }
+
+            // 3. Application de l'environnement et Spawns sécurisés
+            if (envSpawner != null)
+            {
+                EnvironmentData currentEnvData = isDaytime ? envSpawner.dayEnvironment : envSpawner.nightEnvironment;
+                
+                envSpawner.ApplyEnvironment(currentEnvData, CurrentDifficulty);
+
+                if (envSpawner.currentEnvInstance != null)
+                {
+                    var anchor = envSpawner.currentEnvInstance.GetComponent<Demolition_ObstacleAnchor>();
+                    obstacleSpawner?.SpawnForDifficulty(currentLevel, anchor);
+                    guardSpawner?.SpawnGuards(anchor, currentEnvData.robotsMaterial);
+                }
+            }
+            else
+            {
+                Debug.LogError("Demolition_GameManager : envSpawner n'est pas assigné !");
+            }
+
+            UpdateUI();
+        }
+
+        public void RegisterFantome(Demolition_Fantome fantome)
+        {
+            if (!activeFantomes.Contains(fantome))
+                activeFantomes.Add(fantome);
+        }
+
+        public void UnregisterFantome(Demolition_Fantome fantome)
+        {
+            if (activeFantomes.Contains(fantome))
+                activeFantomes.Remove(fantome);
         }
 
         private void LoadPreferences()
@@ -141,6 +196,13 @@ namespace Demolition
             if (sessionGlobalTimer <= 0f)
                 globalTimer = Demolition_GeneralVariables.GetGlobalTimeFromPrefs();
         }
+
+        public void TriggerWinOrReload()
+        {
+            StartCoroutine(FadeOutAndReload());
+        }
+
+
 
         private void EnsureSceneElements()
         {
@@ -187,33 +249,7 @@ namespace Demolition
             UpdateUI();
         }
 
-        public void OnFantomeKilled()
-        {
-            if (!isRunning || isGameOver) return;
 
-            // Vérifie s'il reste d'autres fantômes vivants dans la scène
-            StartCoroutine(CheckRemainingFantomesRoutine());
-        }
-
-        private IEnumerator CheckRemainingFantomesRoutine()
-        {
-            yield return new WaitForSeconds(0.5f);
-
-            var fantomes = FindObjectsOfType<Demolition_Fantome>();
-            int aliveCount = 0;
-            foreach (var f in fantomes)
-            {
-                if (f != null && f.GetHealthRatio() > 0)
-                    aliveCount++;
-            }
-
-            if (aliveCount == 0)
-            {
-                currentLevel++;
-                sessionScore = score;
-                EndScene("Tous les fantômes éliminés !");
-            }
-        }
 
         public void AddScore(int points, Vector3 pos)
         {
@@ -259,6 +295,7 @@ namespace Demolition
         private void EndScene(string reason)
         {
             if (isGameOver) return;
+
             isRunning = false;
 
             Debug.Log($"Demolition: Scene terminée - {reason} (Passage au Niveau {currentLevel})");
@@ -267,6 +304,9 @@ namespace Demolition
 
             if (sceneClearSound != null)
                 audioSource.PlayOneShot(sceneClearSound);
+
+            // Passe à la scène/niveau suivant
+            currentLevel++;
 
             StartCoroutine(FadeOutAndReload());
         }
@@ -313,7 +353,16 @@ namespace Demolition
 
         private IEnumerator FadeOutAndReload()
         {
-            yield return new WaitForSeconds(1f);
+            if(guardSpawner.AliveGuardCount == 0)
+            {
+                for (int i = 0; i < activeFantomes.Count; i++)
+                {
+                    if (activeFantomes[i] != null)
+                        activeFantomes[i].ReleaseAndFlyAway();
+                }
+                yield return new WaitForSeconds(3f);
+            }
+
 
             if (fadeCanvasGroup != null)
             {

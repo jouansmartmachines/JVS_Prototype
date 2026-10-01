@@ -5,84 +5,108 @@ namespace Demolition
 {
     public class Demolition_Fantome : MonoBehaviour
     {
-        [Header("Santé")]
-        public float hp = 100f;
-        public float maxHp = 100f;
+        [Header("Cinématique & Délais")]
+        [Tooltip("Pause (en secondes) après le 'pouf' avant que le fantôme ne commence à monter.")]
+        public float delayBeforeFly = 0.4f;
 
-        [Header("Dégâts")]
-        public float damageMultiplier = 1f;
-        public float minForceToDamage = 3f;
+        [Tooltip("Durée de l'accélération au démarrage pour un départ fluide.")]
+        public float accelerationDuration = 1f;
+
+        [Header("Envol & Zigzag")]
+        [Tooltip("Vitesse maximale d'ascension.")]
+        public float maxFlySpeed = 6f;
+
+        [Tooltip("Largeur de l'oscillation (amplitude du zigzag).")]
+        public float zigzagAmplitude = 1.2f;
+
+        [Tooltip("Vitesse de l'oscillation (fréquence du zigzag).")]
+        public float zigzagFrequency = 2.5f;
 
         [Header("Effets")]
-        public GameObject destructionEffect;
-        public AudioClip destructionSound;
-        public float fadeDuration = 1.5f;
+        public GameObject releaseEffect;
+        public AudioClip releaseSound;
 
-        private bool isDead = false;
+        private bool isFlyingAway = false;
         private Rigidbody rb;
         private Collider col;
-        private Renderer[] renderers;
+        private Renderer meshRenderer;
 
-        void Awake()
+        private void Awake()
         {
             rb = GetComponent<Rigidbody>();
             col = GetComponent<Collider>();
-            renderers = GetComponentsInChildren<Renderer>();
-            maxHp = hp;
+            meshRenderer = GetComponent<Renderer>();
         }
 
-        void OnCollisionEnter(Collision collision)
+        private void OnEnable()
         {
-            if (isDead) return;
-
-            float impactForce = collision.impulse.magnitude;
-            if (impactForce < minForceToDamage) return;
-
-            float damage = impactForce * damageMultiplier;
-            hp -= damage;
-
-            StartCoroutine(FlashDamage());
-
-            if (hp <= 0)
-                Die();
+            if (Demolition_GameManager.Instance != null)
+                Demolition_GameManager.Instance.RegisterFantome(this);
         }
 
-        private IEnumerator FlashDamage()
+        private void OnDisable()
         {
-            foreach (var rend in renderers)
-            {
-                if (rend != null)
-                    rend.material.color = Color.red;
-            }
-            yield return new WaitForSeconds(0.1f);
-            foreach (var rend in renderers)
-            {
-                if (rend != null)
-                    rend.material.color = Color.white;
-            }
+            if (Demolition_GameManager.Instance != null)
+                Demolition_GameManager.Instance.UnregisterFantome(this);
         }
 
-        private void Die()
+        /// <summary>
+        /// Libère le fantôme et lance la séquence cinématique d'envol.
+        /// </summary>
+        public void ReleaseAndFlyAway()
         {
-            if (isDead) return;
-            isDead = true;
+            if (isFlyingAway) return;
+            isFlyingAway = true;
 
-            if (destructionEffect != null)
-                Instantiate(destructionEffect, transform.position, Quaternion.identity);
+            StartCoroutine(FlyRoutine());
+        }
 
-            if (destructionSound != null && Demolition_GameManager.Instance != null)
-                Demolition_GameManager.Instance.PlaySfx(destructionSound);
-
+        private IEnumerator FlyRoutine()
+        {
+            // 1. Désactive la physique
             if (rb != null) rb.isKinematic = true;
             if (col != null) col.enabled = false;
 
-            if (Demolition_GameManager.Instance != null)
-                Demolition_GameManager.Instance.OnFantomeKilled();
-        }
+            // 2. Désactive le mesh de la cage
+            if (meshRenderer != null)
+                meshRenderer.enabled = false;
 
-        public float GetHealthRatio()
-        {
-            return Mathf.Clamp01(hp / maxHp);
+            // 3. Déclenche les effets ("pouf" + son)
+            if (releaseEffect != null)
+                Instantiate(releaseEffect, transform.position, Quaternion.identity);
+
+            if (releaseSound != null && Demolition_GameManager.Instance != null)
+                Demolition_GameManager.Instance.PlaySfx(releaseSound);
+
+            // 4. Pause cinématique : on laisse respirer l'effet "pouf"
+            yield return new WaitForSeconds(delayBeforeFly);
+
+            // 5. Envol progressif en zigzag avec courbe d'accélération
+            Vector3 basePosition = transform.position;
+            Vector3 flyDirectionRight = transform.right != Vector3.zero ? transform.right : Vector3.right;
+            
+            float flyTime = 0f;
+            float currentSpeed = 0f;
+
+            while (true)
+            {
+                flyTime += Time.deltaTime;
+
+                // Lissage de la vitesse au démarrage (Ease-In)
+                float speedPercent = Mathf.Clamp01(flyTime / accelerationDuration);
+                currentSpeed = Mathf.Lerp(0f, maxFlySpeed, speedPercent * speedPercent);
+
+                // Ascension verticale
+                basePosition += Vector3.up * (currentSpeed * Time.deltaTime);
+
+                // Mouvement latéral en zigzag (sinusoïde)
+                float horizontalOffset = Mathf.Sin(flyTime * zigzagFrequency) * zigzagAmplitude;
+
+                // Application de la position finale
+                transform.position = basePosition + (flyDirectionRight * horizontalOffset);
+
+                yield return null;
+            }
         }
     }
 }
