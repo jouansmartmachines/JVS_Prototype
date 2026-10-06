@@ -162,8 +162,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f814da5cb779f5f47a46c5efa01facc0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Demolition.Demolition_Fantome
-  cageObject: {fileID: 8334493386568013090}
-  flySpeed: 5
+  delayBeforeFly: 0.4
+  approachDuration: 0.8
+  minPauseDuration: 1
+  verticalOffset: -0.5
+  accelerationDuration: 1
+  animator: {fileID: 389741510740801556}
+  arrivedTrigger: IsArrived
+  gameEndedTrigger: IsGameEnded
+  gameEndedAnimSpeed: 0.5
+  maxFlySpeed: 6
+  zigzagAmplitude: 1.2
+  zigzagFrequency: 2.5
   releaseEffect: {fileID: 0}
   releaseSound: {fileID: 0}
 --- !u!54 &-1925444986986588754
@@ -295,6 +305,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: abdbffded6bd16644aec17211941b870, type: 3}
+--- !u!95 &389741510740801556 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 6922544943632920207, guid: abdbffded6bd16644aec17211941b870, type: 3}
+  m_PrefabInstance: {fileID: 7312000970014545563}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &8980740470178404218 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1862394319272542689, guid: abdbffded6bd16644aec17211941b870, type: 3}

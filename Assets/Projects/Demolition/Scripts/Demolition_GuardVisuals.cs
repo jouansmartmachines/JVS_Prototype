@@ -56,20 +56,30 @@ namespace Demolition
         public void SetGuardMovement(Vector3 worldDirection)
         {
             if(animator==null)return;
-
+            int reductionValue = 4;
             worldDirection.y=0f;
 
             if(worldDirection.sqrMagnitude<0.001f)
             {
                 animator.SetFloat("GuardX",0f);
                 animator.SetFloat("GuardY",0f);
+                animator.speed=1f;
                 return;
             }
 
-            Vector3 local=transform.InverseTransformDirection(worldDirection.normalized);
+            Vector3 local=transform.InverseTransformDirection(worldDirection.normalized)/reductionValue;
 
-            animator.SetFloat("GuardX",Mathf.Clamp(local.x,-1f,1f));
-            animator.SetFloat("GuardY",Mathf.Clamp(local.z,-1f,1f));
+            animator.SetFloat("GuardX",Mathf.Clamp(local.x,-1f/reductionValue,1f/reductionValue));
+            animator.SetFloat("GuardY",Mathf.Clamp(local.z,-1f/reductionValue,1f/reductionValue));
+
+            animator.speed=1f;
+        }
+        public void SetShieldUp(bool value)
+        {
+            if(animator==null)return;
+
+            animator.SetBool("ShieldUp",value);
+            Debug.Log($"SetShieldUp: {value}");
         }
 
         public void SetWalking(bool isWalking,float animSpeed=1f)
@@ -97,6 +107,7 @@ namespace Demolition
         public bool IsPlayingHit()
         {
             if(animator==null)return false;
+            animator.speed=1f;
 
             AnimatorStateInfo current=animator.GetCurrentAnimatorStateInfo(0);
 
@@ -121,7 +132,6 @@ namespace Demolition
             if(dialogueIndex<0f)
                 dialogueIndex=Random.Range(0f,1f);
 
-            animator.speed=1f;
             animator.SetFloat("DialogueIndex",dialogueIndex);
             animator.SetBool("StartDialogue",true);
 
@@ -139,7 +149,7 @@ namespace Demolition
         public bool IsPlayingDialogue()
         {
             if(animator==null)return false;
-
+            animator.speed=1f;
             return animator.GetCurrentAnimatorStateInfo(0).IsName("Dialogue");
         }
 

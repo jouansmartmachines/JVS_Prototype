@@ -360,7 +360,7 @@ namespace Demolition
                     if (activeFantomes[i] != null)
                         activeFantomes[i].ReleaseAndFlyAway();
                 }
-                yield return new WaitForSeconds(3f);
+                yield return new WaitForSeconds(4f);
             }
 
 

@@ -973,7 +973,8 @@ MonoBehaviour:
     fogEndDistance: 480
     levelScenes:
     - level: 1
-      scenes: []
+      scenes:
+      - {fileID: 5393306358296973353, guid: 7c5a75629875c3e4c88d3061dedb33f9, type: 3}
     - level: 2
       scenes: []
     - level: 3
@@ -996,7 +997,10 @@ MonoBehaviour:
     fogEndDistance: 280
     levelScenes:
     - level: 1
-      scenes: []
+      scenes:
+      - {fileID: 4755093259327311624, guid: fe448af6e3641094a87e767c0819e51d, type: 3}
+      - {fileID: 4602057976064884957, guid: 1542fbb7bdbd59749bbb6fb0a04e0b0e, type: 3}
+      - {fileID: 5393306358296973353, guid: 7c5a75629875c3e4c88d3061dedb33f9, type: 3}
     - level: 2
       scenes: []
     - level: 3
@@ -1210,7 +1214,7 @@ MonoBehaviour:
   overrideDaytime: 0
   debugIsDaytime: 0
   scenesPerDifficulty: 2
-  overrideDifficulty: 0
+  overrideDifficulty: 1
   debugDifficulty: 1
   sceneDuration: 300
   sceneTimer: 0

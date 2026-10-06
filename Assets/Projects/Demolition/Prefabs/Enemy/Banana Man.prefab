@@ -657,6 +657,12 @@ MonoBehaviour:
   guardInitialIdleDuration: 2.4
   guardMinMoveDelay: 2.07
   guardMaxMoveDelay: 3.67
+  hitFX:
+  - {fileID: 1257899049973296, guid: f569d19cf52ef304b82b58d4c05d9080, type: 3}
+  deathFX:
+  - {fileID: 1092234087039896, guid: cf722b6e02d16a54ba0956515d294567, type: 3}
+  - {fileID: 182876, guid: 3cf72e93da3bd384193fdf63d2ab80bd, type: 3}
+  fxSpawnPoint: {fileID: 2883495332727456092}
 --- !u!114 &9041883584963112577
 MonoBehaviour:
   m_ObjectHideFlags: 0

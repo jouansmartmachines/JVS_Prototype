@@ -63,6 +63,11 @@ namespace Demolition
         private float stateTimer = 0f, defensiveTimer = 0f, currentIdleDuration = 2f;
         private bool hasDialogued = false, previousStartPatrol = false;
 
+        [Header("FX")]
+        [SerializeField] private GameObject[] hitFX;
+        [SerializeField] private GameObject[] deathFX;
+        [SerializeField] private Transform fxSpawnPoint;
+
         void Awake()
         {
             rb = GetComponent<Rigidbody>();
@@ -258,6 +263,8 @@ namespace Demolition
             visuals.UpdateBattery(combat.MaxHits-combat.CurrentHits,combat.MaxHits);
 
             visuals.PlayHit();
+            foreach (GameObject fx in hitFX)
+                SpawnFX(fx);
             StartCoroutine(ApplyHitRecoil());
 
             if(isDead)
@@ -314,21 +321,29 @@ namespace Demolition
 
         private void ActivateShield()
         {
-            //if(shield==null||currentState!=GuardState.DefensiveGuard)return;
+            if(shield==null)return;
+
             shieldActive=true;
             shieldTimer=shieldDuration;
+
             shield.SetActive(true);
+            visuals.SetShieldUp(true);
         }
 
         private void DestroyShield()
         {
             if(!shieldActive)return;
+
             shieldActive=false;
             shieldTimer=0f;
-            if(shield!=null)shield.SetActive(false);
+
+            if(shield!=null)
+                shield.SetActive(false);
+
+            visuals.SetShieldUp(false);
+
             ScheduleNextShield();
         }
-
         private void ScheduleGuardMove()
         {
             guardMoving=false;
@@ -444,7 +459,29 @@ namespace Demolition
         {
             currentState = GuardState.Dead;
             OnGuardDestroyed?.Invoke(this);
+            foreach (GameObject fx in deathFX)
+            {
+                SpawnFX(fx,20);
+            }
             Destroy(gameObject);
+        }
+        
+        private void SpawnFX(GameObject fx, int score = 0)
+        {
+            if (fx == null) return;
+
+            Vector3 pos = fxSpawnPoint != null
+                ? fxSpawnPoint.position
+                : transform.position + Vector3.up;
+
+            GameObject instance = Instantiate(fx, pos, Quaternion.identity);
+
+            ScoreFX scoreFX = instance.GetComponent<ScoreFX>();
+
+            if (scoreFX != null)
+                scoreFX.SetScore(score);
+
+            Destroy(instance, 3f);
         }
 
         void OnCollisionStay(Collision c)

@@ -473,6 +473,8 @@ MonoBehaviour:
   spawnScale: {x: 1, y: 1, z: 1}
   spacingX: 5
   spacingZ: 2
+  moveMiddleGuardAside: 0
+  middleGuardAsideSpacing: 2
   obstaclePrefabs:
   - {fileID: 6523533794800431498}
   anchorCamera: {fileID: 8354057842149949770}
@@ -2826,7 +2828,7 @@ Transform:
   m_GameObject: {fileID: 6523533794800431498}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0.258819, z: 0, w: 0.9659259}
-  m_LocalPosition: {x: -82.54, y: 100.057, z: 83.18}
+  m_LocalPosition: {x: -82.54, y: 99.836, z: 83.18}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
