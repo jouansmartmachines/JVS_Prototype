@@ -24,7 +24,7 @@ public enum GameScoreBoard
 
     Monstres,
     Nettoyage,
-    Demolition,
+    Freethespirit,
     Dame,
     Sparks
 }

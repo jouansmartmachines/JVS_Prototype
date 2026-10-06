@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine.UI;
 using TMPro;
-using Demolition;
+using Freethespirit;
 using Object = UnityEngine.Object;
 
 public class JVS_SetupEditor : EditorWindow
@@ -21,8 +21,8 @@ public class JVS_SetupEditor : EditorWindow
     }
 
     // ── Tab management ────────────────────────────────────────────
-    private enum ProjectTab { Demolition, Dame, Sparks }
-    private ProjectTab _activeTab = ProjectTab.Demolition;
+    private enum ProjectTab { Freethespirit, Dame, Sparks }
+    private ProjectTab _activeTab = ProjectTab.Freethespirit;
     private Vector2 _scrollPos;
 
     // ── Colors / styling ──────────────────────────────────────────
@@ -103,11 +103,11 @@ public class JVS_SetupEditor : EditorWindow
         return false;
     }
 
-    // ── Demolition checks (tout fait) ──────────────────────────────
-    private static bool DemolitionGameSceneReady() => true;
-    private static bool DemolitionAccueilReady() => true;
-    private static bool DemolitionMenuReady() => true;
-    private static bool DemolitionScoreReady() => true;
+    // ── Freethespirit checks (tout fait) ──────────────────────────────
+    private static bool FreethespiritGameSceneReady() => true;
+    private static bool FreethespiritAccueilReady() => true;
+    private static bool FreethespiritMenuReady() => true;
+    private static bool FreethespiritScoreReady() => true;
 
     // ── Dame checks (tout fait) ────────────────────────────────────
     private static bool DameGameSceneReady() => true;
@@ -138,43 +138,43 @@ public class JVS_SetupEditor : EditorWindow
     // ── Init steps ────────────────────────────────────────────────
     private void InitializeSteps()
     {
-        _steps[ProjectTab.Demolition] = new List<SetupStep>
+        _steps[ProjectTab.Freethespirit] = new List<SetupStep>
         {
             new SetupStep
             {
                 label = "1. GameScene — Background, Sol, Canvas UI",
-                scenePath = "Assets/Projects/Demolition/Demolition_Scenes/GameScene_Demolition.unity",
-                isDone = DemolitionGameSceneReady,
-                action = Demolition_SetupGameScene,
+                scenePath = "Assets/Projects/Freethespirit/Freethespirit_Scenes/GameScene_Freethespirit.unity",
+                isDone = FreethespiritGameSceneReady,
+                action = Freethespirit_SetupGameScene,
             },
             new SetupStep
             {
                 label = "2. Accueil — Background",
-                scenePath = "Assets/Projects/Demolition/Demolition_Scenes/Accueil_Demolition.unity",
-                isDone = DemolitionAccueilReady,
-                action = Demolition_SetupAccueil,
+                scenePath = "Assets/Projects/Freethespirit/Freethespirit_Scenes/Accueil_Freethespirit.unity",
+                isDone = FreethespiritAccueilReady,
+                action = Freethespirit_SetupAccueil,
             },
             new SetupStep
             {
                 label = "3. Menu — Background + UI options",
-                scenePath = "Assets/Projects/Demolition/Demolition_Scenes/Menu_Demolition.unity",
-                isDone = DemolitionMenuReady,
-                action = Demolition_SetupMenu,
+                scenePath = "Assets/Projects/Freethespirit/Freethespirit_Scenes/Menu_Freethespirit.unity",
+                isDone = FreethespiritMenuReady,
+                action = Freethespirit_SetupMenu,
             },
             new SetupStep
             {
                 label = "4. Score — Background",
-                scenePath = "Assets/Projects/Demolition/Demolition_Scenes/Score_Demolition.unity",
-                isDone = DemolitionScoreReady,
-                action = Demolition_SetupScore,
+                scenePath = "Assets/Projects/Freethespirit/Freethespirit_Scenes/Score_Freethespirit.unity",
+                isDone = FreethespiritScoreReady,
+                action = Freethespirit_SetupScore,
                 isLast = true,
             },
             new SetupStep
             {
                 label = "★ TOUT CONFIGURER — Assets + 4 scènes",
                 scenePath = null,
-                isDone = () => DemolitionGameSceneReady() && DemolitionAccueilReady() && DemolitionMenuReady() && DemolitionScoreReady(),
-                action = Demolition_ConfigTout,
+                isDone = () => FreethespiritGameSceneReady() && FreethespiritAccueilReady() && FreethespiritMenuReady() && FreethespiritScoreReady(),
+                action = Freethespirit_ConfigTout,
             },
         };
 
@@ -249,7 +249,7 @@ public class JVS_SetupEditor : EditorWindow
         {
             var isActive = _activeTab == tab;
             var bgColor = isActive ? ColorTabActive : ColorTabInactive;
-            var icon = tab == ProjectTab.Demolition ? "💥" : tab == ProjectTab.Dame ? "👑" : "✨";
+            var icon = tab == ProjectTab.Freethespirit ? "💥" : tab == ProjectTab.Dame ? "👑" : "✨";
 
             GUI.backgroundColor = bgColor;
             if (GUILayout.Button($"{icon}  {tab}", GUILayout.Height(32), GUILayout.MinWidth(120)))
@@ -366,11 +366,11 @@ public class JVS_SetupEditor : EditorWindow
     //  ACTIONS VIDES — tout est déjà configuré
     // ════════════════════════════════════════════════════════════════
 
-    private static void Demolition_SetupGameScene() { }
-    private static void Demolition_SetupAccueil() { }
-    private static void Demolition_SetupMenu() { }
-    private static void Demolition_SetupScore() { }
-    private static void Demolition_ConfigTout() { }
+    private static void Freethespirit_SetupGameScene() { }
+    private static void Freethespirit_SetupAccueil() { }
+    private static void Freethespirit_SetupMenu() { }
+    private static void Freethespirit_SetupScore() { }
+    private static void Freethespirit_ConfigTout() { }
     private static void Dame_SetupGameScene() { }
     private static void Dame_SetupAccueil() { }
     private static void Dame_SetupMenu() { }
@@ -387,7 +387,7 @@ public class JVS_SetupEditor : EditorWindow
     //  SHARED HELPERS — utilitaires réutilisables
     // ════════════════════════════════════════════════════════════════
 
-    private static string _demoBase = "Assets/Projects/Demolition";
+    private static string _demoBase = "Assets/Projects/Freethespirit";
     private static string _demoPrefab => _demoBase + "/Resources/Prefabs";
     private static string _demoTex => _demoBase + "/Resources/Textures";
     private static string _demoSound => _demoBase + "/Resources/Sounds";
@@ -500,7 +500,7 @@ public class JVS_SetupEditor : EditorWindow
     {
         var ground = GameObject.Find("Ground");
         if (ground == null)
-            ground = new GameObject("Ground", typeof(BoxCollider2D), typeof(SpriteRenderer), typeof(Demolition_GroundScroll));
+            ground = new GameObject("Ground", typeof(BoxCollider2D), typeof(SpriteRenderer), typeof(Freethespirit_GroundScroll));
 
         ground.transform.position = new Vector3(0, -5.2f, 0);
         ground.transform.localScale = Vector3.one;
@@ -520,8 +520,8 @@ public class JVS_SetupEditor : EditorWindow
         var solSprite = LoadSprite(_demoTex, "sol");
         if (solSprite != null) groundSr.sprite = solSprite;
 
-        if (ground.GetComponent<Demolition_GroundScroll>() == null)
-            ground.AddComponent<Demolition_GroundScroll>();
+        if (ground.GetComponent<Freethespirit_GroundScroll>() == null)
+            ground.AddComponent<Freethespirit_GroundScroll>();
     }
 
     private static void SetupGameSceneCanvas()
@@ -594,7 +594,7 @@ public class JVS_SetupEditor : EditorWindow
         }
     }
 
-    private static void SetupDemolitionMenuUI()
+    private static void SetupFreethespiritMenuUI()
     {
         var canvas = Object.FindFirstObjectByType<Canvas>();
         if (canvas == null) return;
@@ -804,7 +804,7 @@ public class JVS_SetupEditor : EditorWindow
 
     private static void CreatePopupTextPrefab()
     {
-        var go = new GameObject("PopupText", typeof(TextMeshPro), typeof(Demolition_PopupText));
+        var go = new GameObject("PopupText", typeof(TextMeshPro), typeof(Freethespirit_PopupText));
         var tmp = go.GetComponent<TextMeshPro>();
         tmp.fontSize = 4f;
         tmp.color = Color.yellow;
